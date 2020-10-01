@@ -1,0 +1,89 @@
+SUBROUTINE FIND_MASS()
+USE PRECISION
+USE PROBLEM_DEF
+USE LS_DATA
+USE VOF_DATA
+USE FLUID_PROPERTIES
+IMPLICIT NONE
+INTEGER :: I,J,K
+CHARACTER(2) :: MET,GRI
+
+ CALL CELL_FACE_VELOCITY()
+
+ MASS_w = 0.0_DP
+ mass_v = 0.0_dp
+ mass_u = 0.0_dp
+
+ MASS_LS = 0.0_DP
+ MASS_VOF = 0.0_DP
+
+ VOL_LS = 0.0_DP
+ VOL_VOF = 0.0_DP
+ 
+ CALL HEAVY_F(PHI)
+ 
+ !$OMP PARALLEL DO REDUCTION(+:MASS_LS,MASS_VOF,VOL_LS,VOL_VOF,MASS_w, mass_v, mass_u)
+ DO K = 1, NODE_Z
+ DO J = 1, NODE_Y
+ DO I = 1, NODE_X
+ 
+  VOL_LS = VOL_LS + HEAVY(I,J,K)
+  ! VOL_VOF = VOL_VOF + VOF(I,J,K)
+ 
+  MASS_LS = MASS_LS + HEAVY(I,J,K)*(HEAVY(I,J,K) + RATIO_RHO*(1.0-HEAVY(I,J,K)))
+  ! MASS_VOF = MASS_VOF + VOF(I,J,K)*(VOF(I,J,K) + RATIO_RHO*(1.0-VOF(I,J,K)))
+ 
+  ! MASS_w = MASS_w + HEAVY(I,J,K)*WH(I,J,K)
+  ! mass_v = mass_v + heavy(i,j,k)*vh(i,j,k)
+  ! mass_u = mass_u + heavy(i,j,k)*uh(i,j,k)
+
+ END DO
+ END DO
+ END DO
+ !$OMP END PARALLEL DO
+ 
+ EM_LS_A = EM_LS_A + ABS(1.0-MASS_LS/IMASS_LS)*DT/TIME_TO_STOP
+ ! EM_VOF_A = EM_VOF_A + ABS(1.0-MASS_VOF/IMASS_vof)*DT/TIME_TO_STOP
+
+ EM_MAX = max( EM_MAX, ABS(1.0-MASS_LS/IMASS_LS) )
+ 
+ ! mass_u = mass_u / vol_ls
+ ! mass_v = mass_v / vol_ls
+ ! MASS_w = MASS_w / VOL_LS 
+ 
+ IF( REC_MASS==0 )THEN
+ 
+   WRITE(MET,'(I2.2)')ITER_CNT
+   WRITE(GRI,'(I2.2)')GRID_CNT
+ 
+   IMASS_LS = MASS_LS
+   IMASS_VOF = MASS_VOF
+
+   IVOL_LS = VOL_LS
+   IVOL_VOF = VOL_VOF
+
+   CLOSE(11)
+   CLOSE(12)
+
+   OPEN(UNIT=11,FILE='MASS VOL LOSS_'//Met//'_'//GRI//'_.PLT')
+   !OPEN(UNIT=11,FILE='MASS LOSS_'//MET//'.PLT')
+   !OPEN(UNIT=11,FILE='MASS LOSS.PLT')
+   WRITE(11,*)'VARIABLES = "T" "LOSS OF MASS(%)" "LOSS OF VOL(%)" '
+
+   !OPEN(UNIT=12,FILE='VOL LOSS_'//Met//'_'//GRI//'_.PLT')
+   !OPEN(UNIT=12,FILE='VOL LOSS_'//MET//'.PLT')
+   !OPEN(UNIT=12,FILE='VOL LOSS.PLT')
+   !WRITE(12,*)'VARIABLES = "T" "LOSS OF LS(%)" "LOSS OF VOF(%)" '
+
+   REC_MASS = 1
+
+   EM_LS_A  = 0.0_DP
+   EM_VOF_A = 0.0_DP
+   EM_MAX = 0.0_DP
+
+ END IF
+ 
+  WRITE(11,*)TIME,(1.0-MASS_LS/IMASS_LS)*100,(1.0-VOL_LS/IVOL_LS)*100
+  !WRITE(12,*)TIME,(1.0-VOL_LS/IVOL_LS)*100,(1.0-VOL_VOF/IVOL_VOF)*100 
+
+END SUBROUTINE

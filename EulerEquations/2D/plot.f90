@@ -1,0 +1,50 @@
+SUBROUTINE PLOT(ITER,nam)
+USE DAT 
+IMPLICIT NONE
+INTEGER :: ITER
+CHARACTER(3) :: NAME
+Character(*) :: nam 
+
+	write(name,'(i3.3)')iter
+	
+	OPEN(UNIT=99,FILE=trim(nam)//'_'//name//'.vtk')
+
+	WRITE(99,'(A)')"# vtk DataFile Version 3.0"
+	write(99,'(A)')"vtk TEST"
+	WRITE(99,'(A)')"ASCII"
+	WRITE(99,'(A)')"DATASET STRUCTURED_POINTS"
+	WRITE(99,'(A,3I6)')"DIMENSIONS",N,M,1
+	WRITE(99,'(A,3ES15.4)')"SPACING",DX,DY,0.0D0
+	WRITE(99,'(A,3ES15.4)')"ORIGIN",XSTART,YSTART,0.0D0
+	WRITE(99,'(A,I)')"POINT_DATA",N*M
+	
+	CALL PLOT_VTK_SCALAR(99,"RHO",RHO)
+	
+	CLOSE(99)
+	
+	ITER=ITER+1
+ 
+end subroutine
+
+SUBROUTINE PLOT_VTK_SCALAR(ID,NAME,X)
+USE DAT, ONLY : M, N
+IMPLICIT NONE
+INTEGER :: I,J,ID
+CHARACTER(*) :: NAME
+REAL(8),DIMENSION(-2:N+3,-2:M+3) :: X
+
+  WRITE(ID,'(A)')"SCALARS "//NAME//" FLOAT"
+  WRITE(ID,'(A)')"LOOKUP_TABLE DEFAULT"
+  
+  DO J = 1, M
+  DO I = 1, N
+	WRITE(ID,'(ES15.4)')X(I,J)
+  ENDDO
+  ENDDO
+  
+  write(ID,*)""
+  
+END SUBROUTINE
+
+
+	

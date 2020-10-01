@@ -1,0 +1,37 @@
+SUBROUTINE RK3_E(BTN)
+USE DAT
+IMPLICIT NONE
+INTEGER :: BTN
+
+  !$OMP PARALLEL DO 
+  DO I = -2, N+3
+	F(I) = U_OLD(I)*( E(i)+P(I) )
+  END DO 
+  !$OMP END PARALLEL DO 
+  
+  CALL SORCE(S0,E,BTN)
+  CALL RK3_1(E)
+  CALL BC(E)
+  
+  !$OMP PARALLEL DO 
+  DO I = -2, N+3
+	F(I) = U_OLD(I)*( E(i)+P(I) )
+  END DO 
+  !$OMP END PARALLEL DO 
+  
+  CALL SORCE(S1,E,BTN)
+  CALL RK3_2(E)
+  CALL BC(E)
+  
+  !$OMP PARALLEL DO 
+  DO I = -2, N+3
+	F(I) = U_OLD(I)*( E(i)+P(I) )
+  END DO 
+  !$OMP END PARALLEL DO 
+  
+  CALL SORCE(S2,E,BTN)
+  CALL RK3_3(E)
+  CALL BC(E)
+  
+
+END SUBROUTINE
