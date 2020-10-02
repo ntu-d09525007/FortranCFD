@@ -122,6 +122,7 @@ CHARACTER(100) :: NAME_OF_FILE
     
     call bc(p%loc%phi%now)
     call bc(p%loc%vof%now)
+    call bc(p%loc%solid%now)
     call velbc(p%loc%vel%x%now,p%loc%vel%y%now,p%loc%vel%z%now)
     
     write(*,*)"Init data finish"

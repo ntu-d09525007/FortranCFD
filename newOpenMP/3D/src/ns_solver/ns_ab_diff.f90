@@ -2,7 +2,7 @@ subroutine ns_ab_diff_sec
 implicit none
 
     call sec_part1
-    !call sec_part2
+    call sec_part2
     call sec_part3
 
 end subroutine
@@ -64,7 +64,7 @@ end do
 call velbc(p%loc%vel%x%old,p%loc%vel%y%old,p%loc%vel%z%old)
 
 call uccd_part1
-!call uccd_part2
+call uccd_part2
 call uccd_part3
 
 end subroutine
