@@ -5,19 +5,19 @@ ooo	Number of threads
 ooo	Plot split (modify if segmentation fault occur when plotting)
 2
 ooo	Name of the problem 
-40_wetbed
+50_PF
 ooo	Cells per unit length 
-40
+50
 ooo	Number of ghost cell
 3
 ooo	Range of domain in X direction
-0.0		10.0
+0.0		3.0
 ooo	Range of domain in Y direction
-0.0		1.0
+0.0		2.0
 ooo	Range of domain in Z direction
-0.0		1.5
+0.0		1.0
 ooo	Time to stop / plot
-5.0		0.1
+10.0		0.5
 ooo	Crount number ( advection / redistance )
 0.01		0.25
 ooo	PPE iteration ( tolerance / w1 / w2 / valve )
@@ -27,7 +27,7 @@ ooo	SRK6 iteration ( tolerance / w )
 ooo	Level set interface width 
 1.5
 ooo	Problem parameters ( Prescribed / L / L+U / L+T / U+T )
-2
+4
 ooo	Density / Viscosity of fluid 1 ( phi > 0 )
 995.6		0.0007972
 ooo	Density / Viscosity of fluid 2 ( phi < 0 )
@@ -39,7 +39,7 @@ ooo	Gravity / Using ?
 ooo	Gravity direction ( no need normalize)
 0.0	    0.0	    	-1.0
 ooo	Characteristic Length, Velocity, Time
-0.15		2.0		0
+1.0		2.0		1.0
 ooo	Dimensionless parameters ( Re, Fr, We )  !!! We should not be zero
 1000.0		0.4096		1.0
 ooo	Density / Viscosity ratio of fluid 1, 2

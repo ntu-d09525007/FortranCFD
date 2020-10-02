@@ -8,37 +8,37 @@ integer :: i,j
     do j = p%loc%js, p%loc%je
     do i = p%loc%is, p%loc%ie
     
-        p%loc%coe%r(i,j,k) = 2.0d0 / (p%loc%rho%now(i,j,k)+p%loc%rho%now(i+1,j,k))
-        p%loc%coe%l(i,j,k) = 2.0d0 / (p%loc%rho%now(i,j,k)+p%loc%rho%now(i-1,j,k))
-        p%loc%coe%f(i,j,k) = 2.0d0 / (p%loc%rho%now(i,j,k)+p%loc%rho%now(i,j+1,k))
-        p%loc%coe%b(i,j,k) = 2.0d0 / (p%loc%rho%now(i,j,k)+p%loc%rho%now(i,j-1,k))
+        p%loc%coe%r(i,j) = 2.0d0 / (p%loc%rho%now(i,j)+p%loc%rho%now(i+1,j))
+        p%loc%coe%l(i,j) = 2.0d0 / (p%loc%rho%now(i,j)+p%loc%rho%now(i-1,j))
+        p%loc%coe%f(i,j) = 2.0d0 / (p%loc%rho%now(i,j)+p%loc%rho%now(i,j+1))
+        p%loc%coe%b(i,j) = 2.0d0 / (p%loc%rho%now(i,j)+p%loc%rho%now(i,j-1))
         
-        p%loc%coe%r(i,j,k) = p%loc%coe%r(i,j,k) / p%glb%dx**2.0d0
-        p%loc%coe%l(i,j,k) = p%loc%coe%l(i,j,k) / p%glb%dx**2.0d0
-        p%loc%coe%f(i,j,k) = p%loc%coe%f(i,j,k) / p%glb%dy**2.0d0
-        p%loc%coe%b(i,j,k) = p%loc%coe%b(i,j,k) / p%glb%dy**2.0d0
+        p%loc%coe%r(i,j) = p%loc%coe%r(i,j) / p%glb%dx**2.0d0
+        p%loc%coe%l(i,j) = p%loc%coe%l(i,j) / p%glb%dx**2.0d0
+        p%loc%coe%f(i,j) = p%loc%coe%f(i,j) / p%glb%dy**2.0d0
+        p%loc%coe%b(i,j) = p%loc%coe%b(i,j) / p%glb%dy**2.0d0
         
-        p%loc%coe%c(i,j,k) = - ( p%loc%coe%r(i,j,k) + p%loc%coe%l(i,j,k) + &
-                                &p%loc%coe%f(i,j,k) + p%loc%coe%b(i,j,k) )
+        p%loc%coe%c(i,j) = - ( p%loc%coe%r(i,j) + p%loc%coe%l(i,j) + &
+                                &p%loc%coe%f(i,j) + p%loc%coe%b(i,j) )
                         
         if( i==1 )then
-            p%loc%coe%c(i,j,k)=p%loc%coe%c(i,j,k)+p%loc%coe%l(i,j,k)
-            p%loc%coe%l(i,j,k)=0.0d0
+            p%loc%coe%c(i,j)=p%loc%coe%c(i,j)+p%loc%coe%l(i,j)
+            p%loc%coe%l(i,j)=0.0d0
         endif
         
         if( i==p%glb%node_x )then
-            p%loc%coe%c(i,j,k)=p%loc%coe%c(i,j,k)+p%loc%coe%r(i,j,k)
-            p%loc%coe%r(i,j,k)=0.0d0
+            p%loc%coe%c(i,j)=p%loc%coe%c(i,j)+p%loc%coe%r(i,j)
+            p%loc%coe%r(i,j)=0.0d0
         endif
         
         if( j==1 )then
-            p%loc%coe%c(i,j,k)=p%loc%coe%c(i,j,k)+p%loc%coe%b(i,j,k)
-            p%loc%coe%b(i,j,k)=0.0d0
+            p%loc%coe%c(i,j)=p%loc%coe%c(i,j)+p%loc%coe%b(i,j)
+            p%loc%coe%b(i,j)=0.0d0
         endif
         
         if( j==p%glb%node_y )then
-            p%loc%coe%c(i,j,k)=p%loc%coe%c(i,j,k)+p%loc%coe%f(i,j,k)
-            p%loc%coe%f(i,j,k)=0.0d0
+            p%loc%coe%c(i,j)=p%loc%coe%c(i,j)+p%loc%coe%f(i,j)
+            p%loc%coe%f(i,j)=0.0d0
         endif
         
     end do
@@ -61,8 +61,8 @@ real(8) :: sump, err, w, pcal, tol
     do j = p%loc%js, p%loc%je
     do i = p%loc%is, p%loc%ie
     
-        p%loc%coe%src(i,j,k) = ( ( p%loc%vel%x%now(i,j,k) - p%loc%vel%x%now(i-1,j,k) ) / p%glb%dx + &
-                                 ( p%loc%vel%y%now(i,j,k) - p%loc%vel%y%now(i,j-1,k) ) / p%glb%dy ) / p%glb%dt
+        p%loc%coe%src(i,j) = ( ( p%loc%vel%x%now(i,j) - p%loc%vel%x%now(i-1,j) ) / p%glb%dx + &
+                                 ( p%loc%vel%y%now(i,j) - p%loc%vel%y%now(i,j-1) ) / p%glb%dy ) / p%glb%dt
                                                 
     end do
     end do 
@@ -78,14 +78,14 @@ do
     do j = p%loc%js, p%loc%je
     do i = p%loc%is, p%loc%ie
     
-        p%loc%p%tmp(i,j,k) = p%loc%p%now(i,j,k)
+        p%loc%p%tmp(i,j) = p%loc%p%now(i,j)
         
-        p%loc%p%now(i,j,k) = p%loc%coe%src(i,j,k) - p%loc%coe%r(i,j,k)*p%loc%p%now(i+1,j,k) &
-                                              &   - p%loc%coe%l(i,j,k)*p%loc%p%now(i-1,j,k) &
-                                              &   - p%loc%coe%f(i,j,k)*p%loc%p%now(i,j+1,k) &
-                                              &   - p%loc%coe%b(i,j,k)*p%loc%p%now(i,j-1,k)
+        p%loc%p%now(i,j) = p%loc%coe%src(i,j) - p%loc%coe%r(i,j)*p%loc%p%now(i+1,j) &
+                                          &   - p%loc%coe%l(i,j)*p%loc%p%now(i-1,j) &
+                                          &   - p%loc%coe%f(i,j)*p%loc%p%now(i,j+1) &
+                                          &   - p%loc%coe%b(i,j)*p%loc%p%now(i,j-1)
                                                         
-        p%loc%p%now(i,j,k) = p%loc%p%now(i,j,k) / p%loc%coe%c(i,j,k)  
+        p%loc%p%now(i,j) = p%loc%p%now(i,j) / p%loc%coe%c(i,j)  
 
     end do
     end do
@@ -96,24 +96,24 @@ do
     do j = p%loc%js, p%loc%je
     do i = p%loc%is, p%loc%ie
            
-        sump = sump + p%loc%p%now(i,j,k)
+        sump = sump + p%loc%p%now(i,j)
 
     end do
     end do
     !$omp end parallel do
     
-    sump = sump / ( p%glb%node_x * p%glb%node_y * p%glb%node_z )
+    sump = sump / ( p%glb%node_x * p%glb%node_y )
 
     err=0.0d0    
     !$omp parallel do collapse(2), reduction(max:err)  
     do j = p%loc%js, p%loc%je
     do i = p%loc%is, p%loc%ie
         
-        p%loc%p%now(i,j,k) = p%loc%p%now(i,j,k) - sump
+        p%loc%p%now(i,j) = p%loc%p%now(i,j) - sump
 
-        p%loc%p%now(i,j,k) = w * p%loc%p%now(i,j,k) + (1.0d0-w)*p%loc%p%tmp(i,j,k)
+        p%loc%p%now(i,j) = w * p%loc%p%now(i,j) + (1.0d0-w)*p%loc%p%tmp(i,j)
 
-        err = max( err,abs(p%loc%p%now(i,j,k)-p%loc%p%tmp(i,j,k)) )
+        err = max( err,abs(p%loc%p%now(i,j)-p%loc%p%tmp(i,j)) )
 
     end do
     end do
@@ -150,24 +150,22 @@ implicit none
 integer :: i,j
 real(8) :: px,py,rho,ux,vy
 
-    !$omp parallel do collapse(3), private(px,py,rho)   
-    do k = p%loc%ks, p%loc%ke
+    !$omp parallel do collapse(2), private(px,py,rho)   
     do j = p%loc%js, p%loc%je
     do i = p%loc%is, p%loc%ie
         
-        rho = (p%loc%rho%now(i,j,k)+p%loc%rho%now(i+1,j,k))/2.0d0
-        px  = (p%loc%p%now(i+1,j,k)-p%loc%p%now(i,j,k)) / p%glb%dx  
-        p%loc%vel%x%now(i,j,k) = p%loc%vel%x%now(i,j,k) - p%glb%dt*px/rho
+        rho = (p%loc%rho%now(i,j)+p%loc%rho%now(i+1,j))/2.0d0
+        px  = (p%loc%p%now(i+1,j)-p%loc%p%now(i,j)) / p%glb%dx  
+        p%loc%vel%x%now(i,j) = p%loc%vel%x%now(i,j) - p%glb%dt*px/rho
         
-        rho = (p%loc%rho%now(i,j,k)+p%loc%rho%now(i,j+1,k))/2.0d0
-        py  = (p%loc%p%now(i,j+1,k)-p%loc%p%now(i,j,k)) / p%glb%dy        
-        p%loc%vel%y%now(i,j,k) = p%loc%vel%y%now(i,j,k) - p%glb%dt*py/rho
+        rho = (p%loc%rho%now(i,j)+p%loc%rho%now(i,j+1))/2.0d0
+        py  = (p%loc%p%now(i,j+1)-p%loc%p%now(i,j)) / p%glb%dy        
+        p%loc%vel%y%now(i,j) = p%loc%vel%y%now(i,j) - p%glb%dt*py/rho
         
-    end do
     end do
     end do
     !$omp end parallel do
 
-    call velbc(p%loc%vel%x%now,p%loc%vel%y%now,p%loc%vel%z%now)
+    call velbc(p%loc%vel%x%now,p%loc%vel%y%now)
   
 end subroutine

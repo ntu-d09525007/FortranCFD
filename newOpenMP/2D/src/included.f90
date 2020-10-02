@@ -13,7 +13,6 @@ include './interface_solver/others_normals.f90'
 include './ns_solver/admas_bashforth_solver.f90'
 include './ns_solver/ns_solvers.f90'
 include './ns_solver/ns_ppe_solver.f90'
-include './ns_solver/ns_split_solver.f90'
 include './ns_solver/ns_ab_diff.f90'
 include './ns_solver/ns_ab_adv.f90'
 

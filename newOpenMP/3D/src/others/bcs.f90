@@ -49,6 +49,27 @@ real(8),dimension(p%loc%is-p%glb%ghc:p%loc%ie+p%glb%ghc,&
                   p%loc%js-p%glb%ghc:p%loc%je+p%glb%ghc,&
                   p%loc%ks-p%glb%ghc:p%loc%ke+p%glb%ghc) :: u,v,w
 integer :: i,j,k
+real(8) :: solid
+
+!$omp parallel do collapse(3), private(solid)
+do k = p%loc%ks, p%loc%ke
+do j = p%loc%js, p%loc%je
+do i = p%loc%is, p%loc%ie
+
+    solid = 0.5d0*( p%loc%solid%now(i,j,k)+p%loc%solid%now(i+1,j,k) )
+    u(i,j,k) = (1.0-solid)*u(i,j,k)
+
+    solid = 0.5d0*( p%loc%solid%now(i,j,k)+p%loc%solid%now(i,j+1,k) )
+    v(i,j,k) = (1.0-solid)*v(i,j,k)
+
+    solid = 0.5d0*( p%loc%solid%now(i,j,k)+p%loc%solid%now(i,j,k+1) )
+    w(i,j,k) = (1.0-solid)*w(i,j,k)
+
+enddo
+enddo
+enddo
+!$omp end parallel do
+
 !==========================================
 !  X-direction velocity boundary condition
 !==========================================
@@ -264,9 +285,9 @@ real(8),dimension(p%loc%is-p%glb%ghc:p%loc%ie+p%glb%ghc,&
                   p%loc%ks-p%glb%ghc:p%loc%ke+p%glb%ghc) :: u,v,w
 integer :: i,j,k
 
-    !==========================================
-    !  X-direction velocity boundary condition
-    !==========================================
+!==========================================
+!  X-direction velocity boundary condition
+!==========================================
 
 if( p%glb%ubc(1) == 1 )then
 

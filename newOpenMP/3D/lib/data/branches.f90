@@ -41,7 +41,7 @@ type job
 integer :: is, ie, js, je, ks, ke
 type(dum_matrices)  :: coe
 type(time_recorded) :: heavy, delta, grad, sign
-type(time_recorded) :: phi, p, rho, mu, vof
+type(time_recorded) :: phi, p, rho, mu, vof, solid
 type(time_recorded_derivatives) :: normals
 type(time_recorded_vec) :: vel, nvel, velsrc
 !-------------------------------------------
@@ -129,6 +129,9 @@ call p%vort_adv%alloc(is,ie,js,je,ks,ke)
 call p%vort_tws%alloc(is,ie,js,je,ks,ke)
 call p%vort_baro%alloc(is,ie,js,je,ks,ke)
 call p%vort_visc%alloc(is,ie,js,je,ks,ke)
+
+! ibm
+call p%solid%alloc(is,ie,js,je,ks,ke)
 
 end subroutine
 

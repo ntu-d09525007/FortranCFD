@@ -35,6 +35,10 @@ CHARACTER(100) :: NAME_OF_FILE
     do i = p%loc%is, p%loc%ie
     
         p%loc%vof%now(i,j,k) = 0.0d0
+        p%loc%solid%now(i,j,k) = 0.0d0
+        p%loc%vel%x%now(i,j,k) = 0.0d0
+        p%loc%vel%y%now(i,j,k) = 0.0d0
+        p%loc%vel%z%now(i,j,k) = 0.0d0
     
         do ii = 1, ug
         do jj = 1, ug
@@ -44,8 +48,10 @@ CHARACTER(100) :: NAME_OF_FILE
             y = 0.5d0*( p%glb%y(i,j,k)+p%glb%y(i,j-1,k) ) + real(jj,8)*p%glb%dy/real(ug,8)
             z = 0.5d0*( p%glb%z(i,j,k)+p%glb%z(i,j,k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
             
-            if( - dsqrt( (x-0.35d0)**2.0d0 + (y-0.35d0)**2.0d0 + (z-0.35d0)**2.0d0 ) + 0.15d0 >= 0.0d0 )then
-                p%loc%vof%now(i,j,k) = p%loc%vof%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
+            ! dambreak -- partial failure
+            !=========================================
+            if( x>1.0d0 .and. x<1.0d0+2.0d0*p%glb%dx .and. abs(y-1.0d0)>0.2d0 )then
+                p%loc%solid%now(i,j,k) = p%loc%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
             end if
             
         end do
@@ -70,13 +76,21 @@ CHARACTER(100) :: NAME_OF_FILE
 
         ! dambreak -- wetbed
         !=========================================
-        if( x<=2.53d0 .and. z<=1.0 )then
-            p%loc%phi%now(i,j,k) = 1.0_8
-        else if ( x>2.53d0 .and. z<=0.12d0 )then
+        ! if( x<=2.53d0 .and. z<=1.0 )then
+        !     p%loc%phi%now(i,j,k) = 1.0_8
+        ! else if ( x>2.53d0 .and. z<=0.12d0 )then
+        !     p%loc%phi%now(i,j,k) = 1.0_8
+        ! else 
+        !     p%loc%phi%now(i,j,k) = -1.0_8
+        ! end if
+
+        ! dambreak -- partial failure
+        !=========================================
+        if( x<1.0d0 .and. z<0.6d0 )then
             p%loc%phi%now(i,j,k) = 1.0_8
         else 
             p%loc%phi%now(i,j,k) = -1.0_8
-        end if
+        endif
         
         ! bubble burst
         !=========================================
@@ -96,23 +110,10 @@ CHARACTER(100) :: NAME_OF_FILE
         !   p%loc%phi%now(i,j,k) = -z + 0.1876d0
         !else if( dsqrt(x**2.0d0+y**2.0d0+(z-0.8d0)**2.0d0)<=0.5d0 )then
         !   p%loc%phi%now(i,j,k) = -dsqrt(x**2.0d0+y**2.0d0+(z-0.8d0)**2.0d0)+0.5d0
+        !   p%loc%vel%z%now(i,j,k) = -1.0d0
         !else 
         !   p%loc%phi%now(i,j,k)= MAX(-z+0.1876d0,-dsqrt(x**2.0d0+y**2.0d0+(z-0.8d0)**2.0d0)+0.5d0 )
         !end if
-        
-        !x = 0.5d0*( p%glb%x(i)+p%glb%x(i+1) )
-        !y = 0.5d0*( p%glb%y(j)+p%glb%y(j+1) )
-        !x = p%glb%x(i)
-        !y = p%glb%y(j)
-        !z = 0.5d0*( p%glb%z(k)+p%glb%z(k+1) )
-        
-        !if( dsqrt(x**2.0d0+y**2.0d0+(z-0.8d0)**2.0d0)<=0.5d0 )then
-        !   p%loc%vel%z%now(i,j,k) = -1.0d0
-        !endif 
-        
-        p%loc%vel%x%now(i,j,k) = 0.0_8
-        p%loc%vel%y%now(i,j,k) = 0.0_8
-        p%loc%vel%z%now(i,j,k) = 0.0_8
         
     end do
     end do

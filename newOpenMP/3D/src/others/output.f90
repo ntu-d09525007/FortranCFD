@@ -3,14 +3,16 @@ use all
 implicit none
 integer :: i,j,k,id
 real(8) :: damfront, damh
+real(8) :: g5a,g0,gc,g8a
 
 id=0
 
 ! level set method, loss of volume/mass in percentage
 write(p%fil%ls_mv,*)p%glb%time,100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass,100.0d0*(p%glb%ivol-p%glb%vol)/p%glb%ivol
 
-! damfront = 0.0d0; damh=0.0d0
 
+! Drybed 
+! damfront = 0.0d0; damh=0.0d0
 ! k=1
 ! !$omp parallel do collapse(2), reduction(max:damfront)
 ! do j = p%loc%js, p%loc%je
@@ -22,7 +24,7 @@ write(p%fil%ls_mv,*)p%glb%time,100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass,100.
 ! enddo
 ! enddo   
 ! !$omp end parallel do
-
+!
 ! i=1
 ! !$omp parallel do collapse(2), reduction(max:damh)
 ! do k = p%loc%ks, p%loc%ke
@@ -34,8 +36,46 @@ write(p%fil%ls_mv,*)p%glb%time,100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass,100.
 ! enddo
 ! enddo
 ! !$omp end parallel do
-
 ! write(p%fil%damdata, *)p%glb%time, damfront, damh
+
+
+! G5A, (x,y) = (0.18,1)
+j=p%glb%node_y/2
+i=int(0.18d0/p%glb%dx-0.5d0)+1
+do k = p%loc%ks, p%loc%ke-1
+    if( p%loc%phi%now(i,j,k) * p%loc%phi%now(i,j,k+1) < 0.0d0 )then
+        g5a = p%glb%z(i,j,k) + p%glb%dz*abs(p%loc%phi%now(i,j,k))/( abs(p%loc%phi%now(i,j,k))+abs(p%loc%phi%now(i,j,k+1))  )
+    endif
+enddo
+
+! G0, (x,y) = (1,1)
+j=p%glb%node_y/2
+i=int(1.0d0/p%glb%dx-0.5d0)+1
+do k = p%loc%ks, p%loc%ke-1
+    if( p%loc%phi%now(i,j,k) * p%loc%phi%now(i,j,k+1) < 0.0d0 )then
+        g0 = p%glb%z(i,j,k) + p%glb%dz*abs(p%loc%phi%now(i,j,k))/( abs(p%loc%phi%now(i,j,k))+abs(p%loc%phi%now(i,j,k+1))  )
+    endif
+enddo
+
+! G0, (x,y) = (0.505,1.65)
+j=int(1.65d0/p%glb%dx-0.5d0)+1
+i=int(0.505d0/p%glb%dx-0.5d0)+1
+do k = p%loc%ks, p%loc%ke-1
+    if( p%loc%phi%now(i,j,k) * p%loc%phi%now(i,j,k+1) < 0.0d0 )then
+        gc = p%glb%z(i,j,k) + p%glb%dz*abs(p%loc%phi%now(i,j,k))/( abs(p%loc%phi%now(i,j,k))+abs(p%loc%phi%now(i,j,k+1))  )
+    endif
+enddo
+
+! g8a, (x,y) = (1.722,1)
+j=p%glb%node_y/2
+i=int(1.722d0/p%glb%dx-0.5d0)+1
+do k = p%loc%ks, p%loc%ke-1
+    if( p%loc%phi%now(i,j,k) * p%loc%phi%now(i,j,k+1) < 0.0d0 )then
+        g8a = p%glb%z(i,j,k) + p%glb%dz*abs(p%loc%phi%now(i,j,k))/( abs(p%loc%phi%now(i,j,k))+abs(p%loc%phi%now(i,j,k+1))  )
+    endif
+enddo
+
+write(p%fil%damdata, *)p%glb%time, g5a, g0, gc, g8a
 
 end subroutine
 

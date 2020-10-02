@@ -129,9 +129,10 @@ real(8) :: mag
     open(unit=p%fil%ls_mv,file="./out/"//trim(p%glb%name)//"_MVloss.plt")
     write(p%fil%ls_mv,*)'variables = "T" "Loss of mass" "Loss of Volume" '
 
-    ! p%fil%damdata = 16
-    ! open(unit=p%fil%damdata,file="./out/"//trim(p%glb%name)//"_DamData.plt")
+    p%fil%damdata = 16
+    open(unit=p%fil%damdata,file="./out/"//trim(p%glb%name)//"_DamData.plt")
     ! write(p%fil%ls_mv,*)'variables = "T" "Damfront" "Wall" '
+    write(p%fil%damdata,*)'variables = "T" "G5A" "G0" "GC" "G8A" '
     
     call omp_set_dynamic(.false.)
     if( p%glb%threads < 0 )then
