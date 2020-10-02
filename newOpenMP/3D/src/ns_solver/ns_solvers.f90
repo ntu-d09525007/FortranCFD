@@ -11,6 +11,7 @@ integer(8) :: cpustart, cpuend
     !call ns_split_solver
     
     call ns_check_convergence_div
+    call ibm_bc
     call node_vel
     
     call system_clock(cpuend)
@@ -144,5 +145,33 @@ integer :: id,i,j,k
     !$omp end parallel do
 
     call nvelbc(p%loc%nvel%x%now,p%loc%nvel%y%now,p%loc%nvel%z%now)
+
+end subroutine
+
+
+subroutine ibm_bc()
+use all
+implicit none
+integer :: i,j,k
+real(8) :: solid
+
+!$omp parallel do collapse(3), private(solid)
+do k = p%loc%ks, p%loc%ke
+do j = p%loc%js, p%loc%je
+do i = p%loc%is, p%loc%ie
+
+    solid = 0.5d0*( p%loc%solid%now(i,j,k)+p%loc%solid%now(i+1,j,k) )
+    p%loc%vel%x%now(i,j,k) = (1.0-solid)*p%loc%vel%x%now(i,j,k)
+
+    solid = 0.5d0*( p%loc%solid%now(i,j,k)+p%loc%solid%now(i,j+1,k) )
+    p%loc%vel%y%now(i,j,k) = (1.0-solid)*p%loc%vel%y%now(i,j,k)
+
+    solid = 0.5d0*( p%loc%solid%now(i,j,k)+p%loc%solid%now(i,j,k+1) )
+    p%loc%vel%z%now(i,j,k) = (1.0-solid)*p%loc%vel%z%now(i,j,k)
+
+enddo
+enddo
+enddo
+!$omp end parallel do
 
 end subroutine
