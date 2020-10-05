@@ -13,7 +13,7 @@ call ppe_mg_solver_init
 call ppe_mg_solver_src(input)
 call multigrid_residual(1,.true.)
 
-do iter = 1, 25
+do iter = 1, 50
 
     p%glb%piter=p%glb%piter+1
     
@@ -40,9 +40,9 @@ do iter = 1, 25
         goto 115
     endif
    
-    if(mod(iter,10).eq.0)then
-        write(*,*)"Final:",iter,p%of(0)%loc%mg(1)%l2norm
-    endif
+    !if(mod(iter,10).eq.0)then
+    !    write(*,*)"Final:",iter,p%of(0)%loc%mg(1)%l2norm
+    !endif
     
 enddo
 
