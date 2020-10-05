@@ -3,11 +3,11 @@ ooo	Method to capture interface ( LS / MPLS / CLSVOF )
 ooo	Name of the problem 
 30_drybed
 ooo	Dimension of threads grid in X, Y, Z direction
-10	1	1
+5	    1  	    2
 ooo	Multigrid level
--1
+5
 ooo	Cells per unit length 
-30
+32
 ooo	Number of ghost cell
 3
 ooo	Range of domain in X direction
@@ -15,13 +15,13 @@ ooo	Range of domain in X direction
 ooo	Range of domain in Y direction
 0.0		1.0
 ooo	Range of domain in Z direction
-0.0		1.25
+0.0		2.0
 ooo	Time to stop / plot
 10.0		0.05
 ooo	Crount number ( advection / redistance )
 0.02		0.25
 ooo	PPE iteration ( tolerance / w1 / w2 / valve )
-7.0	    	0.5	    0.5    	4.0
+10.0	    	0.5	    0.5    	4.0
 ooo	SRK6 iteration ( tolerance / w )
 10.0		0.5	
 ooo	Level set interface width 
