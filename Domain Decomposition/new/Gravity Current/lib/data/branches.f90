@@ -413,7 +413,7 @@ if (p%loc%idy==p%glb%grid_y-1)then
             v(i,p%loc%je+j,k) = - v(i,p%loc%je-j,k)
             w(i,p%loc%je+j,k) = - w(i,p%loc%je+1-j,k)
         enddo
-        v(i,p%loc%je,j) = 0.0d0
+        v(i,p%loc%je,k) = 0.0d0
         enddo
         enddo
             
@@ -426,7 +426,7 @@ if (p%loc%idy==p%glb%grid_y-1)then
             v(i,p%loc%je+j,k) = v(i,p%loc%je-j,k)
             w(i,p%loc%je+j,k) = w(i,p%loc%je+1-j,k)
         enddo
-        v(i,p%loc%je,j) = 0.0d0
+        v(i,p%loc%je,k) = 0.0d0
         enddo
         enddo
                 

@@ -16,7 +16,7 @@ integer :: id,i,j,k
 
 relax_iter = 3
 
-if( p%glb%iter<relax_iter .and. mod(p%glb%iter,20).eq.0 )then
+if( p%glb%iter<relax_iter )then
     call ppe_sor_init
 else
     call ppe_mg_solver_init
@@ -41,8 +41,8 @@ end do
 
 call ns_check_convergence_vel
 
-if( p%glb%iter<relax_iter .and. mod(p%glb%iter,20).eq.0 )then
-    call ppe_sor_solver(1.0d-5)
+if( p%glb%iter<relax_iter )then
+    call ppe_sor_solver(1.0d-6)
 else
     call ppe_mg_solver(iter)
 endif

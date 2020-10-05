@@ -23,7 +23,6 @@ use all
 implicit none
 
 call rho_mu
-call find_gradient(p%loc%mu_ten,p%loc%mu%old)
 
 if( p%glb%btn_sf > 0 )then
     call curv

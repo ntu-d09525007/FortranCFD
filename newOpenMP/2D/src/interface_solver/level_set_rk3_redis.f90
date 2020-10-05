@@ -155,7 +155,7 @@ call bc(p%loc%phi%now)
 call level_set_redis_gradient
 call level_set_redis_lambda(btn)
 
-!$omp parallel do collapse(3), private(src)  
+!$omp parallel do collapse(2), private(src)  
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
         
@@ -174,7 +174,7 @@ call bc(p%loc%phi%now)
 call level_set_redis_gradient
 call level_set_redis_lambda(btn)
 
-!$omp parallel do collapse(3), private(src)    
+!$omp parallel do collapse(2), private(src)    
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
 
@@ -199,11 +199,11 @@ implicit none
 integer :: id,i,j
 real(8) :: upp,upm,ump,umm,vpp,vpm,vmp,vmm
 
-!$omp parallel do collapse(3) 
+!$omp parallel do collapse(2) 
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie     
-    p%loc%normals%x%now(i,j) = (p%loc%phi%now(i,j)-p%loc%phi%now(i-1,j,k))/p%glb%dx
-    p%loc%normals%y%now(i,j) = (p%loc%phi%now(i,j)-p%loc%phi%now(i,j-1,k))/p%glb%dy
+    p%loc%normals%x%now(i,j) = (p%loc%phi%now(i,j)-p%loc%phi%now(i-1,j))/p%glb%dx
+    p%loc%normals%y%now(i,j) = (p%loc%phi%now(i,j)-p%loc%phi%now(i,j-1))/p%glb%dy
 end do 
 end do
 !$omp end parallel do
@@ -213,14 +213,14 @@ call bc(p%loc%normals%y%now)
 
 !$omp parallel do
 do j = p%loc%js, p%loc%je     
-    call wenojs_flux(p%loc%normals%x%now(:,j,k),p%loc%tdata%x%s1(:,j,k),p%loc%tdata%x%s2(:,j,k),&
+    call wenojs_flux(p%loc%normals%x%now(:,j),p%loc%tdata%x%s1(:,j),p%loc%tdata%x%s2(:,j),&
                     &p%loc%is,p%loc%ie,p%glb%ghc)                         
 end do
 !$omp end parallel do
 
 !$omp parallel do
 do i = p%loc%is, p%loc%ie 
-    call wenojs_flux(p%loc%normals%y%now(i,:,k),p%loc%tdata%y%s1(i,:,k),p%loc%tdata%y%s2(i,:,k),&
+    call wenojs_flux(p%loc%normals%y%now(i,:),p%loc%tdata%y%s1(i,:),p%loc%tdata%y%s2(i,:),&
                     &p%loc%js,p%loc%je,p%glb%ghc)                         
 end do
 !$omp end parallel do
@@ -337,7 +337,7 @@ end do
 call bc(p%loc%tdata%x%s2)
 call bc(p%loc%tdata%x%s3)
 
-!$omp parallel do collapse(3), private(ii,jj,kk,a,b)     
+!$omp parallel do collapse(2), private(ii,jj,kk,a,b)     
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
         

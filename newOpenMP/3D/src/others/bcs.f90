@@ -164,7 +164,7 @@ if( p%glb%vbc(2) == 1 )then
         v(i,p%loc%je+j,k) = - v(i,p%loc%je-j,k)
         w(i,p%loc%je+j,k) = - w(i,p%loc%je+1-j,k)
     enddo
-    v(i,p%loc%je,j) = 0.0d0
+    v(i,p%loc%je,k) = 0.0d0
     enddo
     enddo
     !$omp end parallel do
@@ -179,7 +179,7 @@ else if ( p%glb%vbc(2) == 2 )then
         v(i,p%loc%je+j,k) = v(i,p%loc%je-j,k)
         w(i,p%loc%je+j,k) = w(i,p%loc%je+1-j,k)
     enddo
-    v(i,p%loc%je,j) = 0.0d0
+    v(i,p%loc%je,k) = 0.0d0
     enddo
     enddo
     !$omp end parallel do

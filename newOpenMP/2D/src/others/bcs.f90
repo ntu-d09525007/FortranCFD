@@ -69,7 +69,6 @@ endif
     do i = 1, p%glb%ghc
         u(p%loc%ie+i,j) = - u(p%loc%ie-i,j)
         v(p%loc%ie+i,j) = - v(p%loc%ie+1-i,j)
-        w(p%loc%ie+i,j) = - w(p%loc%ie+1-i,j)
     end do  
     u(p%loc%ie,j) = 0.0d0
     end do
@@ -82,7 +81,6 @@ else if ( p%glb%ubc(2) == 2)then
     do i = 1, p%glb%ghc
         u(p%loc%ie+i,j) = u(p%loc%ie-i,j)
         v(p%loc%ie+i,j) = v(p%loc%ie+1-i,j)
-        w(p%loc%ie+i,j) = w(p%loc%ie+1-i,j)
     end do  
     u(p%loc%ie,j) = 0.0d0
     end do
@@ -101,7 +99,6 @@ if( p%glb%vbc(1) == 1 )then
     do j = 1, p%glb%ghc
         u(i,p%loc%js-j) = - u(i,p%loc%js-1+j)
         v(i,p%loc%js-j) = - v(i,p%loc%js-2+j)
-        w(i,p%loc%js-j) = - w(i,p%loc%js-1+j)
     enddo
     v(i,p%loc%js-1) = 0.0d0
     enddo
@@ -114,7 +111,6 @@ else if ( p%glb%vbc(1) == 2 )then
     do j = 1, p%glb%ghc
         u(i,p%loc%js-j) = u(i,p%loc%js-1+j)
         v(i,p%loc%js-j) = v(i,p%loc%js-2+j)
-        w(i,p%loc%js-j) = w(i,p%loc%js-1+j)
     enddo
     v(i,p%loc%js-1) = 0.0d0
     enddo
@@ -129,9 +125,8 @@ if( p%glb%vbc(2) == 1 )then
     do j = 1, p%glb%ghc
         u(i,p%loc%je+j) = - u(i,p%loc%je+1-j)
         v(i,p%loc%je+j) = - v(i,p%loc%je-j)
-        w(i,p%loc%je+j) = - w(i,p%loc%je+1-j)
     enddo
-    v(i,p%loc%je,j) = 0.0d0
+    v(i,p%loc%je) = 0.0d0
     enddo
     !$omp end parallel do
         
@@ -142,9 +137,8 @@ else if ( p%glb%vbc(2) == 2 )then
     do j = 1, p%glb%ghc
         u(i,p%loc%je+j) = u(i,p%loc%je+1-j)
         v(i,p%loc%je+j) = v(i,p%loc%je-j)
-        w(i,p%loc%je+j) = w(i,p%loc%je+1-j)
     enddo
-    v(i,p%loc%je,j) = 0.0d0
+    v(i,p%loc%je) = 0.0d0
     enddo
     !$omp end parallel do
             
@@ -172,7 +166,6 @@ if( p%glb%ubc(1) == 1 )then
     do i = 1, p%glb%ghc
         u(p%loc%is-i,j) = - u(p%loc%is-1+i,j)
         v(p%loc%is-i,j) = - v(p%loc%is-1+i,j)
-        w(p%loc%is-i,j) = - w(p%loc%is-1+i,j)
     end do  
     end do
     !$omp end parallel do
@@ -185,7 +178,6 @@ else if ( p%glb%ubc(1) == 2)then
     do i = 1, p%glb%ghc
         u(p%loc%is-i,j) = u(p%loc%is-1+i,j)
         v(p%loc%is-i,j) = v(p%loc%is-1+i,j)
-        w(p%loc%is-i,j) = w(p%loc%is-1+i,j)
     end do  
     end do
     !$omp end parallel do
@@ -199,7 +191,6 @@ if( p%glb%ubc(2) == 1 )then
     do i = 1, p%glb%ghc
         u(p%loc%ie+i,j) = - u(p%loc%ie+1-i,j)
         v(p%loc%ie+i,j) = - v(p%loc%ie+1-i,j)
-        w(p%loc%ie+i,j) = - w(p%loc%ie+1-i,j)
     end do  
     end do
     !$omp end parallel do
@@ -211,7 +202,6 @@ else if ( p%glb%ubc(2) == 2)then
     do i = 1, p%glb%ghc
         u(p%loc%ie+i,j) = u(p%loc%ie+1-i,j)
         v(p%loc%ie+i,j) = v(p%loc%ie+1-i,j)
-        w(p%loc%ie+i,j) = w(p%loc%ie+1-i,j)
     end do  
     end do
     !$omp end parallel do
@@ -229,7 +219,6 @@ if( p%glb%vbc(1) == 1 )then
     do j = 1, p%glb%ghc
         u(i,p%loc%js-j) = - u(i,p%loc%js-1+j)
         v(i,p%loc%js-j) = - v(i,p%loc%js-1+j)
-        w(i,p%loc%js-j) = - w(i,p%loc%js-1+j)
     enddo
     enddo
     !$omp end parallel do
@@ -241,7 +230,6 @@ else if ( p%glb%vbc(1) == 2 )then
     do j = 1, p%glb%ghc
         u(i,p%loc%js-j) = u(i,p%loc%js-1+j)
         v(i,p%loc%js-j) = v(i,p%loc%js-1+j)
-        w(i,p%loc%js-j) = w(i,p%loc%js-1+j)
     enddo
     enddo
     !$omp end parallel do
@@ -255,7 +243,6 @@ if( p%glb%vbc(2) == 1 )then
     do j = 1, p%glb%ghc
         u(i,p%loc%je+j) = - u(i,p%loc%je+1-j)
         v(i,p%loc%je+j) = - v(i,p%loc%je+1-j)
-        w(i,p%loc%je+j) = - w(i,p%loc%je+1-j)
     enddo
     enddo
     !$omp end parallel do
@@ -267,7 +254,6 @@ else if ( p%glb%vbc(2) == 2 )then
     do j = 1, p%glb%ghc
         u(i,p%loc%je+j) = u(i,p%loc%je+1-j)
         v(i,p%loc%je+j) = v(i,p%loc%je+1-j)
-        w(i,p%loc%je+j) = w(i,p%loc%je+1-j)
     enddo
     enddo
     !$omp end parallel do

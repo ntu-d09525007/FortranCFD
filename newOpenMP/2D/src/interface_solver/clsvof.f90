@@ -47,7 +47,7 @@ integer(8) :: cpustart, cpuend
             a4 = dcosh( beta * ( isgn - p%loc%vel%x%old(i,j)*p%glb%dt/p%glb%dx - xc ) )
             a5 = dcosh( beta * ( isgn - xc ) )
             
-            w  = abs(p%loc%normals%x%now(ii,j)) + abs(p%loc%normals%y%now(ii,j)) + abs(p%loc%normals%z%now(ii,j))
+            w  = abs(p%loc%normals%x%now(ii,j)) + abs(p%loc%normals%y%now(ii,j)) 
             w  = abs(p%loc%normals%x%now(ii,j)) / w
         
             p%loc%tdata%x%l1(i,j) = 0.5d0*( p%loc%vel%x%old(i,j)*p%glb%dt - alpha*p%glb%dx/beta*dlog(a4/a5) )
@@ -108,7 +108,7 @@ integer(8) :: cpustart, cpuend
             a4 = dcosh( beta * ( isgn - p%loc%vel%y%old(i,j)*p%glb%dt/p%glb%dy - xc ) )
             a5 = dcosh( beta * ( isgn - xc ) )
             
-            w  = abs(p%loc%normals%x%now(i,ii)) + abs(p%loc%normals%y%now(i,ii)) + abs(p%loc%normals%z%now(i,ii))
+            w  = abs(p%loc%normals%x%now(i,ii)) + abs(p%loc%normals%y%now(i,ii)) 
             w  = abs(p%loc%normals%y%now(i,ii)) / w
         
             p%loc%tdata%y%l1(i,j) = 0.5d0*( p%loc%vel%y%old(i,j)*p%glb%dt - alpha*p%glb%dy/beta*dlog(a4/a5) )

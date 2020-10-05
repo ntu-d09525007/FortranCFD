@@ -46,6 +46,7 @@ type(time_recorded_derivatives) :: normals
 type(time_recorded_vec) :: vel, nvel, velsrc
 type(tsolver_data) :: tdata
 type(ccd_manager) :: ccdsolvers
+real(8), dimension(:,:), allocatable :: zeros
 contains
 procedure alloc => job_init
 procedure init => job_loc_init
@@ -68,6 +69,9 @@ p%JE = ny
 
 IS = p%IS - GHC; IE = p%IE + GHC
 JS = p%JS - GHC; JE = p%JE + GHC
+
+allocate(p%zeros(is:ie,js:je))
+p%zeros=0.0d0
 
 ! coefficients matrices
 CALL p%COE%ALLOC(IS,IE,JS,JE)

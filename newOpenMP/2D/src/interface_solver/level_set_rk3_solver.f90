@@ -92,9 +92,9 @@ integer :: i,j,k
 
 !$omp parallel do 
 do j = p%loc%js, p%loc%je
-    !call p%loc%uccd%x%solve(p%loc%nvel%x%old(:,j,k),p%loc%phi%now(:,j,k),p%loc%tdata%x%s1(:,j,k),p%loc%tdata%x%s2(:,j,k))
-    call wenojs_flux_split(p%loc%tdata%x%s2(:,j,k),p%loc%tdata%x%s1(:,j,k),&
-                           p%loc%tdata%x%ss2(:,j,k),p%loc%tdata%x%ss1(:,j,k),&
+    !call p%loc%uccd%x%solve(p%loc%nvel%x%old(:,j),p%loc%phi%now(:,j),p%loc%tdata%x%s1(:,j),p%loc%tdata%x%s2(:,j))
+    call wenojs_flux_split(p%loc%tdata%x%s2(:,j),p%loc%tdata%x%s1(:,j),&
+                           p%loc%tdata%x%ss2(:,j),p%loc%tdata%x%ss1(:,j),&
                            p%loc%is,p%loc%ie,p%glb%ghc)
     !call crweno_flux_split(p%loc%tdata%x%s2(:,j),p%loc%tdata%x%s1(:,j),&
     !                      p%loc%tdata%x%ss2(:,j),p%loc%tdata%x%ss1(:,j),&
@@ -104,9 +104,9 @@ end do
 
 !$omp parallel do 
 do i = p%loc%is, p%loc%ie
-    !call p%loc%uccd%y%solve(p%loc%nvel%y%old(i,:,k),p%loc%phi%now(i,:,k),p%loc%tdata%y%s1(i,:,k),p%loc%tdata%y%s2(i,:,k))
-    call wenojs_flux_split(p%loc%tdata%y%s2(i,:,k),p%loc%tdata%y%s1(i,:,k),&
-                          p%loc%tdata%y%ss2(i,:,k),p%loc%tdata%y%ss1(i,:,k),&
+    !call p%loc%uccd%y%solve(p%loc%nvel%y%old(i,:),p%loc%phi%now(i,:),p%loc%tdata%y%s1(i,:),p%loc%tdata%y%s2(i,:))
+    call wenojs_flux_split(p%loc%tdata%y%s2(i,:),p%loc%tdata%y%s1(i,:),&
+                          p%loc%tdata%y%ss2(i,:),p%loc%tdata%y%ss1(i,:),&
                           p%loc%js,p%loc%je,p%glb%ghc)
     !call crweno_flux_split(p%loc%tdata%y%s2(i,:),p%loc%tdata%y%s1(i,:),&
     !                      p%loc%tdata%y%ss2(i,:),p%loc%tdata%y%ss1(i,:),&
@@ -117,8 +117,8 @@ end do
 !$omp parallel do collapse(2) 
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
-    s(i,j) = - (p%loc%tdata%x%ss1(i,j)+p%loc%tdata%x%ss2(i,j)-p%loc%tdata%x%ss1(i-1,j,k)-p%loc%tdata%x%ss2(i-1,j,k)) / p%glb%dx &
-            &- (p%loc%tdata%y%ss1(i,j)+p%loc%tdata%y%ss2(i,j)-p%loc%tdata%y%ss1(i,j-1,k)-p%loc%tdata%y%ss2(i,j-1,k)) / p%glb%dy 
+    s(i,j) = - (p%loc%tdata%x%ss1(i,j)+p%loc%tdata%x%ss2(i,j)-p%loc%tdata%x%ss1(i-1,j)-p%loc%tdata%x%ss2(i-1,j)) / p%glb%dx &
+            &- (p%loc%tdata%y%ss1(i,j)+p%loc%tdata%y%ss2(i,j)-p%loc%tdata%y%ss1(i,j-1)-p%loc%tdata%y%ss2(i,j-1)) / p%glb%dy 
     ! s(i,j) = - p%loc%nvel%x%old(i,j)*p%loc%tdata%x%s1(i,j) &
     !         &  - p%loc%nvel%y%old(i,j)*p%loc%tdata%y%s1(i,j) &
     !         &  - p%loc%nvel%z%old(i,j)*p%loc%tdata%z%s1(i,j) 

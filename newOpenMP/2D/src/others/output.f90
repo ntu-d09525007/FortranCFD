@@ -1,10 +1,8 @@
 subroutine output()
 use all
 implicit none
-integer :: i,j,k,id
+integer :: i,j
 real(8) :: damfront, damh
-
-id=0
 
 ! level set method, loss of volume/mass in percentage
 write(p%fil%ls_mv,*)p%glb%time,100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass,100.0d0*(p%glb%ivol-p%glb%vol)/p%glb%ivol

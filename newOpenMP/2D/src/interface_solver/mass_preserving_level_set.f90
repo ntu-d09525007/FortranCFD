@@ -2,10 +2,8 @@ subroutine mass_preserving_level_set
 use all
 !$ use omp_lib
 implicit none
-integer :: i,j,id,iter
+integer :: i,j,iter
 real(8) :: lam, plam
-
-id=0
 
 do iter = 1, 2
     
@@ -22,7 +20,7 @@ do iter = 1, 2
                                    & p%loc%normals%y%now(i,j)**2.0_8)
         
         plam =  p%loc%delta%now(i,j)**2.0_8 * p%loc%grad%now(i,j) 
-        plam = plam * ( 2.0_8*(1.0_8-p%glb%rho_12)*p%loc%heavy%now(i,j) + p%glb%rho_12 )*p%glb%dx*p%glb%dy*p%glb%dz
+        plam = plam * ( 2.0_8*(1.0_8-p%glb%rho_12)*p%loc%heavy%now(i,j) + p%glb%rho_12 )*p%glb%dx*p%glb%dy
         
         lam = lam + plam
         

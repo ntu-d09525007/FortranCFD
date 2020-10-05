@@ -89,7 +89,6 @@ do i = p%loc%is-1, p%loc%ie
     
 end do
 end do
-end do
 !$omp end parallel do
 
 !$omp parallel do collapse(2)
@@ -110,33 +109,6 @@ do i = p%loc%is, p%loc%ie
                                
 end do
 end do
-!$omp end parallel do
-    
-end subroutine
-
-subroutine ns_ab_adv_source_uccd
-use all
-implicit none
-integer :: i,j,k
-real(8) :: u,v,w
-
-!$omp parallel do collapse(2), private(u,v)
-do j = p%loc%js, p%loc%je
-do i = p%loc%is, p%loc%ie
-
-    u = p%loc%vel%x%tmp(i,j)
-    v = p%loc%tdata%y%s1(i,j)
-
-    p%loc%velsrc%x%now(i,j) = -u*p%loc%vel_ten%xx(i,j)-v*p%loc%vel_ten%xy(i,j)
-
-    u = p%loc%tdata%x%s1(i,j)
-    v = p%loc%vel%y%tmp(i,j)
-
-    p%loc%velsrc%y%now(i,j) = -u*p%loc%vel_ten%yx(i,j)-v*p%loc%vel_ten%yy(i,j)
-
-enddo
-enddo
-enddo
 !$omp end parallel do
     
 end subroutine
