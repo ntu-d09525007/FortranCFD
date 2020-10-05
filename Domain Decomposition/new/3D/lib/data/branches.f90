@@ -1,7 +1,6 @@
 module branches
 use roots
 use ccd_solvers
-use UCCD
 use time_solver
 use mutligrid_root
 implicit none
@@ -54,8 +53,7 @@ type(time_recorded) :: q_cri, omega_cri, lamb_div
 type(tensor) :: vel_ten, vor_ten, p_ten, rho_ten
 !-------------------------------------------
 type(tsolver_data) :: tdata
-type(CCD_ROOTS) :: ccd
-type(UCCD_solver) :: uccd
+type(ccd_manager) :: ccdsolvers
 !-------------------------------------------
 type(multigrid_root),dimension(:),allocatable :: mg
 contains
@@ -144,8 +142,7 @@ CALL P%LOC%VELSRC%ALLOC(IS,IE,JS,JE,KS,KE)
 
 ! solvers
 CALL P%LOC%tdata%ALLOC(IS,IE,JS,JE,KS,KE,P%GLB%DT,P%GLB%t_w,P%GLB%GHC)
-CALL P%LOC%CCD%ALLOC(IS,IE,JS,JE,KS,KE,P%GLB%DX,P%GLB%DY,P%GLB%DZ,P%GLB%DT)
-CALL P%LOC%UCCD%ALLOC(IS,IE,JS,JE,KS,KE,P%GLB%DX,P%GLB%DY,P%GLB%DZ,P%GLB%DT)
+CALL P%LOC%ccdsolvers%init(IS,IE,JS,JE,KS,KE,P%GLB%DX,P%GLB%DY,P%GLB%DZ,P%GLB%DT)
 
 ! vortex identification
 call p%loc%vort%alloc(is,ie,js,je,ks,ke)

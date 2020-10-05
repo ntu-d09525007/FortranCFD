@@ -44,19 +44,19 @@ integer :: i,j,k
 
 do k = p%loc%ks, p%loc%ke
 do j = p%loc%js, p%loc%je
-    call p%loc%ccdsolvers%x%solve("ccd",phi(:,j,k),tens%x(:,j,k),tmp(:,j,k) )
+    call p%loc%ccdsolvers%x%solve("ccd",phi(:,j,k),tens%x(:,j,k),tens%tmp(:,j,k) )
 enddo
 enddo
 
 do k = p%loc%ks, p%loc%ke
 do i = p%loc%is, p%loc%ie
-    call p%loc%ccdsolvers%y%solve("ccd",phi(i,:,k),tens%y(i,:,k),tmp(i,:,k) )
+    call p%loc%ccdsolvers%y%solve("ccd",phi(i,:,k),tens%y(i,:,k),tens%tmp(i,:,k) )
 enddo
 enddo
 
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
-    call p%loc%ccdsolvers%z%solve("ccd",phi(i,j,:),tens%z(i,j,:),tmp(i,j,:) )
+    call p%loc%ccdsolvers%z%solve("ccd",phi(i,j,:),tens%z(i,j,:),tens%tmp(i,j,:) )
 enddo
 enddo
 
