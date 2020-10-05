@@ -16,12 +16,6 @@ integer :: id,i,j,k
 
 relax_iter = 3
 
-if( p%glb%iter<relax_iter )then
-    call ppe_sor_init
-else
-    call ppe_mg_solver_init
-endif
-
 call ns_ab_adv_source
     
 iter=0
@@ -42,7 +36,7 @@ end do
 call ns_check_convergence_vel
 
 if( p%glb%iter<relax_iter )then
-    call ppe_sor_solver(1.0d-6)
+    call ppe_sor_solver(1.0d-8)
 else
     call ppe_mg_solver(iter)
 endif
@@ -56,7 +50,6 @@ integer :: iter,initer
 integer :: id,i,j,k
 real(8) :: tol
 
-call ppe_sor_init
 call ns_ab_adv_source
     
 iter=0

@@ -78,6 +78,8 @@ real(8) :: sump, err, w, pcal, tol
 
     call system_clock(cpustart)
 
+    call ppe_sor_init
+
     !$omp parallel do private(i,j,k)
     do id = 0, p%glb%threads-1
         

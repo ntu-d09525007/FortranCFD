@@ -5,34 +5,56 @@ implicit none
 integer :: iter, id
 integer :: i,j,k,input
 integer(8) :: cpustart, cpuend
+real(8) :: grow
 
 call system_clock(cpustart)
 
+call ppe_mg_solver_init
 call ppe_mg_solver_src(input)
-     
-do iter = 1, 200
+call multigrid_residual(1,.true.)
+
+do iter = 1, 25
 
     p%glb%piter=p%glb%piter+1
     
-    if(iter==1)then
-        call multigrid_full_V_cycle(.false.,5)
-    else
+    !if(iter==1)then
+    !    call multigrid_full_V_cycle(.false.,5)
+    !else
         call multigrid_v_cycle(.false.)
-    endif
+    !endif
     
     !call multigrid_w_cycle(.false.)
     
     call multigrid_residual(1,.false.)
+
+    grow = p%of(0)%loc%mg(1)%l2norm0 / p%of(0)%loc%mg(1)%l2norm
     
-    if( p%of(0)%loc%mg(1)%l2norm .lt. p%glb%p_tol )exit
+    if( grow < 1.0d0 )then
+        if( p%of(0)%loc%mg(1)%l2norm < p%glb%p_tol )then
+            goto 115
+        else
+            call ppe_sor_solver(1.0d-8)
+            return
+        endif
+    else if ( p%of(0)%loc%mg(1)%l2norm < p%glb%p_tol*0.001d0 ) then
+        goto 115
+    endif
    
-    if(mod(iter,50).eq.0)then
+    if(mod(iter,10).eq.0)then
         write(*,*)"Final:",iter,p%of(0)%loc%mg(1)%l2norm
     endif
     
 enddo
 
-p%glb%ppe_linf = p%of(0)%loc%mg(1)%l2norm
+if( p%of(0)%loc%mg(1)%l2norm < p%glb%p_tol )then
+    goto 115
+else
+    call ppe_sor_solver(1.0d-8)
+    return
+endif
+
+
+115 p%glb%ppe_linf = p%of(0)%loc%mg(1)%l2norm
 
 !$omp parallel do private(i,j,k)
 do id = 0, p%glb%threads-1

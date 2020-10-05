@@ -51,7 +51,7 @@ integer :: id,i,j,k
         end do
         end do
       
-	enddo		
+	enddo
     !$omp end parallel do
         
 end subroutine

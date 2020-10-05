@@ -213,6 +213,7 @@ if(reset)then
 else
     !$omp parallel do 
     do id = 0, p%glb%threads-1
+        p%of(id)%loc%mg(level)%l2norm0 = p%of(id)%loc%mg(level)%l2norm
         p%of(id)%loc%mg(level)%l2norm = l2norm
     enddo
     !$omp end parallel do 
