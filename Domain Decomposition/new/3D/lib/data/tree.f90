@@ -68,14 +68,14 @@ integer :: id, level
     write(*,'(A20,I5)')"Multigrid level:",p%glb%level
     
     write(*,'(A20,I8)')"Overlap layer",p%of(id)%glb%ghc
-    write(*,*)" --- SubDomain Information  --- "
-    do id = 0, p%glb%threads-1
-       write(*,'("ID ",I2,": (",I2,",",I2,",",I2,")")')ID,p%of(id)%loc%idx,p%of(id)%loc%idy,p%of(id)%loc%idz
-       write(*,'(A20,I4,A3,I4)')"X index:",p%of(id)%loc%is,"~",p%of(id)%loc%ie
-       write(*,'(A20,I4,A3,I4)')"Y index:",p%of(id)%loc%js,"~",p%of(id)%loc%je
-       write(*,'(A20,I4,A3,I4)')"Z index:",p%of(id)%loc%ks,"~",p%of(id)%loc%ke
-       write(*,*)""
-    end do
+    ! write(*,*)" --- SubDomain Information  --- "
+    ! do id = 0, p%glb%threads-1
+    !    write(*,'("ID ",I2,": (",I2,",",I2,",",I2,")")')ID,p%of(id)%loc%idx,p%of(id)%loc%idy,p%of(id)%loc%idz
+    !    write(*,'(A20,I4,A3,I4)')"X index:",p%of(id)%loc%is,"~",p%of(id)%loc%ie
+    !    write(*,'(A20,I4,A3,I4)')"Y index:",p%of(id)%loc%js,"~",p%of(id)%loc%je
+    !    write(*,'(A20,I4,A3,I4)')"Z index:",p%of(id)%loc%ks,"~",p%of(id)%loc%ke
+    !    write(*,*)""
+    ! end do
 
     ! write(*,'(A)')"Multigrid information"
     ! do id  = 0, p%glb%threads-1
@@ -187,13 +187,17 @@ real(8) :: mag
     p%glb%node_y = p%glb%ug * ( p%glb%yend - p%glb%ystart )
     p%glb%node_z = p%glb%ug * ( p%glb%zend - p%glb%zstart )
     
-    allocate( p%glb%x(0:p%glb%node_x+1), p%glb%y(0:p%glb%node_y+1), p%glb%z(0:p%glb%node_z+1) )
+    allocate( p%glb%x(0:p%glb%node_x+1,0:p%glb%node_y+1,0:p%glb%node_z+1),&
+             &p%glb%y(0:p%glb%node_x+1,0:p%glb%node_y+1,0:p%glb%node_z+1),&
+             &p%glb%z(0:p%glb%node_x+1,0:p%glb%node_y+1,0:p%glb%node_z+1) )
 
     write(*,*)"finish allocating public grids"
     
     !$omp parallel do
     do id = 0, p%glb%threads-1
-        allocate( p%of(id)%glb%x(0:p%glb%node_x+1), p%of(id)%glb%y(0:p%glb%node_y+1), p%of(id)%glb%z(0:p%glb%node_z+1) )
+        allocate( p%of(id)%glb%x(0:p%glb%node_x+1,0:p%glb%node_y+1,0:p%glb%node_z+1),&
+                 &p%of(id)%glb%y(0:p%glb%node_x+1,0:p%glb%node_y+1,0:p%glb%node_z+1),&
+                 &p%of(id)%glb%z(0:p%glb%node_x+1,0:p%glb%node_y+1,0:p%glb%node_z+1) )
     enddo
     !$omp end parallel do
     
@@ -205,25 +209,25 @@ real(8) :: mag
         
     !$omp parallel do
     do i = 1, p%glb%node_x
-        p%glb%x(i) = p%glb%xstart + (i-0.5)*p%glb%dx
+        p%glb%x(i,:,:) = p%glb%xstart + (i-0.5)*p%glb%dx
     enddo
     !$omp end parallel do
     
     !$omp parallel do
     do j = 1, p%glb%node_y
-        p%glb%y(j) = p%glb%ystart + (j-0.5)*p%glb%dy
+        p%glb%y(:,j,:) = p%glb%ystart + (j-0.5)*p%glb%dy
     enddo
     !$omp end parallel do
     
     !$omp parallel do
     do k = 1, p%glb%node_z
-        p%glb%z(k) = p%glb%zstart + (k-0.5)*p%glb%dz
+        p%glb%z(:,:,k) = p%glb%zstart + (k-0.5)*p%glb%dz
     enddo
     !$omp end parallel do
     
-    p%glb%x(0)=p%glb%xstart; p%glb%x(p%glb%node_x+1)=p%glb%xend
-    p%glb%y(0)=p%glb%ystart; p%glb%y(p%glb%node_y+1)=p%glb%yend
-    p%glb%z(0)=p%glb%zstart; p%glb%z(p%glb%node_z+1)=p%glb%zend
+    p%glb%x(0,:,:)=p%glb%xstart; p%glb%x(p%glb%node_x+1,:,:)=p%glb%xend
+    p%glb%y(:,0,:)=p%glb%ystart; p%glb%y(:,p%glb%node_y+1,:)=p%glb%yend
+    p%glb%z(:,:,0)=p%glb%zstart; p%glb%z(:,:,p%glb%node_z+1)=p%glb%zend
 
     write(*,*)"finish assigning grid data"
     

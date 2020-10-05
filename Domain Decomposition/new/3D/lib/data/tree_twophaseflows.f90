@@ -144,88 +144,82 @@ implicit none
 class(manager) :: p
 integer :: id,I,J,k  
     
-!$omp parallel do private(i,j,k)
-do id = 0, p%glb%threads-1
-    
-    do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
-    do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
-    
-        call p%of(id)%loc%ccd%x%solve_fixed_central(15.0_8/16.0_8, p%of(id)%loc%phi%now(:,j,k),&
-                                                                  &p%of(id)%loc%normals%x%now(:,j,k),&
-                                                                  &p%of(id)%loc%normals%xx%now(:,j,k) )
-                                                                
-    enddo
-    enddo
-    
-    do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
-    do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
-    
-        call p%of(id)%loc%ccd%y%solve_fixed_central(15.0_8/16.0_8, p%of(id)%loc%phi%now(i,:,k),&
-                                                                  &p%of(id)%loc%normals%y%now(i,:,k),&
-                                                                  &p%of(id)%loc%normals%yy%now(i,:,k) )
-                                                                        
-    enddo
-    enddo
-
-    do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
-    do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
-    
-        call p%of(id)%loc%ccd%z%solve_fixed_central(15.0_8/16.0_8, p%of(id)%loc%phi%now(i,j,:),&
-                                                                  &p%of(id)%loc%normals%z%now(i,j,:),&
-                                                                  &p%of(id)%loc%normals%zz%now(i,j,:) )
-                                                                        
-    enddo
-    enddo       
-            
-    !===========================================
-    
-    do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
-    do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
-    
-        call p%of(id)%loc%ccd%y%solve_fixed_central(15.0_8/16.0_8, p%of(id)%loc%normals%x%now(i,:,k),&
-                                                                  &p%of(id)%loc%normals%xy%now(i,:,k),&
-                                                                  &p%of(id)%loc%normals%curv%now(i,:,k) )
-                                                                        
-    enddo
-    enddo
-
-    do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
-    do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
-    
-        call p%of(id)%loc%ccd%z%solve_fixed_central(15.0_8/16.0_8, p%of(id)%loc%normals%x%now(i,j,:),&
-                                                                  &p%of(id)%loc%normals%xz%now(i,j,:),&
-                                                                  &p%of(id)%loc%normals%curv%now(i,j,:) )
-                                                                        
-    enddo
-    enddo 
-
-    do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
-    do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
-    
-        call p%of(id)%loc%ccd%z%solve_fixed_central(15.0_8/16.0_8, p%of(id)%loc%normals%y%now(i,j,:),&
-                                                                  &p%of(id)%loc%normals%yz%now(i,j,:),&
-                                                                  &p%of(id)%loc%normals%curv%now(i,j,:) )
-                                                                        
-    enddo
-    enddo
-
-    !===========================================
-    
-    call p%of(id)%bc(0,p%of(id)%loc%normals%x%now)
-    call p%of(id)%bc(0,p%of(id)%loc%normals%xx%now)
-    
-    call p%of(id)%bc(0,p%of(id)%loc%normals%y%now)
-    call p%of(id)%bc(0,p%of(id)%loc%normals%yy%now)
-   
-    call p%of(id)%bc(0,p%of(id)%loc%normals%z%now)
-    call p%of(id)%bc(0,p%of(id)%loc%normals%zz%now)
-     
-    call p%of(id)%bc(0,p%of(id)%loc%normals%xy%now)
-    call p%of(id)%bc(0,p%of(id)%loc%normals%xz%now)
-    call p%of(id)%bc(0,p%of(id)%loc%normals%yz%now)
+    !$omp parallel do private(i,j,k)
+    do id = 0, p%glb%threads-1
+        
+        do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
+        do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
+        
+            call p%of(id)%loc%ccdsolvers%x%solve("ccd", p%of(id)%loc%phi%now(:,j,k),&
+                        &p%of(id)%loc%normals%x%now(:,j,k),p%of(id)%loc%normals%xx%now(:,j,k) )
+                                                                    
+        enddo
+        enddo
+        
+        do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
+        do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
+        
+            call p%of(id)%loc%ccdsolvers%y%solve("ccd", p%of(id)%loc%phi%now(i,:,k),&
+                        &p%of(id)%loc%normals%y%now(i,:,k),p%of(id)%loc%normals%yy%now(i,:,k) )
+                                                                            
+        enddo
+        enddo
  
-enddo       
-!$omp end parallel do
+        do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
+        do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
+        
+            call p%of(id)%loc%ccdsolvers%z%solve("ccd", p%of(id)%loc%phi%now(i,j,:),&
+                        &p%of(id)%loc%normals%z%now(i,j,:),p%of(id)%loc%normals%zz%now(i,j,:) )
+                                                                            
+        enddo
+        enddo       
+                
+        !===========================================
+        
+        do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
+        do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
+        
+            call p%of(id)%loc%ccdsolvers%y%solve("ccd", p%of(id)%loc%normals%x%now(i,:,k),&
+                            &p%of(id)%loc%normals%xy%now(i,:,k),p%of(id)%loc%normals%curv%now(i,:,k) )
+                                                                            
+        enddo
+        enddo
+
+        do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
+        do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
+        
+            call p%of(id)%loc%ccdsolvers%z%solve("ccd", p%of(id)%loc%normals%x%now(i,j,:),&
+                            &p%of(id)%loc%normals%xz%now(i,j,:),p%of(id)%loc%normals%curv%now(i,j,:) )
+                                                                            
+        enddo
+        enddo 
+
+        do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
+        do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
+        
+            call p%of(id)%loc%ccdsolvers%z%solve("ccd", p%of(id)%loc%normals%y%now(i,j,:),&
+                            &p%of(id)%loc%normals%yz%now(i,j,:),p%of(id)%loc%normals%curv%now(i,j,:) )
+                                                                            
+        enddo
+        enddo
+
+        !===========================================
+        
+        call p%of(id)%bc(0,p%of(id)%loc%normals%x%now)
+        call p%of(id)%bc(0,p%of(id)%loc%normals%xx%now)
+        
+        call p%of(id)%bc(0,p%of(id)%loc%normals%y%now)
+        call p%of(id)%bc(0,p%of(id)%loc%normals%yy%now)
+       
+        call p%of(id)%bc(0,p%of(id)%loc%normals%z%now)
+        call p%of(id)%bc(0,p%of(id)%loc%normals%zz%now)
+         
+        call p%of(id)%bc(0,p%of(id)%loc%normals%xy%now)
+        call p%of(id)%bc(0,p%of(id)%loc%normals%xz%now)
+        call p%of(id)%bc(0,p%of(id)%loc%normals%yz%now)
+     
+    enddo       
+    !$omp end parallel do
     
 end subroutine
 

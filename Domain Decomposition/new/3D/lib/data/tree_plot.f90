@@ -13,7 +13,7 @@ real(8) :: x,y,z
  WRITE(777,'(A)')"DATASET STRUCTURED_POINTS"
  WRITE(777,'(A,3I6)')"DIMENSIONS ",p%glb%node_x,p%glb%node_y,p%glb%node_z
  WRITE(777,'(A,3ES15.4)')"SPACING ",p%glb%dx, p%glb%dy, p%glb%dz  
- WRITE(777,'(A,3ES15.4)')"ORIGIN ",p%glb%x(1),p%glb%y(1),p%glb%z(1)
+ WRITE(777,'(A,3ES15.4)')"ORIGIN ",p%glb%x(1,1,1),p%glb%y(1,1,1),p%glb%z(1,1,1)
  WRITE(777,'(A,I12)')"POINT_DATA ",(p%glb%node_x)*(p%glb%node_y)*(p%glb%node_z)
  
  ! 100 format(F20.10)

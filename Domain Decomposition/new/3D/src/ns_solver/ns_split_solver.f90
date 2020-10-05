@@ -111,43 +111,52 @@ integer :: id,i,j,k
         do j = p%of(id)%loc%js, p%of(id)%loc%je
 
             ! ux ------------------------------------------------------------------------
-            call p%of(id)%loc%ccd%x%SOLVE_SRKCCD(p%of(id)%loc%vel%x%old(:,j,k),&
-                                                &p%of(id)%loc%tdata%x%s1(:,j,k),&
-                                                &p%of(id)%loc%tdata%x%ss1(:,j,k))   
+            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",p%of(id)%loc%tdata%x%s1(:,j,k),&
+                                                &p%of(id)%loc%tdata%x%ss1(:,j,k),&
+                                                &p%of(id)%loc%vel%x%tmp(:,j,k),&
+                                                &p%of(id)%loc%vel%x%old(:,j,k))   
 
-            call p%of(id)%loc%ccd%x%SOLVE_SRKCCD(p%of(id)%loc%vel%x%old(:,j,k),&
-                                                &p%of(id)%loc%tdata%x%s2(:,j,k),&
-                                                &p%of(id)%loc%tdata%x%ss2(:,j,k))
+            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",p%of(id)%loc%tdata%x%s2(:,j,k),&
+                                                &p%of(id)%loc%tdata%x%ss2(:,j,k),&
+                                                &p%of(id)%loc%vel%x%tmp(:,j,k),&
+                                                &p%of(id)%loc%vel%x%old(:,j,k)) 
                                                 
-            call p%of(id)%loc%ccd%x%SOLVE_SRKCCD(p%of(id)%loc%vel%x%old(:,j,k),&
-                                                &p%of(id)%loc%tdata%x%s3(:,j,k),&
-                                                &p%of(id)%loc%tdata%x%ss3(:,j,k))
+            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",p%of(id)%loc%tdata%x%s3(:,j,k),&
+                                                &p%of(id)%loc%tdata%x%ss3(:,j,k),&
+                                                &p%of(id)%loc%vel%x%tmp(:,j,k),&
+                                                &p%of(id)%loc%vel%x%old(:,j,k)) 
             
             ! vx ------------------------------------------------------------------------
-            call p%of(id)%loc%ccd%x%SOLVE_SRKCCD(p%of(id)%loc%velsrc%x%now(:,j,k),&
-                                                &p%of(id)%loc%tdata%y%s1(:,j,k),&
-                                                &p%of(id)%loc%tdata%y%ss1(:,j,k))
+            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",p%of(id)%loc%tdata%y%s1(:,j,k),&
+                                                &p%of(id)%loc%tdata%y%ss1(:,j,k),&
+                                                &p%of(id)%loc%vel%x%tmp(:,j,k),&
+                                                &p%of(id)%loc%velsrc%x%now(:,j,k))
 
-            call p%of(id)%loc%ccd%x%SOLVE_SRKCCD(p%of(id)%loc%velsrc%x%now(:,j,k),&
-                                                &p%of(id)%loc%tdata%y%s2(:,j,k),&
-                                                &p%of(id)%loc%tdata%y%ss2(:,j,k))
+            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",p%of(id)%loc%tdata%y%s2(:,j,k),&
+                                                &p%of(id)%loc%tdata%y%ss2(:,j,k),&
+                                                &p%of(id)%loc%vel%x%tmp(:,j,k),&
+                                                &p%of(id)%loc%velsrc%x%now(:,j,k))
 
-            call p%of(id)%loc%ccd%x%SOLVE_SRKCCD(p%of(id)%loc%velsrc%x%now(:,j,k),&
-                                                &p%of(id)%loc%tdata%y%s3(:,j,k),&
-                                                &p%of(id)%loc%tdata%y%ss3(:,j,k))
+            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",p%of(id)%loc%tdata%y%s3(:,j,k),&
+                                                &p%of(id)%loc%tdata%y%ss3(:,j,k),&
+                                                &p%of(id)%loc%vel%x%tmp(:,j,k),&
+                                                &p%of(id)%loc%velsrc%x%now(:,j,k))
 
-            ! wx ------------------------------------------------------------------------        
-            call p%of(id)%loc%ccd%x%SOLVE_SRKCCD(p%of(id)%loc%velsrc%x%old(:,j,k),&
-                                                &p%of(id)%loc%tdata%z%s1(:,j,k),&
-                                                &p%of(id)%loc%tdata%z%ss1(:,j,k))   
+            ! wx ------------------------------------------------------------------------ 
+            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",p%of(id)%loc%tdata%z%s1(:,j,k),&
+                                                &p%of(id)%loc%tdata%z%ss1(:,j,k),&
+                                                &p%of(id)%loc%vel%x%tmp(:,j,k),&
+                                                &p%of(id)%loc%velsrc%x%old(:,j,k))
 
-            call p%of(id)%loc%ccd%x%SOLVE_SRKCCD(p%of(id)%loc%velsrc%x%old(:,j,k),&
-                                                &p%of(id)%loc%tdata%z%s2(:,j,k),&
-                                                &p%of(id)%loc%tdata%z%ss2(:,j,k))
+            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",p%of(id)%loc%tdata%z%s2(:,j,k),&
+                                                &p%of(id)%loc%tdata%z%ss2(:,j,k),&
+                                                &p%of(id)%loc%vel%x%tmp(:,j,k),&
+                                                &p%of(id)%loc%velsrc%x%old(:,j,k))
 
-            call p%of(id)%loc%ccd%x%SOLVE_SRKCCD(p%of(id)%loc%velsrc%x%old(:,j,k),&
-                                                &p%of(id)%loc%tdata%z%s3(:,j,k),&
-                                                &p%of(id)%loc%tdata%z%ss3(:,j,k))
+            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",p%of(id)%loc%tdata%z%s3(:,j,k),&
+                                                &p%of(id)%loc%tdata%z%ss3(:,j,k),&
+                                                &p%of(id)%loc%vel%x%tmp(:,j,k),&
+                                                &p%of(id)%loc%velsrc%x%old(:,j,k))
             
         end do
         end do
@@ -176,41 +185,47 @@ integer :: id,i,j,k
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
 
             ! uy ------------------------------------------------------------------------
-            call p%of(id)%loc%ccd%y%SOLVE_SRKCCD(p%of(id)%loc%velsrc%y%now(i,:,k),&
-                                                &p%of(id)%loc%tdata%x%s1(i,:,k),&
-                                                &p%of(id)%loc%tdata%x%ss1(i,:,k))   
+            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",p%of(id)%loc%tdata%x%s1(i,:,k),&
+                                                &p%of(id)%loc%tdata%x%ss1(i,:,k),&
+                                                &p%of(id)%loc%vel%y%tmp(i,:,k),&
+                                                &p%of(id)%loc%velsrc%y%now(i,:,k))
 
-            call p%of(id)%loc%ccd%y%SOLVE_SRKCCD(p%of(id)%loc%velsrc%y%now(i,:,k),&
-                                                &p%of(id)%loc%tdata%x%s2(i,:,k),&
-                                                &p%of(id)%loc%tdata%x%ss2(i,:,k))
-                                                
-            call p%of(id)%loc%ccd%y%SOLVE_SRKCCD(p%of(id)%loc%velsrc%y%now(i,:,k),&
-                                                &p%of(id)%loc%tdata%x%s3(i,:,k),&
-                                                &p%of(id)%loc%tdata%x%ss3(i,:,k))
+            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",p%of(id)%loc%tdata%x%s2(i,:,k),&
+                                                &p%of(id)%loc%tdata%x%ss2(i,:,k),&
+                                                &p%of(id)%loc%vel%y%tmp(i,:,k),&
+                                                &p%of(id)%loc%velsrc%y%now(i,:,k))
+
+            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",p%of(id)%loc%tdata%x%s3(i,:,k),&
+                                                &p%of(id)%loc%tdata%x%ss3(i,:,k),&
+                                                &p%of(id)%loc%vel%y%tmp(i,:,k),&
+                                                &p%of(id)%loc%velsrc%y%now(i,:,k))
 
             ! vy ------------------------------------------------------------------------
-            call p%of(id)%loc%ccd%y%SOLVE_SRKCCD(p%of(id)%loc%vel%y%old(i,:,k),&
-                                                &p%of(id)%loc%tdata%y%s1(i,:,k),&
-                                                &p%of(id)%loc%tdata%y%ss1(i,:,k))   
+            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",p%of(id)%loc%tdata%y%s1(i,:,k),&
+                                                &p%of(id)%loc%tdata%y%ss1(i,:,k),&
+                                                &p%of(id)%loc%vel%y%tmp(i,:,k),&
+                                                &p%of(id)%loc%vel%y%old(i,:,k))
 
-            call p%of(id)%loc%ccd%y%SOLVE_SRKCCD(p%of(id)%loc%vel%y%old(i,:,k),&
-                                                &p%of(id)%loc%tdata%y%s2(i,:,k),&
-                                                &p%of(id)%loc%tdata%y%ss2(i,:,k))
-                                                
-            call p%of(id)%loc%ccd%y%SOLVE_SRKCCD(p%of(id)%loc%vel%y%old(i,:,k),&
-                                                &p%of(id)%loc%tdata%y%s3(i,:,k),&
-                                                &p%of(id)%loc%tdata%y%ss3(i,:,k))
+            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",p%of(id)%loc%tdata%y%s2(i,:,k),&
+                                                &p%of(id)%loc%tdata%y%ss2(i,:,k),&
+                                                &p%of(id)%loc%vel%y%tmp(i,:,k),&
+                                                &p%of(id)%loc%vel%y%old(i,:,k))
+
+            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",p%of(id)%loc%tdata%y%s3(i,:,k),&
+                                                &p%of(id)%loc%tdata%y%ss3(i,:,k),&
+                                                &p%of(id)%loc%vel%y%tmp(i,:,k),&
+                                                &p%of(id)%loc%vel%y%old(i,:,k))
 
             ! wy ------------------------------------------------------------------------
-            call p%of(id)%loc%ccd%y%SOLVE_SRKCCD(p%of(id)%loc%velsrc%y%old(i,:,k),&
+            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",p%of(id)%loc%velsrc%y%old(i,:,k),&
                                                 &p%of(id)%loc%tdata%z%s1(i,:,k),&
                                                 &p%of(id)%loc%tdata%z%ss1(i,:,k))   
 
-            call p%of(id)%loc%ccd%y%SOLVE_SRKCCD(p%of(id)%loc%velsrc%y%old(i,:,k),&
+            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",p%of(id)%loc%velsrc%y%old(i,:,k),&
                                                 &p%of(id)%loc%tdata%z%s2(i,:,k),&
                                                 &p%of(id)%loc%tdata%z%ss2(i,:,k))
                                                 
-            call p%of(id)%loc%ccd%y%SOLVE_SRKCCD(p%of(id)%loc%velsrc%y%old(i,:,k),&
+            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",p%of(id)%loc%velsrc%y%old(i,:,k),&
                                                 &p%of(id)%loc%tdata%z%s3(i,:,k),&
                                                 &p%of(id)%loc%tdata%z%ss3(i,:,k))
                                                 
@@ -241,43 +256,52 @@ integer :: id,i,j,k
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
 
             ! uz ------------------------------------------------------------------------
-            call p%of(id)%loc%ccd%z%SOLVE_SRKCCD(p%of(id)%loc%velsrc%z%now(i,j,:),&
-                                                &p%of(id)%loc%tdata%x%s1(i,j,:),&
-                                                &p%of(id)%loc%tdata%x%ss1(i,j,:))   
+            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",p%of(id)%loc%tdata%x%s1(i,j,:),&
+                                                &p%of(id)%loc%tdata%x%ss1(i,j,:),&
+                                                &p%of(id)%loc%vel%z%tmp(i,j,:),&
+                                                &p%of(id)%loc%velsrc%z%now(i,j,:))
 
-            call p%of(id)%loc%ccd%z%SOLVE_SRKCCD(p%of(id)%loc%velsrc%z%now(i,j,:),&
-                                                &p%of(id)%loc%tdata%x%s2(i,j,:),&
-                                                &p%of(id)%loc%tdata%x%ss2(i,j,:))
-                                                
-            call p%of(id)%loc%ccd%z%SOLVE_SRKCCD(p%of(id)%loc%velsrc%z%now(i,j,:),&
-                                                &p%of(id)%loc%tdata%x%s3(i,j,:),&
-                                                &p%of(id)%loc%tdata%x%ss3(i,j,:))   
+            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",p%of(id)%loc%tdata%x%s2(i,j,:),&
+                                                &p%of(id)%loc%tdata%x%ss2(i,j,:),&
+                                                &p%of(id)%loc%vel%z%tmp(i,j,:),&
+                                                &p%of(id)%loc%velsrc%z%now(i,j,:))
+
+            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",p%of(id)%loc%tdata%x%s3(i,j,:),&
+                                                &p%of(id)%loc%tdata%x%ss3(i,j,:),&
+                                                &p%of(id)%loc%vel%z%tmp(i,j,:),&
+                                                &p%of(id)%loc%velsrc%z%now(i,j,:)) 
 
             ! vz ------------------------------------------------------------------------
-            call p%of(id)%loc%ccd%z%SOLVE_SRKCCD(p%of(id)%loc%velsrc%z%old(i,j,:),&
-                                                &p%of(id)%loc%tdata%y%s1(i,j,:),&
-                                                &p%of(id)%loc%tdata%y%ss1(i,j,:))   
+            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",p%of(id)%loc%tdata%y%s1(i,j,:),&
+                                                &p%of(id)%loc%tdata%y%ss1(i,j,:),&
+                                                &p%of(id)%loc%vel%z%tmp(i,j,:),&
+                                                &p%of(id)%loc%velsrc%z%old(i,j,:))
 
-            call p%of(id)%loc%ccd%z%SOLVE_SRKCCD(p%of(id)%loc%velsrc%z%old(i,j,:),&
-                                                &p%of(id)%loc%tdata%y%s2(i,j,:),&
-                                                &p%of(id)%loc%tdata%y%ss2(i,j,:))
-                                                
-            call p%of(id)%loc%ccd%z%SOLVE_SRKCCD(p%of(id)%loc%velsrc%z%old(i,j,:),&
-                                                &p%of(id)%loc%tdata%y%s3(i,j,:),&
-                                                &p%of(id)%loc%tdata%y%ss3(i,j,:))
+            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",p%of(id)%loc%tdata%y%s2(i,j,:),&
+                                                &p%of(id)%loc%tdata%y%ss2(i,j,:),&
+                                                &p%of(id)%loc%vel%z%tmp(i,j,:),&
+                                                &p%of(id)%loc%velsrc%z%old(i,j,:))
+
+            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",p%of(id)%loc%tdata%y%s3(i,j,:),&
+                                                &p%of(id)%loc%tdata%y%ss3(i,j,:),&
+                                                &p%of(id)%loc%vel%z%tmp(i,j,:),&
+                                                &p%of(id)%loc%velsrc%z%old(i,j,:))
 
             ! wz ------------------------------------------------------------------------
-            call p%of(id)%loc%ccd%z%SOLVE_SRKCCD(p%of(id)%loc%vel%z%old(i,j,:),&
-                                                &p%of(id)%loc%tdata%z%s1(i,j,:),&
-                                                &p%of(id)%loc%tdata%z%ss1(i,j,:))   
+            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",p%of(id)%loc%tdata%z%s1(i,j,:),&
+                                                &p%of(id)%loc%tdata%z%ss1(i,j,:),&
+                                                &p%of(id)%loc%vel%z%tmp(i,j,:),&
+                                                &p%of(id)%loc%vel%z%old(i,j,:)) 
 
-            call p%of(id)%loc%ccd%z%SOLVE_SRKCCD(p%of(id)%loc%vel%z%old(i,j,:),&
-                                                &p%of(id)%loc%tdata%z%s2(i,j,:),&
-                                                &p%of(id)%loc%tdata%z%ss2(i,j,:))
-                                                
-            call p%of(id)%loc%ccd%z%SOLVE_SRKCCD(p%of(id)%loc%vel%z%old(i,j,:),&
-                                                &p%of(id)%loc%tdata%z%s3(i,j,:),&
-                                                &p%of(id)%loc%tdata%z%ss3(i,j,:))
+            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",p%of(id)%loc%tdata%z%s2(i,j,:),&
+                                                &p%of(id)%loc%tdata%z%ss2(i,j,:),&
+                                                &p%of(id)%loc%vel%z%tmp(i,j,:),&
+                                                &p%of(id)%loc%vel%z%old(i,j,:)) 
+
+            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",p%of(id)%loc%tdata%z%s3(i,j,:),&
+                                                &p%of(id)%loc%tdata%z%ss3(i,j,:),&
+                                                &p%of(id)%loc%vel%z%tmp(i,j,:),&
+                                                &p%of(id)%loc%vel%z%old(i,j,:)) 
                                                 
         end do
         end do
@@ -416,34 +440,34 @@ integer :: i,j,k
 
     do k = q%loc%ks, q%loc%ke
     do j = q%loc%js, q%loc%je
-        call q%loc%ccd%x%SOLVE_SRKCCD(us(:,j,k),us(:,j,k),q%loc%tdata%x%s1(:,j,k),q%loc%tdata%x%ss1(:,j,k))
-        call q%loc%ccd%x%SOLVE_SRKCCD(vs(:,j,k),vs(:,j,k),q%loc%tdata%y%s1(:,j,k),q%loc%tdata%y%ss1(:,j,k))
-        call q%loc%ccd%x%SOLVE_SRKCCD(ws(:,j,k),ws(:,j,k),q%loc%tdata%z%s1(:,j,k),q%loc%tdata%z%ss1(:,j,k))
+        call q%loc%ccdsolvers%x%solve("srkccd",us(:,j,k),us(:,j,k),q%loc%tdata%x%s1(:,j,k),q%loc%tdata%x%ss1(:,j,k))
+        call q%loc%ccdsolvers%x%solve("srkccd",vs(:,j,k),vs(:,j,k),q%loc%tdata%y%s1(:,j,k),q%loc%tdata%y%ss1(:,j,k))
+        call q%loc%ccdsolvers%x%solve("srkccd",ws(:,j,k),ws(:,j,k),q%loc%tdata%z%s1(:,j,k),q%loc%tdata%z%ss1(:,j,k))
         
-        call q%loc%ccd%x%SOLVE_SRKCCD(v(:,j,k),v(:,j,k),q%loc%tdata%y%l1(:,j,k))
-        call q%loc%ccd%x%SOLVE_SRKCCD(w(:,j,k),w(:,j,k),q%loc%tdata%z%l1(:,j,k))
+        call q%loc%ccdsolvers%x%solve("srkccd",v(:,j,k),v(:,j,k),q%loc%tdata%y%l1(:,j,k))
+        call q%loc%ccdsolvers%x%solve("srkccd",w(:,j,k),w(:,j,k),q%loc%tdata%z%l1(:,j,k))
     end do
     end do
 
     do k = q%loc%ks, q%loc%ke
     do i = q%loc%is, q%loc%ie
-        call q%loc%ccd%y%SOLVE_SRKCCD(us(i,:,k),us(i,:,k),q%loc%tdata%x%s2(i,:,k),q%loc%tdata%x%ss2(i,:,k))
-        call q%loc%ccd%y%SOLVE_SRKCCD(vs(i,:,k),vs(i,:,k),q%loc%tdata%y%s2(i,:,k),q%loc%tdata%y%ss2(i,:,k))
-        call q%loc%ccd%y%SOLVE_SRKCCD(ws(i,:,k),ws(i,:,k),q%loc%tdata%z%s2(i,:,k),q%loc%tdata%z%ss2(i,:,k))
+        call q%loc%ccdsolvers%y%solve("srkccd",us(i,:,k),us(i,:,k),q%loc%tdata%x%s2(i,:,k),q%loc%tdata%x%ss2(i,:,k))
+        call q%loc%ccdsolvers%y%solve("srkccd",vs(i,:,k),vs(i,:,k),q%loc%tdata%y%s2(i,:,k),q%loc%tdata%y%ss2(i,:,k))
+        call q%loc%ccdsolvers%y%solve("srkccd",ws(i,:,k),ws(i,:,k),q%loc%tdata%z%s2(i,:,k),q%loc%tdata%z%ss2(i,:,k))
         
-        call q%loc%ccd%y%SOLVE_SRKCCD(u(i,:,k),u(i,:,k),q%loc%tdata%x%l1(i,:,k))
-        call q%loc%ccd%y%SOLVE_SRKCCD(ww(i,:,k),ww(i,:,k),q%loc%tdata%z%l2(i,:,k))
+        call q%loc%ccdsolvers%y%solve("srkccd",u(i,:,k),u(i,:,k),q%loc%tdata%x%l1(i,:,k))
+        call q%loc%ccdsolvers%y%solve("srkccd",ww(i,:,k),ww(i,:,k),q%loc%tdata%z%l2(i,:,k))
     end do
     end do
 
     do j = q%loc%js, q%loc%je
     do i = q%loc%is, q%loc%ie
-        call q%loc%ccd%z%SOLVE_SRKCCD(us(i,:,k),us(i,j,:),q%loc%tdata%x%s3(i,j,:),q%loc%tdata%x%ss3(i,j,:))
-        call q%loc%ccd%z%SOLVE_SRKCCD(vs(i,:,k),vs(i,j,:),q%loc%tdata%y%s3(i,j,:),q%loc%tdata%y%ss3(i,j,:))
-        call q%loc%ccd%z%SOLVE_SRKCCD(ws(i,:,k),ws(i,j,:),q%loc%tdata%z%s3(i,j,:),q%loc%tdata%z%ss3(i,j,:))
+        call q%loc%ccdsolvers%z%solve("srkccd",us(i,:,k),us(i,j,:),q%loc%tdata%x%s3(i,j,:),q%loc%tdata%x%ss3(i,j,:))
+        call q%loc%ccdsolvers%z%solve("srkccd",vs(i,:,k),vs(i,j,:),q%loc%tdata%y%s3(i,j,:),q%loc%tdata%y%ss3(i,j,:))
+        call q%loc%ccdsolvers%z%solve("srkccd",ws(i,:,k),ws(i,j,:),q%loc%tdata%z%s3(i,j,:),q%loc%tdata%z%ss3(i,j,:))
         
-        call q%loc%ccd%z%SOLVE_SRKCCD(uu(i,j,:),uu(i,j,:),q%loc%tdata%x%l2(i,j,:))
-        call q%loc%ccd%z%SOLVE_SRKCCD(vv(i,j,:),vv(i,j,:),q%loc%tdata%y%l2(i,j,:))
+        call q%loc%ccdsolvers%z%solve("srkccd",uu(i,j,:),uu(i,j,:),q%loc%tdata%x%l2(i,j,:))
+        call q%loc%ccdsolvers%z%solve("srkccd",vv(i,j,:),vv(i,j,:),q%loc%tdata%y%l2(i,j,:))
     end do
     end do
 ! ----------------------------------------------

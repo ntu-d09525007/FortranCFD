@@ -224,3 +224,16 @@ real(8) :: uh, vh, wh
     !$omp end parallel do
     
 end subroutine
+
+subroutine ns_ab_uccd()
+use all
+implicit none
+integer :: id,i,j,k
+
+!$omp parallel do
+do id = 0, p%glb%threads-1
+
+enddo
+!$omp end parallel do
+
+end subroutine

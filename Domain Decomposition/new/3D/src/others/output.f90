@@ -15,7 +15,7 @@ real(8) :: damfront, damh
             do j = p%of(id)%loc%js, p%of(id)%loc%je
             do i = p%of(id)%loc%is, p%of(id)%loc%ie
                 if( p%of(id)%loc%phi%now(i,j,k)*p%of(id)%loc%phi%now(i+1,j,k) < 0.0d0 )then
-                    damfront = max( damfront, p%glb%x(i) + &
+                    damfront = max( damfront, p%glb%x(i,j,k) + &
                         p%glb%dx*abs(p%of(id)%loc%phi%now(i,j,k))/( abs(p%of(id)%loc%phi%now(i,j,k))+abs(p%of(id)%loc%phi%now(i+1,j,k))) )
                 endif
             enddo
@@ -27,7 +27,7 @@ real(8) :: damfront, damh
             do k = p%of(id)%loc%ks, p%of(id)%loc%ke
             do j = p%of(id)%loc%js, p%of(id)%loc%je
                 if( p%of(id)%loc%phi%now(i,j,k)*p%of(id)%loc%phi%now(i,j,k+1) < 0.0d0 )then
-                    damh = max( damh, p%glb%z(k) + &
+                    damh = max( damh, p%glb%z(i,j,k) + &
                         p%glb%dz*abs(p%of(id)%loc%phi%now(i,j,k))/( abs(p%of(id)%loc%phi%now(i,j,k))+abs(p%of(id)%loc%phi%now(i,j,k+1))) )
                 endif
             enddo

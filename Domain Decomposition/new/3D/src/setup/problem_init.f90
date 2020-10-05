@@ -42,9 +42,9 @@ CHARACTER(100) :: NAME_OF_FILE
             do jj = 1, ug
             do kk = 1, ug
                 
-                x = 0.5d0*( p%glb%x(i)+p%glb%x(i-1) ) + real(ii,8)*p%glb%dx/real(ug,8)
-                y = 0.5d0*( p%glb%y(j)+p%glb%y(j-1) ) + real(jj,8)*p%glb%dy/real(ug,8)
-                z = 0.5d0*( p%glb%z(k)+p%glb%z(k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
+                x = 0.5d0*( p%glb%x(i,j,k)+p%glb%x(i-1,j,k) ) + real(ii,8)*p%glb%dx/real(ug,8)
+                y = 0.5d0*( p%glb%y(i,j,k)+p%glb%y(i,j-1,k) ) + real(jj,8)*p%glb%dy/real(ug,8)
+                z = 0.5d0*( p%glb%z(i,j,k)+p%glb%z(i,j,k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
                 
                 if( - dsqrt( (x-0.35d0)**2.0d0 + (y-0.35d0)**2.0d0 + (z-0.35d0)**2.0d0 ) + 0.15d0 >= 0.0d0 )then
                     p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
@@ -54,9 +54,9 @@ CHARACTER(100) :: NAME_OF_FILE
             end do
             end do
         
-            x = p%glb%x(i)
-            y = p%glb%y(j)
-            z = p%glb%z(k)
+            x = p%glb%x(i,j,k)
+            y = p%glb%y(i,j,k)
+            z = p%glb%z(i,j,k)
             
             ! vortex
             !=========================================

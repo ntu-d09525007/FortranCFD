@@ -27,11 +27,9 @@ implicit none
 integer :: id,i,j,k
 
 call p%rho_mu
+call p%curv
+call pt%normals%sync
 
-if( p%glb%btn_sf > 0 )then
-    call p%curv
-    call pt%normals%sync
-endif
     
 end subroutine
 
