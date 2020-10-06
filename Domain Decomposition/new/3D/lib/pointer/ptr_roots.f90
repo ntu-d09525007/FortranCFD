@@ -1,25 +1,20 @@
 module ptr_roots
-!$ use omp_lib
 use tree
 implicit none
 
 type pointer_child
-integer :: idx, idy, idz
 integer :: is, ie, js, je, ks, ke, ghc
 real(8), dimension(:,:,:), pointer :: dat
-contains
 end type pointer_child
 
 type pointer_parent
-integer :: threads, gx, gy, gz
+integer :: gx, gy, gz
 integer(8) :: cpurate
 real(8) :: cputime
-type(pointer_child),allocatable :: of(:)
+type(pointer_child),allocatable :: of(:,:,:)
 contains
 procedure init => ptrpart_init
 procedure sync => ptrpart_sync
-procedure check => ptrpart_chk
-procedure release => ptrpart_release
 procedure reset => ptrpart_reset
 end type pointer_parent
 
@@ -31,10 +26,28 @@ real(8) :: cputime
 contains
 procedure init => ptrvecpart_init
 procedure sync => ptrvecpart_sync
-procedure check => ptrvecpart_chk
-procedure release => ptrvecpart_release
 procedure reset => ptrvecpart_reset
 end type pointer_vector_parent
+
+type pointer_mg_child
+integer :: n
+real(8), dimension(:,:,:), pointer :: dat
+end type pointer_mg_child
+
+type pointer_mg_child2
+type(pointer_mg_child),allocatable :: at(:)
+end type pointer_mg_child2
+
+type pointer_mg_parent
+integer :: gx, gy, gz
+integer(8) :: cpurate
+real(8) :: cputime
+type(pointer_mg_child2),allocatable :: of(:,:,:)
+contains
+procedure init => ptrmgpart_init
+procedure sync => ptrmgpart_sync
+procedure reset => ptrmgpart_reset
+end type pointer_mg_parent
 
 contains 
 
@@ -42,9 +55,8 @@ subroutine ptrpart_init(p,src)
 implicit none
 class(pointer_parent) :: p
 type(manager) :: src
-integer :: id
+integer :: idx,idy,idz,id
 
-    p%threads = src%glb%threads
     p%cputime = 0.0d0
     p%cpurate = src%glb%cpurate
     
@@ -52,24 +64,26 @@ integer :: id
     p%gy = src%glb%grid_y
     p%gz = src%glb%grid_z
     
-    allocate( p%of(0:p%threads-1) )
+    allocate( p%of(0:p%gx-1,0:p%gy-1,0:p%gz-1) )
     
-    !$omp parallel do 
-    do id = 0, p%threads-1
+    !$omp parallel do collapse(3), private(id)
+    do idz = 0, p%gz-1
+    do idy = 0, p%gy-1
+    do idx = 0, p%gx-1
+
+        id = src%glb%id(idx,idy,idz)
         
-        p%of(id)%is = src%of(id)%loc%is
-        p%of(id)%ie = src%of(id)%loc%ie 
-        p%of(id)%js = src%of(id)%loc%js
-        p%of(id)%je = src%of(id)%loc%je
-        p%of(id)%ks = src%of(id)%loc%ks
-        p%of(id)%ke = src%of(id)%loc%ke
+        p%of(idx,idy,idz)%is = src%of(id)%loc%is
+        p%of(idx,idy,idz)%ie = src%of(id)%loc%ie 
+        p%of(idx,idy,idz)%js = src%of(id)%loc%js
+        p%of(idx,idy,idz)%je = src%of(id)%loc%je
+        p%of(idx,idy,idz)%ks = src%of(id)%loc%ks
+        p%of(idx,idy,idz)%ke = src%of(id)%loc%ke
         
-        p%of(id)%ghc = src%glb%ghc
-        
-        p%of(id)%idx = src%of(id)%loc%idx
-        p%of(id)%idy = src%of(id)%loc%idy
-        p%of(id)%idz = src%of(id)%loc%idz
-        
+        p%of(idx,idy,idz)%ghc = src%glb%ghc
+    
+    enddo
+    enddo
     enddo
     !$omp end parallel do
 
@@ -93,96 +107,73 @@ integer :: num, comp
     
 end subroutine
 
-
-subroutine ptrpart_chk(p) 
+subroutine ptrmgpart_init(p,src)
 implicit none
-class(pointer_parent) :: p
-integer :: id
+class(pointer_mg_parent) :: p
+type(manager) :: src
+integer :: idx,idy,idz,id,level
 
-    !$omp parallel private(id), num_threads(p%threads) 
-        
-        id=0
-        !$ id = omp_get_thread_num()
-        
-        if( .not. associated(p%of(id)%dat) )then
-            write(*,*)" The pointer is not associated. Stop the program. "
-            stop
-        endif
+p%cputime = 0.0d0
+p%cpurate = src%glb%cpurate
 
-    !$omp end parallel
+p%gx = src%glb%grid_x
+p%gy = src%glb%grid_y
+p%gz = src%glb%grid_z
 
-end subroutine
+allocate( p%of(0:p%gx-1,0:p%gy-1,0:p%gz-1) )
 
-subroutine ptrvecpart_chk(p)
-implicit none
-class(pointer_vector_parent) :: p
-integer :: comp
+!$omp parallel do collapse(3), private(id,level)
+do idz = 0, p%gz-1
+do idy = 0, p%gy-1
+do idx = 0, p%gx-1
 
-    do comp = 1, p%num
-        call p%nodes(comp)%check
+    id = src%glb%id(idx,idy,idz)
+
+    allocate( p%of(idx,idy,idz)%at(src%glb%level) )
+
+    do level = 1, src%glb%level
+        p%of(idx,idy,idz)%at(level)%n = src%of(id)%loc%mg(level)%nx
     enddo
-    
-end subroutine
 
-subroutine ptrpart_release(p)
-implicit none
-class(pointer_parent) :: p
-integer :: id
-    
-    !$omp parallel private(id), num_threads(p%threads) 
-        
-        id = 0
-        !$ id = omp_get_thread_num()
-        
-        nullify(p%of(id)%dat)
-        
-    !$omp end parallel
+enddo
+enddo
+enddo
+!$omp end parallel do
 
-end subroutine
-
-subroutine ptrvecpart_release(p)
-implicit none
-class(pointer_vector_parent) :: p
-integer :: comp
-
-    do comp = 1, p%num
-        call p%nodes(comp)%release
-    enddo
-    
 end subroutine
 
 subroutine ptrpart_sync(p)
 implicit none
 class(pointer_parent) :: p
-integer :: id,i,j,k
+integer :: idx,idy,idz,i,j,k
 integer(8) :: cpustart, cpuend
 
     call system_clock(cpustart)
 
-    call p%check
-
-    !$omp parallel do private(i,j,k)
-    do id = 0, p%threads-1
+    !$omp parallel do private(i,j,k), collapse(3)
+    do idz = 0, p%gz-1
+    do idy = 0, p%gy-1
+    do idx = 0, p%gx-1
         
         ! x direction
-        if(p%of(id)%idx<p%gx-1)then
+        if(idx<p%gx-1)then
             
-            do k = p%of(id)%ks-p%of(id)%ghc, p%of(id)%ke+p%of(id)%ghc
-            do j = p%of(id)%js-p%of(id)%ghc, p%of(id)%je+p%of(id)%ghc
-            do i = p%of(id)%ie+1, p%of(id)%ie+p%of(id)%ghc
-                p%of(id)%dat(i,j,k) = p%of(id+1)%dat(i,j,k)
+            do k = p%of(idx,idy,idz)%ks-p%of(idx,idy,idz)%ghc, p%of(idx,idy,idz)%ke+p%of(idx,idy,idz)%ghc
+            do j = p%of(idx,idy,idz)%js-p%of(idx,idy,idz)%ghc, p%of(idx,idy,idz)%je+p%of(idx,idy,idz)%ghc
+            do i = p%of(idx,idy,idz)%ie+1, p%of(idx,idy,idz)%ie+p%of(idx,idy,idz)%ghc
+                p%of(idx,idy,idz)%dat(i,j,k) = p%of(idx+1,idy,idz)%dat(i,j,k)
             end do
             end do
             end do
         
         endif
 
-        if(p%of(id)%idx>0)then
+        if(idx>0)then
             
-            do k = p%of(id)%ks-p%of(id)%ghc, p%of(id)%ke+p%of(id)%ghc
-            do j = p%of(id)%js-p%of(id)%ghc, p%of(id)%je+p%of(id)%ghc
-            do i = p%of(id)%is-1, p%of(id)%is-p%of(id)%ghc, -1
-                p%of(id)%dat(i,j,k) = p%of(id-1)%dat(i,j,k)
+            do k = p%of(idx,idy,idz)%ks-p%of(idx,idy,idz)%ghc, p%of(idx,idy,idz)%ke+p%of(idx,idy,idz)%ghc
+            do j = p%of(idx,idy,idz)%js-p%of(idx,idy,idz)%ghc, p%of(idx,idy,idz)%je+p%of(idx,idy,idz)%ghc
+            do i = p%of(idx,idy,idz)%is-1, p%of(idx,idy,idz)%is-p%of(idx,idy,idz)%ghc, -1
+                p%of(idx,idy,idz)%dat(i,j,k) = p%of(idx-1,idy,idz)%dat(i,j,k)
             end do
             end do
             end do
@@ -190,24 +181,24 @@ integer(8) :: cpustart, cpuend
         endif
         
         ! y direction
-        if(p%of(id)%idy<p%gy-1)then
+        if(idy<p%gy-1)then
             
-            do k = p%of(id)%ks-p%of(id)%ghc, p%of(id)%ke+p%of(id)%ghc
-            do i = p%of(id)%is-p%of(id)%ghc, p%of(id)%ie+p%of(id)%ghc
-            do j = p%of(id)%je+1, p%of(id)%je+p%of(id)%ghc
-                p%of(id)%dat(i,j,k) = p%of(id+p%gx)%dat(i,j,k)
+            do k = p%of(idx,idy,idz)%ks-p%of(idx,idy,idz)%ghc, p%of(idx,idy,idz)%ke+p%of(idx,idy,idz)%ghc
+            do i = p%of(idx,idy,idz)%is-p%of(idx,idy,idz)%ghc, p%of(idx,idy,idz)%ie+p%of(idx,idy,idz)%ghc
+            do j = p%of(idx,idy,idz)%je+1, p%of(idx,idy,idz)%je+p%of(idx,idy,idz)%ghc
+                p%of(idx,idy,idz)%dat(i,j,k) = p%of(idx,idy+1,idz)%dat(i,j,k)
             end do
             end do
             end do
         
         endif
         
-        if(p%of(id)%idy>0)then
+        if(idy>0)then
             
-            do k = p%of(id)%ks-p%of(id)%ghc, p%of(id)%ke+p%of(id)%ghc
-            do i = p%of(id)%is-p%of(id)%ghc, p%of(id)%ie+p%of(id)%ghc
-            do j = p%of(id)%js-1, p%of(id)%js-p%of(id)%ghc, -1
-                p%of(id)%dat(i,j,k) = p%of(id-p%gx)%dat(i,j,k)
+            do k = p%of(idx,idy,idz)%ks-p%of(idx,idy,idz)%ghc, p%of(idx,idy,idz)%ke+p%of(idx,idy,idz)%ghc
+            do i = p%of(idx,idy,idz)%is-p%of(idx,idy,idz)%ghc, p%of(idx,idy,idz)%ie+p%of(idx,idy,idz)%ghc
+            do j = p%of(idx,idy,idz)%js-1, p%of(idx,idy,idz)%js-p%of(idx,idy,idz)%ghc, -1
+                p%of(idx,idy,idz)%dat(i,j,k) = p%of(idx,idy-1,idz)%dat(i,j,k)
             end do
             end do
             end do
@@ -215,30 +206,32 @@ integer(8) :: cpustart, cpuend
         endif
         
         ! z direction
-        if(p%of(id)%idz<p%gz-1)then
+        if(idz<p%gz-1)then
         
-            do j = p%of(id)%js-p%of(id)%ghc, p%of(id)%je+p%of(id)%ghc
-            do i = p%of(id)%is-p%of(id)%ghc, p%of(id)%ie+p%of(id)%ghc       
-            do k = p%of(id)%ke+1, p%of(id)%ke+p%of(id)%ghc
-                p%of(id)%dat(i,j,k) = p%of(id+p%gx*p%gy)%dat(i,j,k)
+            do j = p%of(idx,idy,idz)%js-p%of(idx,idy,idz)%ghc, p%of(idx,idy,idz)%je+p%of(idx,idy,idz)%ghc
+            do i = p%of(idx,idy,idz)%is-p%of(idx,idy,idz)%ghc, p%of(idx,idy,idz)%ie+p%of(idx,idy,idz)%ghc       
+            do k = p%of(idx,idy,idz)%ke+1, p%of(idx,idy,idz)%ke+p%of(idx,idy,idz)%ghc
+                p%of(idx,idy,idz)%dat(i,j,k) = p%of(idx,idy,idz+1)%dat(i,j,k)
             end do
             end do
             end do
         
         endif
 
-        if(p%of(id)%idz>0)then
+        if(idz>0)then
             
-            do j = p%of(id)%js-p%of(id)%ghc, p%of(id)%je+p%of(id)%ghc
-            do i = p%of(id)%is-p%of(id)%ghc, p%of(id)%ie+p%of(id)%ghc
-            do k = p%of(id)%ks-1, p%of(id)%ks-p%of(id)%ghc, -1
-                p%of(id)%dat(i,j,k) = p%of(id-p%gx*p%gy)%dat(i,j,k)
+            do j = p%of(idx,idy,idz)%js-p%of(idx,idy,idz)%ghc, p%of(idx,idy,idz)%je+p%of(idx,idy,idz)%ghc
+            do i = p%of(idx,idy,idz)%is-p%of(idx,idy,idz)%ghc, p%of(idx,idy,idz)%ie+p%of(idx,idy,idz)%ghc
+            do k = p%of(idx,idy,idz)%ks-1, p%of(idx,idy,idz)%ks-p%of(idx,idy,idz)%ghc, -1
+                p%of(idx,idy,idz)%dat(i,j,k) = p%of(idx,idy,idz-1)%dat(i,j,k)
             end do
             end do
             end do
         
         endif
 
+    end do
+    end do
     end do
     !$omp end parallel do
     
@@ -256,8 +249,6 @@ integer :: comp
     
     call system_clock(cpustart)
 
-    call p%check
-
     do comp = 1, p%num
         call p%nodes(comp)%sync
     enddo
@@ -267,11 +258,125 @@ integer :: comp
     
 end subroutine 
 
+subroutine ptrmgpart_sync(p,level)
+implicit none
+class(pointer_mg_parent) :: p
+integer,intent(in) :: level
+integer :: idx,idy,idz,i,j,k,n
+integer(8) :: cpustart, cpuend
+
+call system_clock(cpustart)
+
+n = p%of(0,0,0)%at(level)%n
+
+!$omp parallel do collapse(3), private(i,j,k)
+do idx = 0, p%gx-1
+do idy = 0, p%gy-1
+do idz = 0, p%gz-1
+
+    if( idx>0 )then
+        do k = 1, n
+        do j = 1, n
+            p%of(idx,idy,idz)%at(level)%dat(0,j,k) = p%of(idx-1,idy,idz)%at(level)%dat(n,j,k)
+        enddo
+        enddo
+    else
+        do k = 1, n
+        do j = 1, n
+            p%of(idx,idy,idz)%at(level)%dat(0,j,k) = p%of(idx,idy,idz)%at(level)%dat(1,j,k)
+        enddo
+        enddo
+    endif
+
+    if( idx<p%gx-1 )then
+        do k = 1, n
+        do j = 1, n
+            p%of(idx,idy,idz)%at(level)%dat(n+1,j,k) = p%of(idx+1,idy,idz)%at(level)%dat(1,j,k)
+        enddo
+        enddo
+    else
+        do k = 1, n
+        do j = 1, n
+            p%of(idx,idy,idz)%at(level)%dat(n+1,j,k) = p%of(idx,idy,idz)%at(level)%dat(n,j,k)
+        enddo
+        enddo
+    endif
+
+    !--------------------------
+
+    if( idy>0 )then
+        do k = 1, n
+        do i = 1, n
+            p%of(idx,idy,idz)%at(level)%dat(i,0,k) = p%of(idx,idy-1,idz)%at(level)%dat(i,n,k)
+        enddo
+        enddo
+    else
+        do k = 1, n
+        do i = 1, n
+            p%of(idx,idy,idz)%at(level)%dat(i,0,k) = p%of(idx,idy,idz)%at(level)%dat(i,1,k)
+        enddo
+        enddo
+    endif
+
+    if( idy<p%gy-1 )then
+        do k = 1, n
+        do i = 1, n
+            p%of(idx,idy,idz)%at(level)%dat(i,n+1,k) = p%of(idx,idy+1,idz)%at(level)%dat(i,1,k)
+        enddo
+        enddo
+    else
+        do k = 1, n
+        do i = 1, n
+            p%of(idx,idy,idz)%at(level)%dat(i,n+1,k) = p%of(idx,idy,idz)%at(level)%dat(i,n,k)
+        enddo
+        enddo
+    endif
+
+    !--------------------------
+
+    if( idz>0 )then
+        do j = 1, n
+        do i = 1, n
+            p%of(idx,idy,idz)%at(level)%dat(i,j,0) = p%of(idx,idy,idz-1)%at(level)%dat(i,j,n)
+        enddo
+        enddo
+    else
+        do j = 1, n
+        do i = 1, n
+            p%of(idx,idy,idz)%at(level)%dat(i,j,0) = p%of(idx,idy,idz)%at(level)%dat(i,j,1)
+        enddo
+        enddo
+    endif
+
+    if( idz<p%gz-1 )then
+        do j = 1, n
+        do i = 1, n
+            p%of(idx,idy,idz)%at(level)%dat(i,j,n+1) = p%of(idx,idy,idz+1)%at(level)%dat(i,j,1)
+        enddo
+        enddo
+    else
+        do j = 1, n
+        do i = 1, n
+            p%of(idx,idy,idz)%at(level)%dat(i,j,n+1) = p%of(idx,idy,idz)%at(level)%dat(i,j,n)
+        enddo
+        enddo
+    endif
+
+enddo
+enddo
+enddo
+!$omp end parallel do
+
+call system_clock(cpuend)
+p%cputime = p%cputime + real(cpuend-cpustart,kind=8)/real(p%cpurate,kind=8)
+
+end subroutine
+
 subroutine ptrpart_reset(p)
 implicit none
 class(pointer_parent) :: p
 
-    p%cputime=0.0d0
+p%cputime=0.0d0
 
 end subroutine
 
@@ -280,10 +385,18 @@ implicit none
 class(pointer_vector_parent) :: p
 integer :: comp
 
-    p%cputime=0.0d0
-    do comp = 1, p%num
-        call p%nodes(comp)%reset
-    enddo
+p%cputime=0.0d0
+do comp = 1, p%num
+    call p%nodes(comp)%reset
+enddo
+
+end subroutine
+
+subroutine ptrmgpart_reset(p)
+implicit none
+class(pointer_mg_parent) :: p
+
+p%cputime = 0.0d0
 
 end subroutine
 

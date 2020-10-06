@@ -282,7 +282,13 @@ real(8) :: mag
     !$omp end parallel do
 
     write(*,*)"finish initializing job data"
-    
+
+    allocate( p%glb%id(0:p%glb%grid_x-1,0:p%glb%grid_y-1,0:p%glb%grid_z-1) )
+
+    do id = 0, p%glb%threads-1
+        p%glb%id(p%of(id)%loc%idx,p%of(id)%loc%idy,p%of(id)%loc%idz) = id
+    enddo
+
     p%glb%time = 0.0_8
     p%glb%iter = 0
     p%glb%pid = 0

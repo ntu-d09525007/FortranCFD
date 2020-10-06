@@ -1,3 +1,20 @@
+subroutine manager_mgsync_setup(p)
+implicit none
+class(manager) :: p
+integer :: level
+
+allocate( p%mg%syncer(p%glb%level) )
+
+if( p%glb%split == 1)then
+
+endif
+
+do level = 1, p%glb%level
+    allocate( p%mg%syncer(level)%sendp()
+enddo
+
+end subroutine
+
 subroutine manager_mg_setup(p)
 implicit none
 class(manager) :: p

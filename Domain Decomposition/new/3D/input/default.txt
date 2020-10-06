@@ -3,7 +3,7 @@ ooo	Method to capture interface ( LS / MPLS / CLSVOF )
 ooo	Name of the problem 
 30_drybed
 ooo	Dimension of threads grid in X, Y, Z direction
-5	    1  	    2
+5	1	2
 ooo	Multigrid level
 5
 ooo	Cells per unit length 

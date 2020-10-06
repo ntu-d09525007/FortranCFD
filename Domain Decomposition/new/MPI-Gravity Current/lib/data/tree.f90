@@ -8,6 +8,10 @@ integer :: ls_mv
 integer :: c
 end type filemanager
 
+type multigrid_sync
+real(8),dimension(:,:,:,:),allocatable :: sendp,sendm,recvp,recvm,buffer1,buffer2
+end type multigrid_sync
+
 type multigrid
 integer :: n, nx, ny, nz
 integer,dimension(:,:,:),allocatable :: node
@@ -15,6 +19,7 @@ integer,dimension(:),allocatable :: ix,iy,iz
 integer,dimension(:),allocatable :: ipiv, i, j, k
 real(8),dimension(:,:),allocatable :: A, AA
 real(8),dimension(:),allocatable :: B, BB, work, error, sol
+type(multigrid_sync),allocatable,dimension(:) :: syncer
 end type multigrid
 
 type manager

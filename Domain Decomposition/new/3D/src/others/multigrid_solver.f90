@@ -14,7 +14,7 @@ a = -2.0d0/dx**2.0d0 -2.0d0/dy**2.0d0 -2.0d0/dz**2.0d0
 
 do relax_iter = 1, num
 
-    call multigrid_sync(level) 
+    call pt%mg%sync(level) 
         
     !$omp parallel do private(i,j,k)
     do id = 0, p%glb%threads-1      
@@ -44,7 +44,7 @@ do relax_iter = 1, num
             
 enddo
     
-call multigrid_sync(level)
+call pt%mg%sync(level)
     
 end subroutine
 
@@ -110,7 +110,7 @@ integer :: id,level
 integer :: i,j,k
 real(8) :: mx,my,mz
 
-call multigrid_sync(level+1)
+call pt%mg%sync(level+1)
         
 !$omp parallel do private(i,j,k,mx,my,mz)
 do id = 0, p%glb%threads-1
@@ -166,7 +166,7 @@ integer :: level,id,i,j,k,n
 real(8) :: dx,dy,dz,l2norm
 logical :: reset
 
-call multigrid_sync(level)
+call pt%mg%sync(level)
 
 n = p%glb%threads * p%of(0)%loc%mg(level)%n
 
@@ -218,114 +218,6 @@ else
     enddo
     !$omp end parallel do 
 endif
-
-end subroutine
-
-subroutine multigrid_sync(level)
-use all
-implicit none
-integer :: id,i,j,k,level
-integer :: nx,ny,nz
-
-nz = p%of(0)%loc%mg(level)%nz
-ny = p%of(0)%loc%mg(level)%ny
-nx = p%of(0)%loc%mg(level)%nx
-    
-!$omp parallel do private(i,j,k)
-do id = 0, p%glb%threads-1  
-    
-    !==================================================================
-    
-    if( p%of(id)%loc%idx>0 )then
-        do k = 1, nz
-        do j = 1, ny
-            p%of(id)%loc%mg(level)%sol(0,j,k)=p%of(id-1)%loc%mg(level)%sol(nx,j,k)
-        enddo
-        enddo
-    else
-        do k = 1, nz
-        do j = 1, ny
-            p%of(id)%loc%mg(level)%sol(0,j,k)=p%of(id)%loc%mg(level)%sol(1,j,k)
-        enddo
-        enddo
-    endif
-    
-    if( p%of(id)%loc%idx<p%glb%grid_x-1 )then
-        do k = 1, nz
-        do j = 1, ny
-            p%of(id)%loc%mg(level)%sol(nx+1,j,k)=p%of(id+1)%loc%mg(level)%sol(1,j,k)
-        enddo
-        enddo
-    else
-        do k = 1, nz
-        do j = 1, ny
-            p%of(id)%loc%mg(level)%sol(nx+1,j,k)=p%of(id)%loc%mg(level)%sol(nx,j,k)
-        enddo
-        enddo
-    endif
-    
-    !==============================================================
-    
-    if( p%of(id)%loc%idy>0 )then
-        do k = 1, nz
-        do i = 1, nx
-            p%of(id)%loc%mg(level)%sol(i,0,k)=p%of(id-p%glb%grid_x)%loc%mg(level)%sol(i,ny,k)
-        enddo
-        enddo
-    else
-        do k = 1, nz
-        do i = 1, nx
-            p%of(id)%loc%mg(level)%sol(i,0,k)=p%of(id)%loc%mg(level)%sol(i,1,k)
-        enddo
-        enddo
-    endif
-    
-    if( p%of(id)%loc%idy<p%glb%grid_y-1 )then
-        do k = 1, nz
-        do i = 1, nx
-            p%of(id)%loc%mg(level)%sol(i,ny+1,k)=p%of(id+p%glb%grid_x)%loc%mg(level)%sol(i,1,k)
-        enddo
-        enddo
-    else
-        do k = 1, nz
-        do i = 1, nx
-            p%of(id)%loc%mg(level)%sol(i,ny+1,k)=p%of(id)%loc%mg(level)%sol(i,ny,k)
-        enddo
-        enddo
-    endif   
-    
-    !==============================================================
-    
-    if( p%of(id)%loc%idz>0 )then
-        do j = 1, ny
-        do i = 1, nx
-            p%of(id)%loc%mg(level)%sol(i,j,0)=p%of(id-p%glb%grid_x*p%glb%grid_y)%loc%mg(level)%sol(i,j,nz)
-        enddo
-        enddo
-    else
-        do j = 1, ny
-        do i = 1, nx
-            p%of(id)%loc%mg(level)%sol(i,j,0)=p%of(id)%loc%mg(level)%sol(i,j,1)
-        enddo
-        enddo
-    endif
-    
-    if( p%of(id)%loc%idz<p%glb%grid_z-1 )then
-        do j = 1, ny
-        do i = 1, nx
-            p%of(id)%loc%mg(level)%sol(i,j,nz+1)=p%of(id+p%glb%grid_x*p%glb%grid_y)%loc%mg(level)%sol(i,j,1)
-        enddo
-        enddo
-    else
-        do j = 1, ny
-        do i = 1, nx
-            p%of(id)%loc%mg(level)%sol(i,j,nz+1)=p%of(id)%loc%mg(level)%sol(i,j,nz)
-        enddo
-        enddo
-    endif
-    
-enddo  
-!$omp end parallel do
 
 end subroutine
 
