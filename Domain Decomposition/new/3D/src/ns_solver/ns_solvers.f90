@@ -29,7 +29,6 @@ integer :: id,i,j,k
 call p%rho_mu
 call p%curv
 call pt%normals%sync
-
     
 end subroutine
 

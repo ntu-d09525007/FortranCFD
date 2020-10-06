@@ -1,6 +1,13 @@
 subroutine ns_ab_diff_source
 implicit none
 
+    call ns_ab_diff_source_sec
+
+end subroutine
+
+subroutine ns_ab_diff_source_sec
+implicit none
+
     call u_source
     call v_source
     call w_source 
@@ -256,5 +263,10 @@ real(8) :: wx,wy,wz,uz,vz,phix,phiy,phiz,dif_x,dif_y,dif_z,curv
         
     enddo
     !$omp end parallel do
+
+end subroutine
+
+subroutine ns_ab_diff_source_uccd
+
 
 end subroutine
