@@ -232,7 +232,7 @@ do id = 0, p%glb%threads-1
 enddo    
 !$omp end parallel do
 
-    call multigrid_sync(1)
+    call pt%mg%sync(1)
 
 end subroutine
 
