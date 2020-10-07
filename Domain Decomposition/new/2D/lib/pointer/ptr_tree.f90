@@ -6,7 +6,7 @@ type ptr_family
 type(pointer_parent) :: phi, p, vof
 type(pointer_vector_parent) :: vel, nvel, nvel_old, velsrc_old, velsrc
 type(pointer_vector_parent) :: normals
-type(pointer_vector_parent) :: tdatax, tdatay, tdataz
+type(pointer_vector_parent) :: tdatax, tdatay
 type(pointer_mg_parent) :: mg
 contains 
 procedure init => ptr_family_init
@@ -37,7 +37,6 @@ integer :: idx,idy,id,level
         
     call p%tdatax%init(src,3)
     call p%tdatay%init(src,3)
-    call p%tdataz%init(src,3)
 
     call p%mg%init(src)
 
@@ -84,10 +83,6 @@ integer :: idx,idy,id,level
         p%tdatay%nodes(1)%of(idx,idy)%dat => src%of(id)%loc%tdata%y%s1
         p%tdatay%nodes(2)%of(idx,idy)%dat => src%of(id)%loc%tdata%y%s2
         p%tdatay%nodes(3)%of(idx,idy)%dat => src%of(id)%loc%tdata%y%s3
-
-        p%tdataz%nodes(1)%of(idx,idy)%dat => src%of(id)%loc%tdata%z%s1
-        p%tdataz%nodes(2)%of(idx,idy)%dat => src%of(id)%loc%tdata%z%s2
-        p%tdataz%nodes(3)%of(idx,idy)%dat => src%of(id)%loc%tdata%z%s3
         
     end do
     end do

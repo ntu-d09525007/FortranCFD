@@ -2,7 +2,7 @@ subroutine level_set_rk3_solver()
 use all
 !$ use omp_lib
 implicit none
-integer :: i,j,k,id
+integer :: i,j,id
 integer(8) :: cpustart, cpuend
 real(8) :: src
 
@@ -10,19 +10,17 @@ real(8) :: src
     
     call level_set_rk3_source_setup
 
-    !$omp parallel do private(i,j,k,src)
+    !$omp parallel do private(i,j,src)
     do id = 0, p%glb%threads-1
         
         call level_set_rk3_source(p%of(id),p%of(id)%loc%tdata%x%l1)
         
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
-            src = p%of(id)%loc%tdata%x%l1(i,j,k)
-            p%of(id)%loc%phi%now(i,j,k) = p%of(id)%loc%phi%now(i,j,k) + src * p%glb%dt
+            src = p%of(id)%loc%tdata%x%l1(i,j)
+            p%of(id)%loc%phi%now(i,j) = p%of(id)%loc%phi%now(i,j) + src * p%glb%dt
         end do 
         end do 
-        end do
         
         call p%of(id)%bc(0,p%of(id)%loc%phi%now)
     
@@ -32,19 +30,17 @@ real(8) :: src
     call pt%phi%sync
     call level_set_rk3_source_setup
     
-    !$omp parallel do private(i,j,k,src)
+    !$omp parallel do private(i,j,src)
     do id = 0, p%glb%threads-1
         
         call level_set_rk3_source(p%of(id),p%of(id)%loc%tdata%x%l2)
         
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
-            src = ( -3.0d0*p%of(id)%loc%tdata%x%l1(i,j,k) + p%of(id)%loc%tdata%x%l2(i,j,k) ) / 4.0d0
-            p%of(id)%loc%phi%now(i,j,k) = p%of(id)%loc%phi%now(i,j,k) + src * p%glb%dt
+            src = ( -3.0d0*p%of(id)%loc%tdata%x%l1(i,j) + p%of(id)%loc%tdata%x%l2(i,j) ) / 4.0d0
+            p%of(id)%loc%phi%now(i,j) = p%of(id)%loc%phi%now(i,j) + src * p%glb%dt
         end do 
         end do 
-        end do
         
         call p%of(id)%bc(0,p%of(id)%loc%phi%now)
     
@@ -54,19 +50,17 @@ real(8) :: src
     call pt%phi%sync
     call level_set_rk3_source_setup
     
-    !$omp parallel do private(i,j,k,src)
+    !$omp parallel do private(i,j,src)
     do id = 0, p%glb%threads-1
         
         call level_set_rk3_source(p%of(id),p%of(id)%loc%tdata%x%l3)
         
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
-            src = ( -p%of(id)%loc%tdata%x%l1(i,j,k)-p%of(id)%loc%tdata%x%l2(i,j,k)+8.0d0*p%of(id)%loc%tdata%x%l3(i,j,k) ) / 12.0d0
-            p%of(id)%loc%phi%now(i,j,k) = p%of(id)%loc%phi%now(i,j,k) + src * p%glb%dt
+            src = ( -p%of(id)%loc%tdata%x%l1(i,j)-p%of(id)%loc%tdata%x%l2(i,j)+8.0d0*p%of(id)%loc%tdata%x%l3(i,j) ) / 12.0d0
+            p%of(id)%loc%phi%now(i,j) = p%of(id)%loc%phi%now(i,j) + src * p%glb%dt
         end do 
         end do 
-        end do
         
         call p%of(id)%bc(0,p%of(id)%loc%phi%now)
     
@@ -76,7 +70,7 @@ real(8) :: src
     call pt%phi%sync    
     
     call system_clock(cpuend)
-    p%glb%ls_adv = p%glb%ls_adv + real(cpuend-cpustart,kind=8) / real( p%glb%cpurate, kind=8 )
+    p%glb%ls_adv = p%glb%ls_adv + real(cpuend-cpustartind=8) / real( p%glb%cpurate, kind=8 )
 
 end subroutine
 
@@ -84,39 +78,32 @@ subroutine level_set_rk3_source_setup
 use all
 !$ use omp_lib
 implicit none
-integer :: id,i,j,k
+integer :: id,i,j
 
 
-    !$omp parallel do private(i,j,k)
+    !$omp parallel do private(i,j)
     do id = 0, p%glb%threads-1
         
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
         
-            p%of(id)%loc%tdata%x%s1(i,j,k) = 0.5d0*(p%of(id)%loc%nvel%x%old(i,j,k)+abs(p%of(id)%loc%nvel%x%old(i,j,k)))*p%of(id)%loc%phi%now(i,j,k)
-            p%of(id)%loc%tdata%x%s2(i,j,k) = 0.5d0*(p%of(id)%loc%nvel%x%old(i,j,k)-abs(p%of(id)%loc%nvel%x%old(i,j,k)))*p%of(id)%loc%phi%now(i,j,k)
+            p%of(id)%loc%tdata%x%s1(i,j) = 0.5d0*(p%of(id)%loc%nvel%x%old(i,j)+abs(p%of(id)%loc%nvel%x%old(i,j)))*p%of(id)%loc%phi%now(i,j)
+            p%of(id)%loc%tdata%x%s2(i,j) = 0.5d0*(p%of(id)%loc%nvel%x%old(i,j)-abs(p%of(id)%loc%nvel%x%old(i,j)))*p%of(id)%loc%phi%now(i,j)
         
-            p%of(id)%loc%tdata%y%s1(i,j,k) = 0.5d0*(p%of(id)%loc%nvel%y%old(i,j,k)+abs(p%of(id)%loc%nvel%y%old(i,j,k)))*p%of(id)%loc%phi%now(i,j,k)
-            p%of(id)%loc%tdata%y%s2(i,j,k) = 0.5d0*(p%of(id)%loc%nvel%y%old(i,j,k)-abs(p%of(id)%loc%nvel%y%old(i,j,k)))*p%of(id)%loc%phi%now(i,j,k)
-        
-            p%of(id)%loc%tdata%z%s1(i,j,k) = 0.5d0*(p%of(id)%loc%nvel%z%old(i,j,k)+abs(p%of(id)%loc%nvel%z%old(i,j,k)))*p%of(id)%loc%phi%now(i,j,k)
-            p%of(id)%loc%tdata%z%s2(i,j,k) = 0.5d0*(p%of(id)%loc%nvel%z%old(i,j,k)-abs(p%of(id)%loc%nvel%z%old(i,j,k)))*p%of(id)%loc%phi%now(i,j,k)
-            
-        end do
+            p%of(id)%loc%tdata%y%s1(i,j) = 0.5d0*(p%of(id)%loc%nvel%y%old(i,j)+abs(p%of(id)%loc%nvel%y%old(i,j)))*p%of(id)%loc%phi%now(i,j)
+            p%of(id)%loc%tdata%y%s2(i,j) = 0.5d0*(p%of(id)%loc%nvel%y%old(i,j)-abs(p%of(id)%loc%nvel%y%old(i,j)))*p%of(id)%loc%phi%now(i,j)
+
         end do
         end do 
         
         call p%of(id)%bc(0,p%of(id)%loc%tdata%x%s1);call p%of(id)%bc(0,p%of(id)%loc%tdata%x%s2)
         call p%of(id)%bc(0,p%of(id)%loc%tdata%y%s1);call p%of(id)%bc(0,p%of(id)%loc%tdata%y%s2)
-        call p%of(id)%bc(0,p%of(id)%loc%tdata%z%s1);call p%of(id)%bc(0,p%of(id)%loc%tdata%z%s2)
     
     enddo
     !$omp end parallel do
     
     call pt%tdatax%sync
     call pt%tdatay%sync
-    call pt%tdataz%sync
 
 end subroutine 
 
@@ -125,55 +112,37 @@ use all
 implicit none
 type(job) :: q
 real(8), dimension(q%loc%is-q%glb%ghc:q%loc%ie+q%glb%ghc,&
-                  &q%loc%js-q%glb%ghc:q%loc%je+q%glb%ghc,&
-                  &q%loc%ks-q%glb%ghc:q%loc%ke+q%glb%ghc) :: s
-integer :: i,j,k
+                  &q%loc%js-q%glb%ghc:q%loc%je+q%glb%ghc) :: s
+integer :: i,j
 
-                                  
-    do k = q%loc%ks, q%loc%ke
     do j = q%loc%js, q%loc%je
-        !call q%loc%uccd%x%solve(q%loc%nvel%x%old(:,j,k),q%loc%phi%now(:,j,k),q%loc%tdata%x%s1(:,j,k),q%loc%tdata%x%s2(:,j,k))
-        call wenojs_flux_split(q%loc%tdata%x%s2(:,j,k),q%loc%tdata%x%s1(:,j,k),&
-                              q%loc%tdata%x%ss2(:,j,k),q%loc%tdata%x%ss1(:,j,k),&
+        !call q%loc%uccd%x%solve(q%loc%nvel%x%old(:,j),q%loc%phi%now(:,j),q%loc%tdata%x%s1(:,j),q%loc%tdata%x%s2(:,j))
+        call wenojs_flux_split(q%loc%tdata%x%s2(:,j),q%loc%tdata%x%s1(:,j),&
+                              q%loc%tdata%x%ss2(:,j),q%loc%tdata%x%ss1(:,j),&
                               q%loc%is,q%loc%ie,q%glb%ghc)
         !call crweno_flux_split(q%loc%tdata%x%s2(:,j),q%loc%tdata%x%s1(:,j),&
         !                      q%loc%tdata%x%ss2(:,j),q%loc%tdata%x%ss1(:,j),&
         !                      q%loc%is,q%loc%ie,q%glb%ghc)
     end do 
-    end do
 
-    do k = q%loc%ks, q%loc%ke
     do i = q%loc%is, q%loc%ie
-        !call q%loc%uccd%y%solve(q%loc%nvel%y%old(i,:,k),q%loc%phi%now(i,:,k),q%loc%tdata%y%s1(i,:,k),q%loc%tdata%y%s2(i,:,k))
-        call wenojs_flux_split(q%loc%tdata%y%s2(i,:,k),q%loc%tdata%y%s1(i,:,k),&
-                              q%loc%tdata%y%ss2(i,:,k),q%loc%tdata%y%ss1(i,:,k),&
+        !call q%loc%uccd%y%solve(q%loc%nvel%y%old(i,:),q%loc%phi%now(i,:),q%loc%tdata%y%s1(i,:),q%loc%tdata%y%s2(i,:))
+        call wenojs_flux_split(q%loc%tdata%y%s2(i,:),q%loc%tdata%y%s1(i,:),&
+                              q%loc%tdata%y%ss2(i,:),q%loc%tdata%y%ss1(i,:),&
                               q%loc%js,q%loc%je,q%glb%ghc)
         !call crweno_flux_split(q%loc%tdata%y%s2(i,:),q%loc%tdata%y%s1(i,:),&
         !                      q%loc%tdata%y%ss2(i,:),q%loc%tdata%y%ss1(i,:),&
         !                      q%loc%js,q%loc%je,q%glb%ghc)
     end do 
-    end do
 
     do j = q%loc%js, q%loc%je
     do i = q%loc%is, q%loc%ie
-        !call q%loc%uccd%z%solve(q%loc%nvel%z%old(i,j,:),q%loc%phi%now(i,j,:),q%loc%tdata%z%s1(i,j,:),q%loc%tdata%z%s2(i,j,:))
-        call wenojs_flux_split(q%loc%tdata%z%s2(i,j,:),q%loc%tdata%z%s1(i,j,:),&
-                              q%loc%tdata%z%ss2(i,j,:),q%loc%tdata%z%ss1(i,j,:),&
-                              q%loc%ks,q%loc%ke,q%glb%ghc)
+        s(i,j) = - (q%loc%tdata%x%ss1(i,j)+q%loc%tdata%x%ss2(i,j)-q%loc%tdata%x%ss1(i-1,j)-q%loc%tdata%x%ss2(i-1,j)) / p%glb%dx &
+                &- (q%loc%tdata%y%ss1(i,j)+q%loc%tdata%y%ss2(i,j)-q%loc%tdata%y%ss1(i,j-1)-q%loc%tdata%y%ss2(i,j-1)) / p%glb%dy
+        ! s(i,j) = - q%loc%nvel%x%old(i,j)*q%loc%tdata%x%s1(i,j) &
+        !         &  - q%loc%nvel%y%old(i,j)*q%loc%tdata%y%s1(i,j) &
+        !         &  - q%loc%nvel%z%old(i,j)*q%loc%tdata%z%s1(i,j) 
     end do 
-    end do
-    
-    do k = q%loc%ks, q%loc%ke
-    do j = q%loc%js, q%loc%je
-    do i = q%loc%is, q%loc%ie
-        s(i,j,k) = - (q%loc%tdata%x%ss1(i,j,k)+q%loc%tdata%x%ss2(i,j,k)-q%loc%tdata%x%ss1(i-1,j,k)-q%loc%tdata%x%ss2(i-1,j,k)) / p%glb%dx &
-                  &- (q%loc%tdata%y%ss1(i,j,k)+q%loc%tdata%y%ss2(i,j,k)-q%loc%tdata%y%ss1(i,j-1,k)-q%loc%tdata%y%ss2(i,j-1,k)) / p%glb%dy &
-                  &- (q%loc%tdata%z%ss1(i,j,k)+q%loc%tdata%z%ss2(i,j,k)-q%loc%tdata%z%ss1(i,j,k-1)-q%loc%tdata%z%ss2(i,j,k-1)) / p%glb%dz
-        ! s(i,j,k) = - q%loc%nvel%x%old(i,j,k)*q%loc%tdata%x%s1(i,j,k) &
-        !         &  - q%loc%nvel%y%old(i,j,k)*q%loc%tdata%y%s1(i,j,k) &
-        !         &  - q%loc%nvel%z%old(i,j,k)*q%loc%tdata%z%s1(i,j,k) 
-    end do 
-    end do
     end do
     
 end subroutine

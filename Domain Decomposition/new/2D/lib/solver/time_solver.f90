@@ -18,7 +18,7 @@ end type tsolver_roots
 type tsolver_data
 integer :: is, ie, js, je
 logical :: is_vector_solver
-type(tsolver_roots) :: x, y, z
+type(tsolver_roots) :: x, y
 contains
 procedure alloc => tsolver_data_alloc
 procedure init => tsolver_data_init

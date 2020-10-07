@@ -1,5 +1,5 @@
 include './setup/problem_init.f90'
-include './setup/velocity.f90'
+
 include './interface_solver/interface_solver.f90'
 include './interface_solver/clsvof.f90'
 include './interface_solver/level_set_symplectic_solver.f90'
@@ -18,4 +18,3 @@ include './others/output.f90'
 include './others/debug.f90'
 include './others/multigrid_solver.f90'
 include './others/plot.f90'
-include './others/vortex_related.f90'
