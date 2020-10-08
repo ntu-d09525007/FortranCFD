@@ -65,7 +65,7 @@ do
 end do 
 
     call system_clock(cpuend)
-    p%glb%ls_red = p%glb%ls_red + real(btnind=8)*real(cpuend-cpustartind=8)/real(p%glb%cpurateind=8)
+    p%glb%ls_red = p%glb%ls_red + real(btn,kind=8)*real(cpuend-cpustart,kind=8)/real(p%glb%cpurate,kind=8)
 
 end subroutine
 

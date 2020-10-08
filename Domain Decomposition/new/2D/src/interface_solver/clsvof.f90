@@ -147,7 +147,7 @@ integer(8) :: cpustart, cpuend
     call pt%vof%sync
     
     call system_clock(cpuend)
-    p%glb%ls_adv = p%glb%ls_adv + real(cpuend-cpustartind=8) / real( p%glb%cpurate, kind=8 )
+    p%glb%ls_adv = p%glb%ls_adv + real(cpuend-cpustart,kind=8) / real( p%glb%cpurate, kind=8 )
     
 end subroutine
 
@@ -202,7 +202,7 @@ end do
     call pt%phi%sync
 
     call system_clock(cpuend)
-    p%glb%ls_red = p%glb%ls_red + real(cpuend-cpustartind=8)/real(p%glb%cpurateind=8)   
+    p%glb%ls_red = p%glb%ls_red + real(cpuend-cpustart,kind=8)/real(p%glb%cpurate,kind=8)   
     
     call level_set_rk3_redis(1)
 

@@ -123,13 +123,13 @@ real(8) :: uh,vh
             vh = 0.5d0*( p%of(id)%loc%vel%y%old(i,j) + p%of(id)%loc%vel%y%old(i+1,j) )
 
             p%of(id)%loc%velsrc%x%now(i,j) = - uh*( p%of(id)%loc%tdata%x%s1(i,j)-p%of(id)%loc%tdata%x%s1(i-1,j) )/p%glb%dx &
-                                            &- vh*( p%of(id)%loc%tdata%x%s2(i,j)-p%of(id)%loc%tdata%x%s2(i,j-1) )/p%glb%dy &
+                                            &- vh*( p%of(id)%loc%tdata%x%s2(i,j)-p%of(id)%loc%tdata%x%s2(i,j-1) )/p%glb%dy 
                       
             uh = 0.5d0*( p%of(id)%loc%vel%x%old(i,j) + p%of(id)%loc%vel%x%old(i,j+1) )
             vh = 0.5d0*( p%of(id)%loc%vel%y%old(i,j) + p%of(id)%loc%vel%y%old(i,j+1) )
  
             p%of(id)%loc%velsrc%y%now(i,j) = - uh*( p%of(id)%loc%tdata%y%s1(i,j)-p%of(id)%loc%tdata%y%s1(i-1,j) )/p%glb%dx &
-                                            &- vh*( p%of(id)%loc%tdata%y%s2(i,j)-p%of(id)%loc%tdata%y%s2(i,j-1) )/p%glb%dy &
+                                            &- vh*( p%of(id)%loc%tdata%y%s2(i,j)-p%of(id)%loc%tdata%y%s2(i,j-1) )/p%glb%dy 
                                              
         end do
         end do
@@ -149,13 +149,12 @@ real(8) :: u,v
 do id = 0, p%glb%threads-1
         
     call p%of(id)%find_stag_vel( p%of(id)%loc%tdata%x%s1, p%of(id)%loc%tdata%y%s1, &
-                                &p%of(id)%loc%vel%x%old, p%of(id)%loc%vel%y%old, )
+                                &p%of(id)%loc%vel%x%old, p%of(id)%loc%vel%y%old )
 enddo       
 !$omp end parallel do
 
 call pt%tdatax%sync
 call pt%tdatay%sync
-
 
 !$omp parallel do private(u,v,i,j)
 do id = 0, p%glb%threads-1
@@ -215,12 +214,6 @@ do id = 0, p%glb%threads-1
 
         p%of(id)%loc%velsrc%y%now(i,j) = - u * p%of(id)%loc%vel_ten%yx(i,j) &
                                       &  - v * p%of(id)%loc%vel_ten%yy(i,j)
-
-        u = p%of(id)%loc%tdata%x%s2(i,j)
-        v = p%of(id)%loc%tdata%y%s2(i,j)
-
-        p%of(id)%loc%velsrc%z%now(i,j) = - u * p%of(id)%loc%vel_ten%zx(i,j) &
-                                      &  - v * p%of(id)%loc%vel_ten%zy(i,j)
 
     enddo
     enddo

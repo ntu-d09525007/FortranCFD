@@ -3,7 +3,7 @@ ooo	Method to capture interface ( LS / MPLS / CLSVOF )
 ooo	Name of the problem 
 30_drybed
 ooo	Dimension of threads grid in X, Y, Z direction
-5	1	2
+5	3
 ooo	Multigrid level
 5
 ooo	Cells per unit length 
@@ -13,9 +13,7 @@ ooo	Number of ghost cell
 ooo	Range of domain in X direction
 0.0		5.0
 ooo	Range of domain in Y direction
-0.0		1.0
-ooo	Range of domain in Z direction
-0.0		2.0
+0.0		3.0
 ooo	Time to stop / plot
 10.0		0.05
 ooo	Crount number ( advection / redistance )
@@ -37,7 +35,7 @@ ooo	Surface tension of fluid 1, 2 / Using ?
 ooo	Gravity / Using ?
 9.81		1
 ooo	Gravity direction ( no need normalize)
-0.0	    0.0	    	-1.0
+0.0	    -1.0
 ooo	Characteristic Length, Velocity, Time
 0.05715		2.0		0
 ooo	Dimensionless parameters ( Re, Fr, We )  !!! We should not be zero
@@ -47,6 +45,4 @@ ooo	Density / Viscosity ratio of fluid 1, 2
 ooo	Velocity boundary condition in X direction ( no-slip / slip / non-reflective )
 1		1
 ooo	Velocity boundary condition in Y direction ( no-slip / slip / non-reflective )
-1		1
-ooo	Velocity boundary condition in Z direction ( no-slip / slip / non-reflective )
 1		1

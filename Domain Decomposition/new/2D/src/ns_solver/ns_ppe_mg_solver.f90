@@ -76,7 +76,7 @@ call pt%p%sync
 call ppe_mg_correction
 
 call system_clock(cpuend)
-p%glb%ppe = p%glb%ppe + real(cpuend-cpustartind=8)/real(p%glb%cpurateind=8)
+p%glb%ppe = p%glb%ppe + real(cpuend-cpustart,kind=8)/real(p%glb%cpurate,kind=8)
     
 end subroutine
 

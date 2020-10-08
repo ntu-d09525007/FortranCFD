@@ -182,14 +182,16 @@ real(8) :: mag
     p%glb%node_y = p%glb%ug * ( p%glb%yend - p%glb%ystart )
     
     allocate( p%glb%x(0:p%glb%node_x+1,0:p%glb%node_y+1),&
-             &p%glb%y(0:p%glb%node_x+1,0:p%glb%node_y+1) )
+             &p%glb%y(0:p%glb%node_x+1,0:p%glb%node_y+1),&
+             &p%glb%zeros(0:p%glb%node_x+1,0:p%glb%node_y+1) )
 
     write(*,*)"finish allocating public grids"
     
     !$omp parallel do
     do id = 0, p%glb%threads-1
         allocate( p%of(id)%glb%x(0:p%glb%node_x+1,0:p%glb%node_y+1),&
-                 &p%of(id)%glb%y(0:p%glb%node_x+1,0:p%glb%node_y+1) )
+                 &p%of(id)%glb%y(0:p%glb%node_x+1,0:p%glb%node_y+1),&
+                 &p%of(id)%glb%zeros(0:p%glb%node_x+1,0:p%glb%node_y+1) )
     enddo
     !$omp end parallel do
     

@@ -2,8 +2,8 @@ subroutine problem_init()
 use all
 !$ use omp_lib
 implicit none
-integer :: id,i,j, g,ii,jj
-real(8) :: x, y, z, err
+integer :: id,i,j,ug,ii,jj
+real(8) :: x,y,err
 CHARACTER(100) :: NAME_OF_FILE
     
     NAME_OF_FILE='d'
@@ -39,7 +39,6 @@ CHARACTER(100) :: NAME_OF_FILE
         
             do ii = 1, ug
             do jj = 1, ug
-            do kk = 1, ug
                 
                 x = 0.5d0*( p%glb%x(i,j)+p%glb%x(i-1,j) ) + real(ii,8)*p%glb%dx/real(ug,8)
                 y = 0.5d0*( p%glb%y(i,j)+p%glb%y(i,j-1) ) + real(jj,8)*p%glb%dy/real(ug,8)
@@ -63,11 +62,10 @@ CHARACTER(100) :: NAME_OF_FILE
 
         end do
         end do
-        end do
         
         call p%of(id)%bc(0,p%of(id)%loc%phi%now)
         call p%of(id)%bc(0,p%of(id)%loc%vof%now)
-        call p%of(id)%velbc(p%of(id)%loc%vel%x%now,p%of(id)%loc%vel%y%now
+        call p%of(id)%velbc(p%of(id)%loc%vel%x%now,p%of(id)%loc%vel%y%now)
 
     enddo
     !$omp end parallel do

@@ -34,7 +34,7 @@ real(8) :: mu_12, rho_12
 real(8) :: vel_div, vel_sdiv, ns_linf, ns_l2f, ppe_linf
 real(8) :: btn_sf, btn_g
 real(8) :: ls_adv, ls_red, ppe, ns, syn
-real(8),dimension(:,:),allocatable :: x, y
+real(8),dimension(:,:),allocatable :: x, y, zeros
 integer,allocatable :: id(:,:)
 end type global
 
@@ -46,8 +46,10 @@ type(time_recorded) :: heavy, delta, grad, sign
 type(time_recorded) :: phi, p, rho, mu, vof
 type(time_recorded_derivatives) :: normals
 type(time_recorded_vec) :: vel, nvel, velsrc
+type(tensor) :: vel_ten
 type(tsolver_data) :: tdata
 type(ccd_manager) :: ccdsolvers
+real(8),dimension(:,:),allocatable :: zeros
 !-------------------------------------------
 type(multigrid_root),dimension(:),allocatable :: mg
 contains
@@ -96,6 +98,8 @@ ENDIF
 
 IS = P%LOC%IS - P%GLB%GHC; IE = P%LOC%IE + P%GLB%GHC
 JS = P%LOC%JS - P%GLB%GHC; JE = P%LOC%JE + P%GLB%GHC
+
+allocate(p%loc%zeros(is:ie,js:je))
 
 ! coefficients matrices
 CALL P%LOC%COE%ALLOC(IS,IE,JS,JE)

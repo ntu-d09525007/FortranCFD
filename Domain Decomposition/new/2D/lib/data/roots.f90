@@ -59,7 +59,7 @@ p%order = order
 p%is = is; p%ie = ie
 p%js = js; p%je = je
 
-if( order == 3)then
+if( order == 2)then
 
 allocate( p%xx(is:ie,js:je), p%xy(is:ie,js:je), &
           p%yx(is:ie,js:je), p%yy(is:ie,js:je) )

@@ -43,14 +43,13 @@ subroutine tsolver_data_solve_srk4(p,err)
 implicit none
 class(tsolver_data) :: p
 real(8), intent(out) :: err
-real(8) :: err1, err2, err3
+real(8) :: err1, err2
 
  call p%x%solve_srk4(err1)
 
  if( p%is_vector_solver )then
     call p%y%solve_srk4(err2)
-    call p%z%solve_srk4(err3)
-    err = max( err1, err2, err3 )
+    err = max( err1, err2 )
  else
     err = err1
  endif

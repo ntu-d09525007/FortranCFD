@@ -20,8 +20,7 @@ do iter = 1, 2
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
         
             p%of(id)%loc%grad%now(i,j) = dsqrt( p%of(id)%loc%normals%x%now(i,j)**2.0_8 + &
-                                                & p%of(id)%loc%normals%y%now(i,j)**2.0_8 + &
-                                                & p%of(id)%loc%normals%z%now(i,j)**2.0_8 )
+                                              & p%of(id)%loc%normals%y%now(i,j)**2.0_8 )
             
             plam =  p%of(id)%loc%delta%now(i,j)**2.0_8 * p%of(id)%loc%grad%now(i,j) 
             plam = plam * ( 2.0_8*(1.0_8-p%glb%rho_12)*p%of(id)%loc%heavy%now(i,j) + p%glb%rho_12 )*p%glb%dx*p%glb%dy

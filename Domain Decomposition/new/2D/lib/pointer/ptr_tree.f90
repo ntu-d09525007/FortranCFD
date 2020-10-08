@@ -99,7 +99,7 @@ real(8)  :: y
     y = p%phi%cputime + p%p%cputime + p%vof%cputime
     y = y + p%vel%cputime + p%nvel%cputime + p%velsrc%cputime + p%velsrc_old%cputime
     y = y + p%normals%cputime 
-    y = y + p%tdatax%cputime + p%tdatay%cputime + p%tdataz%cputime
+    y = y + p%tdatax%cputime + p%tdatay%cputime
 
 end subroutine
 
@@ -117,8 +117,6 @@ class(ptr_family) :: p
     call p%normals%reset
     call p%tdatax%reset
     call p%tdatay%reset
-    call p%tdataz%reset
-    
 
 end subroutine
 

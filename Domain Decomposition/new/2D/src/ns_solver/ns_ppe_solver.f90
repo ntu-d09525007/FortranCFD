@@ -2,64 +2,47 @@ subroutine ppe_sor_init
 use all
 !$ use omp_lib
 implicit none
-integer :: id,i,j,k
+integer :: id,i,j
 
-    !$omp parallel do private(i,j,k)
+    !$omp parallel do private(i,j)
     do id = 0, p%glb%threads-1
         
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
         
-            p%of(id)%loc%coe%r(i,j,k) = 2.0d0 / (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i+1,j,k))
-            p%of(id)%loc%coe%l(i,j,k) = 2.0d0 / (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i-1,j,k))
-            p%of(id)%loc%coe%f(i,j,k) = 2.0d0 / (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j+1,k))
-            p%of(id)%loc%coe%b(i,j,k) = 2.0d0 / (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j-1,k))
-            p%of(id)%loc%coe%u(i,j,k) = 2.0d0 / (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j,k+1))
-            p%of(id)%loc%coe%d(i,j,k) = 2.0d0 / (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j,k-1))
-            
-            p%of(id)%loc%coe%r(i,j,k) = p%of(id)%loc%coe%r(i,j,k) / p%glb%dx**2.0d0
-            p%of(id)%loc%coe%l(i,j,k) = p%of(id)%loc%coe%l(i,j,k) / p%glb%dx**2.0d0
-            p%of(id)%loc%coe%f(i,j,k) = p%of(id)%loc%coe%f(i,j,k) / p%glb%dy**2.0d0
-            p%of(id)%loc%coe%b(i,j,k) = p%of(id)%loc%coe%b(i,j,k) / p%glb%dy**2.0d0
-            p%of(id)%loc%coe%u(i,j,k) = p%of(id)%loc%coe%u(i,j,k) / p%glb%dz**2.0d0
-            p%of(id)%loc%coe%d(i,j,k) = p%of(id)%loc%coe%d(i,j,k) / p%glb%dz**2.0d0
-            
-            p%of(id)%loc%coe%c(i,j,k) = - ( p%of(id)%loc%coe%r(i,j,k) + p%of(id)%loc%coe%l(i,j,k) + &
-                                    &       p%of(id)%loc%coe%f(i,j,k) + p%of(id)%loc%coe%b(i,j,k) + &
-                                    &       p%of(id)%loc%coe%u(i,j,k) + p%of(id)%loc%coe%d(i,j,k) )
+            p%of(id)%loc%coe%r(i,j) = 2.0d0 / (p%of(id)%loc%rho%now(i,j)+p%of(id)%loc%rho%now(i+1,j))
+            p%of(id)%loc%coe%l(i,j) = 2.0d0 / (p%of(id)%loc%rho%now(i,j)+p%of(id)%loc%rho%now(i-1,j))
+            p%of(id)%loc%coe%f(i,j) = 2.0d0 / (p%of(id)%loc%rho%now(i,j)+p%of(id)%loc%rho%now(i,j+1))
+            p%of(id)%loc%coe%b(i,j) = 2.0d0 / (p%of(id)%loc%rho%now(i,j)+p%of(id)%loc%rho%now(i,j-1))
+  
+            p%of(id)%loc%coe%r(i,j) = p%of(id)%loc%coe%r(i,j) / p%glb%dx**2.0d0
+            p%of(id)%loc%coe%l(i,j) = p%of(id)%loc%coe%l(i,j) / p%glb%dx**2.0d0
+            p%of(id)%loc%coe%f(i,j) = p%of(id)%loc%coe%f(i,j) / p%glb%dy**2.0d0
+            p%of(id)%loc%coe%b(i,j) = p%of(id)%loc%coe%b(i,j) / p%glb%dy**2.0d0
+  
+            p%of(id)%loc%coe%c(i,j) = - ( p%of(id)%loc%coe%r(i,j) + p%of(id)%loc%coe%l(i,j) + &
+                                    &     p%of(id)%loc%coe%f(i,j) + p%of(id)%loc%coe%b(i,j) )
                             
             if( i==1 )then
-                p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%l(i,j,k)
-                p%of(id)%loc%coe%l(i,j,k)=0.0d0
+                p%of(id)%loc%coe%c(i,j)=p%of(id)%loc%coe%c(i,j)+p%of(id)%loc%coe%l(i,j)
+                p%of(id)%loc%coe%l(i,j)=0.0d0
             endif
             
             if( i==p%glb%node_x )then
-                p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%r(i,j,k)
-                p%of(id)%loc%coe%r(i,j,k)=0.0d0
+                p%of(id)%loc%coe%c(i,j)=p%of(id)%loc%coe%c(i,j)+p%of(id)%loc%coe%r(i,j)
+                p%of(id)%loc%coe%r(i,j)=0.0d0
             endif
             
             if( j==1 )then
-                p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%b(i,j,k)
-                p%of(id)%loc%coe%b(i,j,k)=0.0d0
+                p%of(id)%loc%coe%c(i,j)=p%of(id)%loc%coe%c(i,j)+p%of(id)%loc%coe%b(i,j)
+                p%of(id)%loc%coe%b(i,j)=0.0d0
             endif
             
             if( j==p%glb%node_y )then
-                p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%f(i,j,k)
-                p%of(id)%loc%coe%f(i,j,k)=0.0d0
+                p%of(id)%loc%coe%c(i,j)=p%of(id)%loc%coe%c(i,j)+p%of(id)%loc%coe%f(i,j)
+                p%of(id)%loc%coe%f(i,j)=0.0d0
             endif
             
-            if( k==1 )then
-                p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%d(i,j,k)
-                p%of(id)%loc%coe%d(i,j,k)=0.0d0
-            endif
-            
-            if( k==p%glb%node_z )then
-                p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%u(i,j,k)
-                p%of(id)%loc%coe%u(i,j,k)=0.0d0
-            endif
-            
-        end do
         end do
         end do
         
@@ -72,7 +55,7 @@ subroutine ppe_sor_solver(tol)
 use all
 !$ use omp_lib
 implicit none
-integer :: id,i,j,k,iter
+integer :: id,i,j,iter
 integer(8) :: cpustart, cpuend
 real(8) :: sump, err, w, pcal, tol
 
@@ -80,18 +63,15 @@ real(8) :: sump, err, w, pcal, tol
 
     call ppe_sor_init
 
-    !$omp parallel do private(i,j,k)
+    !$omp parallel do private(i,j)
     do id = 0, p%glb%threads-1
         
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
         
-            p%of(id)%loc%coe%src(i,j,k) = ( ( p%of(id)%loc%vel%x%now(i,j,k) - p%of(id)%loc%vel%x%now(i-1,j,k) ) / p%glb%dx + &
-                                            ( p%of(id)%loc%vel%y%now(i,j,k) - p%of(id)%loc%vel%y%now(i,j-1,k) ) / p%glb%dy + & 
-                                            ( p%of(id)%loc%vel%z%now(i,j,k) - p%of(id)%loc%vel%z%now(i,j,k-1) ) / p%glb%dz ) / p%glb%dt
+            p%of(id)%loc%coe%src(i,j) = ( ( p%of(id)%loc%vel%x%now(i,j) - p%of(id)%loc%vel%x%now(i-1,j) ) / p%glb%dx + &
+                                          ( p%of(id)%loc%vel%y%now(i,j) - p%of(id)%loc%vel%y%now(i,j-1) ) / p%glb%dy ) / p%glb%dt
                                                     
-        end do
         end do
         end do
        
@@ -104,25 +84,21 @@ do
     
     p%glb%piter=p%glb%piter+1
 
-    !$omp parallel do private(i,j,k)
+    !$omp parallel do private(i,j)
     do id = 0, p%glb%threads-1
 
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
         
-            p%of(id)%loc%p%tmp(i,j,k) = p%of(id)%loc%p%now(i,j,k)
+            p%of(id)%loc%p%tmp(i,j) = p%of(id)%loc%p%now(i,j)
             
-            p%of(id)%loc%p%now(i,j,k) = p%of(id)%loc%coe%src(i,j,k) - p%of(id)%loc%coe%r(i,j,k)*p%of(id)%loc%p%now(i+1,j,k) &
-                                                                &   - p%of(id)%loc%coe%l(i,j,k)*p%of(id)%loc%p%now(i-1,j,k) &
-                                                                &   - p%of(id)%loc%coe%f(i,j,k)*p%of(id)%loc%p%now(i,j+1,k) &
-                                                                &   - p%of(id)%loc%coe%b(i,j,k)*p%of(id)%loc%p%now(i,j-1,k) &
-                                                                &   - p%of(id)%loc%coe%u(i,j,k)*p%of(id)%loc%p%now(i,j,k+1) &
-                                                                &   - p%of(id)%loc%coe%d(i,j,k)*p%of(id)%loc%p%now(i,j,k-1)
+            p%of(id)%loc%p%now(i,j) = p%of(id)%loc%coe%src(i,j) - p%of(id)%loc%coe%r(i,j)*p%of(id)%loc%p%now(i+1,j) &
+                                                            &   - p%of(id)%loc%coe%l(i,j)*p%of(id)%loc%p%now(i-1,j) &
+                                                            &   - p%of(id)%loc%coe%f(i,j)*p%of(id)%loc%p%now(i,j+1) &
+                                                            &   - p%of(id)%loc%coe%b(i,j)*p%of(id)%loc%p%now(i,j-1)
                                                             
-            p%of(id)%loc%p%now(i,j,k) = p%of(id)%loc%p%now(i,j,k) / p%of(id)%loc%coe%c(i,j,k)  
+            p%of(id)%loc%p%now(i,j) = p%of(id)%loc%p%now(i,j) / p%of(id)%loc%coe%c(i,j)  
   
-        end do
         end do
         end do
     
@@ -130,39 +106,35 @@ do
     !$omp end parallel do
     
     sump=0.0d0
-    !$omp parallel do private(i,j,k), reduction(+:sump)
+    !$omp parallel do private(i,j), reduction(+:sump)
     do id = 0, p%glb%threads-1
         
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
                
-            sump = sump + p%of(id)%loc%p%now(i,j,k)
+            sump = sump + p%of(id)%loc%p%now(i,j)
 
-        end do
         end do
         end do
     
     enddo
     !$omp end parallel do
     
-    sump = sump / ( p%glb%node_x * p%glb%node_y * p%glb%node_z )
+    sump = sump / ( p%glb%node_x * p%glb%node_y )
 
     err=0.0d0    
-    !$omp parallel do private(i,j,k), reduction(max:err)
+    !$omp parallel do private(i,j), reduction(max:err)
     do id = 0, p%glb%threads-1
         
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
             
-            p%of(id)%loc%p%now(i,j,k) = p%of(id)%loc%p%now(i,j,k) - sump
+            p%of(id)%loc%p%now(i,j) = p%of(id)%loc%p%now(i,j) - sump
 
-            p%of(id)%loc%p%now(i,j,k) = w * p%of(id)%loc%p%now(i,j,k) + (1.0d0-w)*p%of(id)%loc%p%tmp(i,j,k)
+            p%of(id)%loc%p%now(i,j) = w * p%of(id)%loc%p%now(i,j) + (1.0d0-w)*p%of(id)%loc%p%tmp(i,j)
 
-            err = max( err,abs(p%of(id)%loc%p%now(i,j,k)-p%of(id)%loc%p%tmp(i,j,k)) )
+            err = max( err,abs(p%of(id)%loc%p%now(i,j)-p%of(id)%loc%p%tmp(i,j)) )
 
-        end do
         end do
         end do
         
@@ -199,33 +171,27 @@ subroutine ns_momentum_correction
 use all
 !$ use omp_lib
 implicit none
-integer :: id,i,j,k
-real(8) :: px,py,pz,rho,ux,vy,wz
+integer :: id,i,j
+real(8) :: px,py,rho,ux,vy
 
-    !$omp parallel do private(i,j,k,px,py,pz,rho)
+    !$omp parallel do private(i,j,px,py,rho)
     do id = 0, p%glb%threads-1
         
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
             
-            rho = (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i+1,j,k))/2.0d0
-            px  = (p%of(id)%loc%p%now(i+1,j,k)-p%of(id)%loc%p%now(i,j,k)) / p%glb%dx  
-            p%of(id)%loc%vel%x%now(i,j,k) = p%of(id)%loc%vel%x%now(i,j,k) - p%glb%dt*px/rho
+            rho = (p%of(id)%loc%rho%now(i,j)+p%of(id)%loc%rho%now(i+1,j))/2.0d0
+            px  = (p%of(id)%loc%p%now(i+1,j)-p%of(id)%loc%p%now(i,j)) / p%glb%dx  
+            p%of(id)%loc%vel%x%now(i,j) = p%of(id)%loc%vel%x%now(i,j) - p%glb%dt*px/rho
             
-            rho = (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j+1,k))/2.0d0
-            py  = (p%of(id)%loc%p%now(i,j+1,k)-p%of(id)%loc%p%now(i,j,k)) / p%glb%dy        
-            p%of(id)%loc%vel%y%now(i,j,k) = p%of(id)%loc%vel%y%now(i,j,k) - p%glb%dt*py/rho
-            
-            rho = (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j,k+1))/2.0d0
-            pz  = (p%of(id)%loc%p%now(i,j,k+1)-p%of(id)%loc%p%now(i,j,k)) / p%glb%dz        
-            p%of(id)%loc%vel%z%now(i,j,k) = p%of(id)%loc%vel%z%now(i,j,k) - p%glb%dt*pz/rho
-            
-        end do
+            rho = (p%of(id)%loc%rho%now(i,j)+p%of(id)%loc%rho%now(i,j+1))/2.0d0
+            py  = (p%of(id)%loc%p%now(i,j+1)-p%of(id)%loc%p%now(i,j)) / p%glb%dy        
+            p%of(id)%loc%vel%y%now(i,j) = p%of(id)%loc%vel%y%now(i,j) - p%glb%dt*py/rho
+
         end do
         end do
     
-        call p%of(id)%velbc(p%of(id)%loc%vel%x%now,p%of(id)%loc%vel%y%now,p%of(id)%loc%vel%z%now)
+        call p%of(id)%velbc(p%of(id)%loc%vel%x%now,p%of(id)%loc%vel%y%now)
       
     enddo       
     !$omp end parallel do

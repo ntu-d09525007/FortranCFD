@@ -109,7 +109,6 @@ do id = 0, p%glb%threads-1
         
     enddo
     enddo
-    enddo
 
     do j = 1, p%of(id)%loc%mg(level)%ny
     do i = 1, p%of(id)%loc%mg(level)%nx 
@@ -153,7 +152,6 @@ do id = 0, p%glb%threads-1
                                     
         L2norm = L2norm + p%of(id)%loc%mg(level)%res(i,j)**2.0d0
 
-    enddo
     enddo
     enddo
 
@@ -322,7 +320,6 @@ do level = 1, p%glb%level-1
     !$omp parallel do private(i,j)
     do id = 0, p%glb%threads-1      
         
-        do k = 1, p%of(id)%loc%mg(level+1)%nz
         do j = 1, p%of(id)%loc%mg(level+1)%ny
         do i = 1, p%of(id)%loc%mg(level+1)%nx
         
@@ -332,7 +329,6 @@ do level = 1, p%glb%level-1
              
             p%of(id)%loc%mg(level+1)%sol(i,j) = 0.0d0
             
-        enddo
         enddo
         enddo
 
