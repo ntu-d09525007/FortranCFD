@@ -50,37 +50,37 @@ do i = 1, p%n
 
     if( p%i(i)>1 )then
         p%A(i,p%node(p%i(i)-1,p%j(i),p%k(i))) = 1.0d0 / dx**2.0d0
-    else !if ( p%idx==0 )then
+    else if ( p%idx==0 )then
         p%A(i,i) = p%A(i,i) + 1.0d0 / dx**2.0d0
     endif
 
     if( p%i(i)<p%nx )then
         p%A(i,p%node(p%i(i)+1,p%j(i),p%k(i))) = 1.0d0 / dx**2.0d0
-    else !if ( p%idx==p%gx-1 )then
+    else if ( p%idx==p%gx-1 )then
         p%A(i,i) = p%A(i,i) + 1.0d0 / dx**2.0d0
     endif
 
     if( p%j(i)>1 )then
         p%A(i,p%node(p%i(i),p%j(i)-1,p%k(i))) = 1.0d0 / dy**2.0d0
-    else !if ( p%idy==0 )then
+    else if ( p%idy==0 )then
         p%A(i,i) = p%A(i,i) + 1.0d0 / dx**2.0d0
     endif
 
     if( p%j(i)<p%ny )then
         p%A(i,p%node(p%i(i),p%j(i)+1,p%k(i))) = 1.0d0 / dy**2.0d0
-    else !if ( p%idy==p%gy-1 )then
+    else if ( p%idy==p%gy-1 )then
         p%A(i,i) = p%A(i,i) + 1.0d0 / dx**2.0d0
     endif
 
     if( p%k(i)>1 )then
         p%A(i,p%node(p%i(i),p%j(i),p%k(i)-1)) = 1.0d0 / dz**2.0d0
-    else !if ( p%idz==0 )then
+    else if ( p%idz==0 )then
         p%A(i,i) = p%A(i,i) + 1.0d0 / dx**2.0d0
     endif
 
     if( p%k(i)<p%nz )then
         p%A(i,p%node(p%i(i),p%j(i),p%k(i)+1)) = 1.0d0 / dz**2.0d0
-    else !if ( p%idz==p%gz-1 )then
+    else if ( p%idz==p%gz-1 )then
         p%A(i,i) = p%A(i,i) + 1.0d0 / dx**2.0d0
     endif
 
@@ -106,29 +106,29 @@ do i = 1, p%n
         p%AA(i,j) = p%A(i,j)
     enddo
 
-    ! if( p%i(i) == 1 .and. p%idx.ne.0 )then
-    !     p%B(i) = p%B(i) - p%sol(p%i(i)-1,p%j(i),p%k(i))/dx**2.0d0
-    ! endif
+    if( p%i(i) == 1 .and. p%idx.ne.0 )then
+        p%B(i) = p%B(i) - p%sol(p%i(i)-1,p%j(i),p%k(i))/dx**2.0d0
+    endif
 
-    ! if( p%i(i) == p%nx .and. p%idx.ne.p%gx-1 )then
-    !     p%B(i) = p%B(i) - p%sol(p%i(i)+1,p%j(i),p%k(i))/dx**2.0d0
-    ! endif
+    if( p%i(i) == p%nx .and. p%idx.ne.p%gx-1 )then
+        p%B(i) = p%B(i) - p%sol(p%i(i)+1,p%j(i),p%k(i))/dx**2.0d0
+    endif
 
-    ! if( p%j(i) == 1 .and. p%idy.ne.0 )then
-    !     p%B(i) = p%B(i) - p%sol(p%i(i),p%j(i)-1,p%k(i))/dy**2.0d0
-    ! endif
+    if( p%j(i) == 1 .and. p%idy.ne.0 )then
+        p%B(i) = p%B(i) - p%sol(p%i(i),p%j(i)-1,p%k(i))/dy**2.0d0
+    endif
 
-    ! if( p%j(i) == p%ny .and. p%idy.ne.p%gy-1 )then
-    !     p%B(i) = p%B(i) - p%sol(p%i(i),p%j(i)+1,p%k(i))/dy**2.0d0
-    ! endif
+    if( p%j(i) == p%ny .and. p%idy.ne.p%gy-1 )then
+        p%B(i) = p%B(i) - p%sol(p%i(i),p%j(i)+1,p%k(i))/dy**2.0d0
+    endif
 
-    ! if( p%k(i) == 1 .and. p%idz.ne.0 )then
-    !     p%B(i) = p%B(i) - p%sol(p%i(i),p%j(i),p%k(i)-1)/dz**2.0d0
-    ! endif
+    if( p%k(i) == 1 .and. p%idz.ne.0 )then
+        p%B(i) = p%B(i) - p%sol(p%i(i),p%j(i),p%k(i)-1)/dz**2.0d0
+    endif
 
-    ! if( p%k(i) == p%nz .and. p%idz.ne.p%gz-1 )then
-    !     p%B(i) = p%B(i) - p%sol(p%i(i),p%j(i),p%k(i)+1)/dz**2.0d0
-    ! endif
+    if( p%k(i) == p%nz .and. p%idz.ne.p%gz-1 )then
+        p%B(i) = p%B(i) - p%sol(p%i(i),p%j(i),p%k(i)+1)/dz**2.0d0
+    endif
 
 enddo
 
