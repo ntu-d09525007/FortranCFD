@@ -108,12 +108,15 @@ do
         call p%of(id)%loc%mg(level)%solve
     enddo
     !$omp end parallel do 
+    call pt%mg%sync(level)
     call multigrid_compatibility_sol(level)
     call multigrid_residual(level,.false.)
     if(p%of(0)%loc%mg(level)%l2norm<p%glb%p_tol*0.001)exit
     write(*,*)iter,p%of(0)%loc%mg(level)%l2norm
     
 enddo
+
+pause
 
 if(show)write(*,*)"Residual:",p%of(0)%loc%mg(level)%l2norm
 

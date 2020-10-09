@@ -8,7 +8,7 @@ integer, dimension(:,:,:), allocatable :: node
 integer, dimension(:), allocatable :: i, j, k, ipiv
 real(8), dimension(:,:,:), allocatable :: sol, res, pol, src
 real(8),dimension(:,:),allocatable :: A, AA
-real(8),dimension(:),allocatable :: B, work, error, sol
+real(8),dimension(:),allocatable :: B, work
 real(8) :: L2norm, L2norm0
 contains
 procedure :: init => mg_init
@@ -29,7 +29,7 @@ dx = p%dx;dy = p%dy;dz = p%dz
 
 allocate( p%sol(0:p%nx+1,0:p%ny+1,0:p%nz+1), p%src(0:p%nx+1,0:p%ny+1,0:p%nz+1) )
 allocate( p%res(0:p%nx+1,0:p%ny+1,0:p%nz+1), p%pol(0:p%nx+1,0:p%ny+1,0:p%nz+1) )
-allocate( p%B(p%n), p%work(p%n), p%error(p%n), p%sol(p%n) )
+allocate( p%B(p%n), p%work(p%n))
 allocate( p%A(p%n,p%n), p%AA(p%n,p%n) )
 allocate( p%node(p%nx,p%ny,p%nz), p%i(p%n), p%j(p%n), p%k(p%n), p%ipiv(p%n))
 
@@ -90,8 +90,13 @@ end subroutine
 
 subroutine mg_solve(p)
 implicit none
-class(mutligrid_root) :: p
+class(multigrid_root) :: p
 integer :: i,j,info
+real(8) :: dx,dy,dz
+
+dx = p%dx
+dy = p%dy
+dz = p%dz
 
 do i = 1, p%n
 
