@@ -53,7 +53,7 @@ use all
 implicit none
 integer :: id,i,j
 real(8) :: pout, pin, in, out, umax
-real(8) :: L1, L2
+real(8) :: L1, L2, curv
 
 pout=0.0d0
 out=0.0d0
@@ -98,5 +98,27 @@ write(*,'(A,F8.5)')"Pressure inside the rod:",pin*p%glb%we
 write(*,'(A,ES11.4)')"L1 error:",L1/in
 write(*,'(A,ES11.4)')"L2 error:",dsqrt(L2/in)
 write(*,'(A,ES11.4)')"Maximum Velocity:",umax
+
+call p%curv
+
+in=0.0d0;L1=0.0d0;L2=0.0d0;curv=0.0d0
+!$omp parallel do private(i,j), reduction(+:in,L1,L2,curv)
+do id = 0, p%glb%threads-1
+    do j = p%of(id)%loc%js, p%of(id)%loc%je
+    do i = p%of(id)%loc%is, p%of(id)%loc%ie
+        if( abs(p%of(id)%loc%phi%now(i,j))<p%glb%ls_wid/2.0d0 )then
+            in = in + 1.0d0
+            curv = curv + abs(p%of(id)%loc%normals%curv%now(i,j))
+            L1 = L1 + abs(abs(p%of(id)%loc%normals%curv%now(i,j))-1.0d0)
+            L2 = L2 + abs(abs(p%of(id)%loc%normals%curv%now(i,j))-1.0d0)**2.0d0
+        endif
+    enddo
+    enddo
+enddo
+!$omp end parallel do
+
+write(*,'(A,F8.5)')"Curvature:",curv/in
+write(*,'(A,ES11.4)')"L1 error:",L1/in
+write(*,'(A,ES11.4)')"L2 error:",dsqrt(L2/in)
 
 end subroutine
