@@ -45,13 +45,13 @@ implicit none
 type(tensor) :: tens
 real(8),dimension(p%loc%is-p%glb%ghc:p%loc%ie+p%glb%ghc,&
                   p%loc%js-p%glb%ghc:p%loc%je+p%glb%ghc,&
-                  p%loc%ks-p%glb%ghc:p%loc%ke+p%glb%ghc) :: phi,tmp
+                  p%loc%ks-p%glb%ghc:p%loc%ke+p%glb%ghc) :: phi
 integer :: i,j,k
 
 !$omp parallel do collapse(2)
 do k = p%loc%ks, p%loc%ke
 do j = p%loc%js, p%loc%je
-    call p%loc%ccdsolvers%x%solve("ccd",phi(:,j,k),tens%x(:,j,k),tmp(:,j,k))
+    call p%loc%ccdsolvers%x%solve("ccd",phi(:,j,k),tens%x(:,j,k),tens%tmp(:,j,k))
 enddo
 enddo
 !$omp end parallel do
@@ -59,7 +59,7 @@ enddo
 !$omp parallel do collapse(2)
 do k = p%loc%ks, p%loc%ke
 do i = p%loc%is, p%loc%ie
-    call p%loc%ccdsolvers%y%solve("ccd",phi(i,:,k),tens%y(i,:,k),tmp(i,:,k))
+    call p%loc%ccdsolvers%y%solve("ccd",phi(i,:,k),tens%y(i,:,k),tens%tmp(i,:,k))
 enddo
 enddo
 !$omp end parallel do
@@ -67,7 +67,7 @@ enddo
 !$omp parallel do collapse(2)
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
-    call p%loc%ccdsolvers%z%solve("ccd",phi(i,j,:),tens%z(i,j,:),tmp(i,j,:))
+    call p%loc%ccdsolvers%z%solve("ccd",phi(i,j,:),tens%z(i,j,:),tens%tmp(i,j,:))
 enddo
 enddo
 !$omp end parallel do

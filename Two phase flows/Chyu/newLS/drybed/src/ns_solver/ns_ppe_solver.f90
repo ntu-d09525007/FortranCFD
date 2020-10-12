@@ -24,8 +24,8 @@ integer :: id,i,j,k
         p%loc%coe%d(i,j,k) = p%loc%coe%d(i,j,k) / p%glb%dz**2.0d0
         
         p%loc%coe%c(i,j,k) = - ( p%loc%coe%r(i,j,k) + p%loc%coe%l(i,j,k) + &
-                                &       p%loc%coe%f(i,j,k) + p%loc%coe%b(i,j,k) + &
-                                &       p%loc%coe%u(i,j,k) + p%loc%coe%d(i,j,k) )
+                                &p%loc%coe%f(i,j,k) + p%loc%coe%b(i,j,k) + &
+                                &p%loc%coe%u(i,j,k) + p%loc%coe%d(i,j,k) )
                         
         if( i==1 )then
             p%loc%coe%c(i,j,k)=p%loc%coe%c(i,j,k)+p%loc%coe%l(i,j,k)
@@ -80,8 +80,8 @@ real(8) :: sump, err, w, pcal, tol
     do i = p%loc%is, p%loc%ie
     
         p%loc%coe%src(i,j,k) = ( ( p%loc%vel%x%now(i,j,k) - p%loc%vel%x%now(i-1,j,k) ) / p%glb%dx + &
-                                        ( p%loc%vel%y%now(i,j,k) - p%loc%vel%y%now(i,j-1,k) ) / p%glb%dy + & 
-                                        ( p%loc%vel%z%now(i,j,k) - p%loc%vel%z%now(i,j,k-1) ) / p%glb%dz ) / p%glb%dt
+                                 ( p%loc%vel%y%now(i,j,k) - p%loc%vel%y%now(i,j-1,k) ) / p%glb%dy + & 
+                                 ( p%loc%vel%z%now(i,j,k) - p%loc%vel%z%now(i,j,k-1) ) / p%glb%dz ) / p%glb%dt
                                                 
     end do
     end do
@@ -102,11 +102,11 @@ do
         p%loc%p%tmp(i,j,k) = p%loc%p%now(i,j,k)
         
         p%loc%p%now(i,j,k) = p%loc%coe%src(i,j,k) - p%loc%coe%r(i,j,k)*p%loc%p%now(i+1,j,k) &
-                                                            &   - p%loc%coe%l(i,j,k)*p%loc%p%now(i-1,j,k) &
-                                                            &   - p%loc%coe%f(i,j,k)*p%loc%p%now(i,j+1,k) &
-                                                            &   - p%loc%coe%b(i,j,k)*p%loc%p%now(i,j-1,k) &
-                                                            &   - p%loc%coe%u(i,j,k)*p%loc%p%now(i,j,k+1) &
-                                                            &   - p%loc%coe%d(i,j,k)*p%loc%p%now(i,j,k-1)
+                                              &   - p%loc%coe%l(i,j,k)*p%loc%p%now(i-1,j,k) &
+                                              &   - p%loc%coe%f(i,j,k)*p%loc%p%now(i,j+1,k) &
+                                              &   - p%loc%coe%b(i,j,k)*p%loc%p%now(i,j-1,k) &
+                                              &   - p%loc%coe%u(i,j,k)*p%loc%p%now(i,j,k+1) &
+                                              &   - p%loc%coe%d(i,j,k)*p%loc%p%now(i,j,k-1)
                                                         
         p%loc%p%now(i,j,k) = p%loc%p%now(i,j,k) / p%loc%coe%c(i,j,k)  
 

@@ -38,7 +38,7 @@ end type time_recorded_vec
 type tensor
 integer :: order 
 integer :: is, ie, js ,je, ks, ke
-real(8), dimension(:,:,:), allocatable :: x,y,z
+real(8), dimension(:,:,:), allocatable :: x,y,z,tmp
 real(8), dimension(:,:,:), allocatable :: xx,xy,xz,yx,yy,yz,zx,zy,zz
 real(8), dimension(:,:,:), allocatable :: xxx,xyy,xzz,yxx,yyy,yzz,zxx,zyy,zzz
 contains
@@ -72,7 +72,7 @@ allocate( p%xxx(is:ie,js:je,ks:ke), p%xyy(is:ie,js:je,ks:ke), p%xzz(is:ie,js:je,
 
 else if ( order == 1 )then
 
-allocate( p%x(is:ie,js:je,ks:ke), p%y(is:ie,js:je,ks:ke), p%z(is:ie,js:je,ks:ke) )
+allocate( p%x(is:ie,js:je,ks:ke), p%y(is:ie,js:je,ks:ke), p%z(is:ie,js:je,ks:ke), p%tmp(is:ie,js:je,ks:ke)  )
 
 endif
 
@@ -151,6 +151,7 @@ implicit none
 integer :: i,j,k
 class(time_recorded) :: p
 
+!$omp parallel do collapse(3)
 do k = p%ks, p%ke
 do j = p%js, p%je
 do i = p%is, p%ie
@@ -160,6 +161,7 @@ do i = p%is, p%ie
 end do
 end do 
 end do
+!$omp end parallel do
 
 end subroutine
 
@@ -198,6 +200,7 @@ implicit none
 integer :: i,j,k
 class(time_recorded) :: p
 
+!$omp parallel do collapse(3)
 do k = p%ks, p%ke
 do j = p%js, p%je
 do i = p%is, p%ie
@@ -206,6 +209,7 @@ do i = p%is, p%ie
 end do
 end do 
 end do
+!$omp end parallel do
  
 end subroutine
 

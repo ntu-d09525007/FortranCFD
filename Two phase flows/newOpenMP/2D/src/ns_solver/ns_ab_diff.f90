@@ -2,7 +2,7 @@ subroutine ns_ab_diff_sec
 implicit none
 
     call sec_part1
-    !call sec_part2
+    call sec_part2
     call sec_part3
 
 end subroutine
@@ -53,13 +53,14 @@ implicit none
 integer :: i,j
 real(8) :: rho,ux,vx,uy,vy
 real(8) :: dif_x,dif_y
-real(8) :: phix,phiy
+real(8) :: phix,phiy,delta
 
-    !$omp parallel do collapse(2), private(rho,ux,vx,uy,vy,dif_x,dif_y,phix,phiy)
+    !$omp parallel do collapse(2), private(rho,ux,vx,uy,vy,dif_x,dif_y,phix,phiy,delta)
     do j = p%loc%js, p%loc%je
     do i = p%loc%is, p%loc%ie
 
         rho = 0.5d0*(p%loc%rho%old(i,j)+p%loc%rho%old(i+1,j))
+        delta = 0.5d0*(p%loc%delta%old(i,j)+p%loc%delta%old(i+1,j))
 
         ux = 0.5d0*( p%loc%vel%x%old(i+1,j)-p%loc%vel%x%old(i-1,j) )/p%glb%dx
         uy = 0.5d0*( p%loc%vel%x%old(i,j+1)-p%loc%vel%x%old(i,j-1) )/p%glb%dy
@@ -69,14 +70,15 @@ real(8) :: phix,phiy
         phix = (p%loc%phi%old(i+1,j)-p%loc%phi%old(i,j))/p%glb%dx
         phiy = 0.25d0*(p%loc%phi%old(i+1,j+1)-p%loc%phi%old(i+1,j-1)+p%loc%phi%old(i,j+1)-p%loc%phi%old(i,j-1))/p%glb%dy
     
-        dif_x = phix*2.0d0*ux/(rho*p%glb%re)
-        dif_y = phiy*(uy+vx)/(rho*p%glb%re)
+        dif_x = (1.0d0-p%glb%mu_12)*delta*phix*2.0d0*ux/(rho*p%glb%re)
+        dif_y = (1.0d0-p%glb%mu_12)*delta*phiy*(uy+vx)/(rho*p%glb%re)
 
         p%loc%velsrc%x%tmp(i,j) = p%loc%velsrc%x%tmp(i,j) + dif_x + dif_y 
 
         !-------------------------------------------------------------
 
         rho = 0.5d0*(p%loc%rho%old(i,j)+p%loc%rho%old(i,j+1))
+        delta = 0.5d0*(p%loc%delta%old(i,j)+p%loc%delta%old(i,j+1))
 
         vx = 0.5d0*( p%loc%vel%y%old(i+1,j)-p%loc%vel%y%old(i-1,j) )/p%glb%dx
         vy = 0.5d0*( p%loc%vel%y%old(i,j+1)-p%loc%vel%y%old(i,j-1) )/p%glb%dy
@@ -86,8 +88,8 @@ real(8) :: phix,phiy
         phix = 0.25d0*(p%loc%phi%old(i+1,j)-p%loc%phi%old(i-1,j)+p%loc%phi%old(i+1,j+1)-p%loc%phi%old(i-1,j+1))/p%glb%dx
         phiy = ( p%loc%phi%old(i,j+1)-p%loc%phi%old(i,j) )/p%glb%dy
 
-        dif_x = phix*(uy+vx)/(rho*p%glb%re)
-        dif_y = phiy*2.0d0*vy/(rho*p%glb%re)
+        dif_x = (1.0d0-p%glb%mu_12)*delta*phix*(uy+vx)/(rho*p%glb%re)
+        dif_y = (1.0d0-p%glb%mu_12)*delta*phiy*2.0d0*vy/(rho*p%glb%re)
 
         p%loc%velsrc%y%tmp(i,j) = p%loc%velsrc%y%tmp(i,j) + dif_x + dif_y
 

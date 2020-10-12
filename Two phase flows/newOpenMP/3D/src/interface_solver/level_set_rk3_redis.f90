@@ -368,8 +368,8 @@ do k = p%loc%ks, p%loc%ke
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
     
-    lam = p%loc%delta%now(i,j,k)
-    !lam = (2.0d0*(1.0d0-p%glb%rho_12)*p%loc%heavy%now(i,j,k)+p%glb%rho_12)*p%loc%delta%now(i,j,k)
+    !lam = p%loc%delta%now(i,j,k)
+    lam = (2.0d0*(1.0d0-p%glb%rho_12)*p%loc%heavy%now(i,j,k)+p%glb%rho_12)*p%loc%delta%now(i,j,k)
     
     p%loc%tdata%x%s2(i,j,k) = lam*p%loc%sign%tmp(i,j,k)*( p%loc%grad%now(i,j,k) - 1.0d0 ) 
     p%loc%tdata%x%s3(i,j,k) = p%loc%grad%now(i,j,k)*p%loc%delta%now(i,j,k)*lam

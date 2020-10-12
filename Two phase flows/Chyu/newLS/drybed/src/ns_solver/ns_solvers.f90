@@ -11,6 +11,7 @@ integer(8) :: cpustart, cpuend
     !call ns_split_solver
     
     call ns_check_convergence_div
+    !call ibm_bc
     call node_vel
     
     call system_clock(cpuend)
@@ -20,12 +21,9 @@ end subroutine
 
 subroutine ns_init
 use all
-!$ use omp_lib
 implicit none
-integer :: id,i,j,k
 
 call rho_mu
-
 if( p%glb%btn_sf > 0 )then
     call curv
 endif
@@ -36,7 +34,7 @@ subroutine ns_linearize
 use all
 !$ use omp_lib
 implicit none
-integer :: id,i,j,k
+integer :: i,j,k
 
 !$omp parallel do collapse(3)  
 do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
@@ -49,7 +47,13 @@ end do
 end do
 end do   
 !$omp end parallel do
-        
+
+   
+call find_stag_vel(  p%loc%tdata%x%s1, p%loc%tdata%y%s1, p%loc%tdata%z%s1, &
+                    &p%loc%tdata%x%s2, p%loc%tdata%y%s2, p%loc%tdata%z%s2, &
+                    &p%loc%vel%x%tmp, p%loc%vel%y%tmp, p%loc%vel%z%tmp )
+
+
 end subroutine
 
 subroutine ns_check_convergence_div
@@ -139,5 +143,33 @@ integer :: id,i,j,k
     !$omp end parallel do
 
     call nvelbc(p%loc%nvel%x%now,p%loc%nvel%y%now,p%loc%nvel%z%now)
+
+end subroutine
+
+
+subroutine ibm_bc()
+use all
+implicit none
+integer :: i,j,k
+real(8) :: solid
+
+!$omp parallel do collapse(3), private(solid)
+do k = p%loc%ks, p%loc%ke
+do j = p%loc%js, p%loc%je
+do i = p%loc%is, p%loc%ie
+
+    solid = 0.5d0*( p%loc%solid%now(i,j,k)+p%loc%solid%now(i+1,j,k) )
+    p%loc%vel%x%now(i,j,k) = (1.0-solid)*p%loc%vel%x%now(i,j,k)
+
+    solid = 0.5d0*( p%loc%solid%now(i,j,k)+p%loc%solid%now(i,j+1,k) )
+    p%loc%vel%y%now(i,j,k) = (1.0-solid)*p%loc%vel%y%now(i,j,k)
+
+    solid = 0.5d0*( p%loc%solid%now(i,j,k)+p%loc%solid%now(i,j,k+1) )
+    p%loc%vel%z%now(i,j,k) = (1.0-solid)*p%loc%vel%z%now(i,j,k)
+
+enddo
+enddo
+enddo
+!$omp end parallel do
 
 end subroutine

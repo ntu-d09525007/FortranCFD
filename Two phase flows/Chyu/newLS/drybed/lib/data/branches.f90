@@ -11,6 +11,7 @@ integer :: level
 integer :: method
 integer :: how_to_paras
 integer :: node_x, node_y, node_z
+integer :: num_of_plot
 integer :: ug ! grid per unit length
 integer :: ghc ! ghost cell
 integer :: ubc(2), vbc(2), wbc(2)
@@ -33,14 +34,14 @@ real(8) :: mu_12, rho_12
 real(8) :: vel_div, vel_sdiv, ns_linf, ns_l2f, ppe_linf
 real(8) :: btn_sf, btn_g
 real(8) :: ls_adv, ls_red, ppe, ns, syn
-real(8),dimension(:),allocatable :: x, y, z
+real(8),dimension(:,:,:),allocatable :: x, y, z
 end type global
 
 type job
 integer :: is, ie, js, je, ks, ke
 type(dum_matrices)  :: coe
 type(time_recorded) :: heavy, delta, grad, sign
-type(time_recorded) :: phi, p, rho, mu, vof
+type(time_recorded) :: phi, p, rho, mu, vof, solid
 type(time_recorded_derivatives) :: normals
 type(time_recorded_vec) :: vel, nvel, velsrc
 !-------------------------------------------
@@ -48,7 +49,7 @@ type(time_recorded_vec) :: vort, lamb
 type(time_recorded_vec) :: vort_adv, vort_tws, vort_baro, vort_visc
 type(time_recorded) :: q_cri, omega_cri, lamb_div
 !-------------------------------------------
-type(tensor) :: vel_ten, vor_ten, p_ten, rho_ten
+type(tensor) :: vel_ten, vor_ten, p_ten, rho_ten, mu_ten
 !-------------------------------------------
 type(tsolver_data) :: tdata
 type(ccd_manager) :: ccdsolvers
@@ -121,12 +122,16 @@ call p%vel_ten%alloc(3,is,ie,js,je,ks,ke)
 call p%vor_ten%alloc(3,is,ie,js,je,ks,ke)
 call p%p_ten%alloc(1,is,ie,js,je,ks,ke)
 call p%rho_ten%alloc(1,is,ie,js,je,ks,ke)
+call p%mu_ten%alloc(1,is,ie,js,je,ks,ke)
 
 !vorticity production
 call p%vort_adv%alloc(is,ie,js,je,ks,ke)
 call p%vort_tws%alloc(is,ie,js,je,ks,ke)
 call p%vort_baro%alloc(is,ie,js,je,ks,ke)
 call p%vort_visc%alloc(is,ie,js,je,ks,ke)
+
+! ibm
+call p%solid%alloc(is,ie,js,je,ks,ke)
 
 end subroutine
 

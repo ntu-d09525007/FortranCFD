@@ -61,6 +61,8 @@ character(*) :: path
  read(526,*)
  read(526,*)p%glb%threads
  read(526,*)
+ read(526,*)p%glb%num_of_plot
+ read(526,*)
  read(526,*)p%glb%name
  read(526,*)
  read(526,*)p%glb%ug
@@ -129,7 +131,8 @@ real(8) :: mag
 
     p%fil%damdata = 16
     open(unit=p%fil%damdata,file="./out/"//trim(p%glb%name)//"_DamData.plt")
-    write(p%fil%ls_mv,*)'variables = "T" "Damfront" "Wall" '
+    write(p%fil%damdata,*)'variables = "T" "Damfront" "Wall" '
+    !write(p%fil%damdata,*)'variables = "T" "G5A" "G0" "GC" "G8A" '
     
     call omp_set_dynamic(.false.)
     if( p%glb%threads < 0 )then
@@ -144,7 +147,9 @@ real(8) :: mag
     p%glb%node_y = p%glb%ug * ( p%glb%yend - p%glb%ystart )
     p%glb%node_z = p%glb%ug * ( p%glb%zend - p%glb%zstart )
     
-    allocate( p%glb%x(0:p%glb%node_x+1), p%glb%y(0:p%glb%node_y+1), p%glb%z(0:p%glb%node_z+1) )
+    allocate( p%glb%x(0:p%glb%node_x+1,0:p%glb%node_y+1,0:p%glb%node_z+1), &
+              p%glb%y(0:p%glb%node_x+1,0:p%glb%node_y+1,0:p%glb%node_z+1), &
+              p%glb%z(0:p%glb%node_x+1,0:p%glb%node_y+1,0:p%glb%node_z+1) )
 
     write(*,*)"finish allocating public grids"
     
@@ -154,25 +159,25 @@ real(8) :: mag
         
     !$omp parallel do
     do i = 1, p%glb%node_x
-        p%glb%x(i) = p%glb%xstart + (i-0.5)*p%glb%dx
+        p%glb%x(i,:,:) = p%glb%xstart + (i-0.5)*p%glb%dx
     enddo
     !$omp end parallel do
     
     !$omp parallel do
     do j = 1, p%glb%node_y
-        p%glb%y(j) = p%glb%ystart + (j-0.5)*p%glb%dy
+        p%glb%y(:,j,:) = p%glb%ystart + (j-0.5)*p%glb%dy
     enddo
     !$omp end parallel do
     
     !$omp parallel do
     do k = 1, p%glb%node_z
-        p%glb%z(k) = p%glb%zstart + (k-0.5)*p%glb%dz
+        p%glb%z(:,:,k) = p%glb%zstart + (k-0.5)*p%glb%dz
     enddo
     !$omp end parallel do
     
-    p%glb%x(0)=p%glb%xstart; p%glb%x(p%glb%node_x+1)=p%glb%xend
-    p%glb%y(0)=p%glb%ystart; p%glb%y(p%glb%node_y+1)=p%glb%yend
-    p%glb%z(0)=p%glb%zstart; p%glb%z(p%glb%node_z+1)=p%glb%zend
+    p%glb%x(0,:,:)=p%glb%xstart; p%glb%x(p%glb%node_x+1,:,:)=p%glb%xend
+    p%glb%y(:,0,:)=p%glb%ystart; p%glb%y(:,p%glb%node_y+1,:)=p%glb%yend
+    p%glb%z(:,:,0)=p%glb%zstart; p%glb%z(:,:,p%glb%node_z+1)=p%glb%zend
 
     write(*,*)"finish assigning grid data"
     
@@ -281,7 +286,7 @@ real(8) :: x,y,z
  WRITE(777,'(A)')"DATASET STRUCTURED_POINTS"
  WRITE(777,'(A,3I6)')"DIMENSIONS ",p%glb%node_x,p%glb%node_y,p%glb%node_z
  WRITE(777,'(A,3ES15.4)')"SPACING ",p%glb%dx, p%glb%dy, p%glb%dz  
- WRITE(777,'(A,3ES15.4)')"ORIGIN ",p%glb%x(1),p%glb%y(1),p%glb%z(1)
+ WRITE(777,'(A,3ES15.4)')"ORIGIN ",p%glb%x(1,1,1),p%glb%y(1,1,1),p%glb%z(1,1,1)
  WRITE(777,'(A,I12)')"POINT_DATA ",(p%glb%node_x)*(p%glb%node_y)*(p%glb%node_z)
  
  close(777)

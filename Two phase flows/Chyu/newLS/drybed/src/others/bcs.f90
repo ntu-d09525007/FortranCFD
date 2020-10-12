@@ -49,6 +49,7 @@ real(8),dimension(p%loc%is-p%glb%ghc:p%loc%ie+p%glb%ghc,&
                   p%loc%js-p%glb%ghc:p%loc%je+p%glb%ghc,&
                   p%loc%ks-p%glb%ghc:p%loc%ke+p%glb%ghc) :: u,v,w
 integer :: i,j,k
+
 !==========================================
 !  X-direction velocity boundary condition
 !==========================================
@@ -163,7 +164,7 @@ if( p%glb%vbc(2) == 1 )then
         v(i,p%loc%je+j,k) = - v(i,p%loc%je-j,k)
         w(i,p%loc%je+j,k) = - w(i,p%loc%je+1-j,k)
     enddo
-    v(i,p%loc%je,j) = 0.0d0
+    v(i,p%loc%je,k) = 0.0d0
     enddo
     enddo
     !$omp end parallel do
@@ -178,7 +179,7 @@ else if ( p%glb%vbc(2) == 2 )then
         v(i,p%loc%je+j,k) = v(i,p%loc%je-j,k)
         w(i,p%loc%je+j,k) = w(i,p%loc%je+1-j,k)
     enddo
-    v(i,p%loc%je,j) = 0.0d0
+    v(i,p%loc%je,k) = 0.0d0
     enddo
     enddo
     !$omp end parallel do
@@ -264,9 +265,9 @@ real(8),dimension(p%loc%is-p%glb%ghc:p%loc%ie+p%glb%ghc,&
                   p%loc%ks-p%glb%ghc:p%loc%ke+p%glb%ghc) :: u,v,w
 integer :: i,j,k
 
-    !==========================================
-    !  X-direction velocity boundary condition
-    !==========================================
+!==========================================
+!  X-direction velocity boundary condition
+!==========================================
 
 if( p%glb%ubc(1) == 1 )then
 

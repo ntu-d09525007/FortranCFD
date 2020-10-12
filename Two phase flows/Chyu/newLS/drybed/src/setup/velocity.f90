@@ -13,13 +13,13 @@ real(8) :: x, y, z, xx, yy, zz, pi, ct, linf, linf2
     do j = p%loc%js, p%loc%je
     do i = p%loc%is, p%loc%ie
     
-        x = p%glb%x(i)
-        y = p%glb%y(j)
-        z = p%glb%z(k)
+        x = p%glb%x(i,j,k)
+        y = p%glb%y(i,j,k)
+        z = p%glb%z(i,j,k)
         
-        xx = 0.5_8 * ( p%glb%x(i) + p%glb%x(i+1) )
-        yy = 0.5_8 * ( p%glb%y(j) + p%glb%y(j+1) )
-        zz = 0.5_8 * ( p%glb%z(k) + p%glb%z(k+1) )
+        xx = 0.5_8 * ( p%glb%x(i,j,k) + p%glb%x(i+1,j,k) )
+        yy = 0.5_8 * ( p%glb%y(i,j,k) + p%glb%y(j,j+1,k) )
+        zz = 0.5_8 * ( p%glb%z(i,j,k) + p%glb%z(k,j,k+1) )
         
         p%loc%nvel%x%now(i,j,k) =   2.0d0*dsin(pi*x)**2.0d0*dsin(2.0d0*pi*y)*dsin(2.0d0*pi*z) * ct
         p%loc%nvel%y%now(i,j,k) =      -  dsin(2.0d0*pi*x)*dsin(pi*y)**2.0d0*dsin(2.0d0*pi*z) * ct

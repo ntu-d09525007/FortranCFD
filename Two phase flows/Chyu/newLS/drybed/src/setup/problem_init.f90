@@ -35,74 +35,62 @@ CHARACTER(100) :: NAME_OF_FILE
     do i = p%loc%is, p%loc%ie
     
         p%loc%vof%now(i,j,k) = 0.0d0
+        p%loc%solid%now(i,j,k) = 0.0d0
+        p%loc%vel%x%now(i,j,k) = 0.0d0
+        p%loc%vel%y%now(i,j,k) = 0.0d0
+        p%loc%vel%z%now(i,j,k) = 0.0d0
     
-        do ii = 1, ug
-        do jj = 1, ug
-        do kk = 1, ug
+        ! do ii = 1, ug
+        ! do jj = 1, ug
+        ! do kk = 1, ug
             
-            x = 0.5d0*( p%glb%x(i)+p%glb%x(i-1) ) + real(ii,8)*p%glb%dx/real(ug,8)
-            y = 0.5d0*( p%glb%y(j)+p%glb%y(j-1) ) + real(jj,8)*p%glb%dy/real(ug,8)
-            z = 0.5d0*( p%glb%z(k)+p%glb%z(k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
+        !     x = 0.5d0*( p%glb%x(i,j,k)+p%glb%x(i-1,j,k) ) + real(ii,8)*p%glb%dx/real(ug,8)
+        !     y = 0.5d0*( p%glb%y(i,j,k)+p%glb%y(i,j-1,k) ) + real(jj,8)*p%glb%dy/real(ug,8)
+        !     z = 0.5d0*( p%glb%z(i,j,k)+p%glb%z(i,j,k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
             
-            if( - dsqrt( (x-0.35d0)**2.0d0 + (y-0.35d0)**2.0d0 + (z-0.35d0)**2.0d0 ) + 0.15d0 >= 0.0d0 )then
-                p%loc%vof%now(i,j,k) = p%loc%vof%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
-            end if
+        !     ! dambreak -- partial failure
+        !     !=========================================
+        !     if( x>1.0d0 .and. x<1.0d0+2.0d0*p%glb%dx .and. abs(y-1.0d0)>0.2d0 )then
+        !         p%loc%solid%now(i,j,k) = p%loc%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
+        !     end if
             
-        end do
-        end do
-        end do
+        ! end do
+        ! end do
+        ! end do
     
-        x = p%glb%x(i)
-        y = p%glb%y(j)
-        z = p%glb%z(k)
+        x = p%glb%x(i,j,k)
+        y = p%glb%y(i,j,k)
+        z = p%glb%z(i,j,k)
         
         ! vortex
         !=========================================
         !p%loc%phi%now(i,j,k) = - dsqrt( (x-0.35d0)**2.0d0 + (y-0.35d0)**2.0d0 + (z-0.35d0)**2.0d0 ) + 0.15d0
         
-        ! dambreak
+        ! dambreak -- drybed
         !=========================================
         if( x<=1.0d0 .and. y<=1.0d0 .and. z<=1.0d0 )then
             p%loc%phi%now(i,j,k) = 1.0_8
         else
             p%loc%phi%now(i,j,k) = -1.0_8
         end if
-        
-        ! bubble burst
+
+        ! dambreak -- wetbed
         !=========================================
-        ! if( z<-2.0d0 )then
-            ! if( x**2.0d0 + y**2.0d0 + (z+3.2d0)**2.0d0 < 1.0d0 )then
-                ! p%loc%phi%now(i,j,k) = dsqrt( x**2.0d0 + y**2.0d0 + (z+3.2d0)**2.0d0 ) - 1.0d0
-            ! else
-                ! p%loc%phi%now(i,j,k) = min( dsqrt( x**2.0d0 + y**2.0d0 + (z+3.2d0)**2.0d0 ) - 1.0d0, -2.0-z )
-            ! endif
-        ! else
-            ! p%loc%phi%now(i,j,k) = -2.0d0-z
+        ! if( x<=2.53d0 .and. z<=1.0 )then
+        !     p%loc%phi%now(i,j,k) = 1.0_8
+        ! else if ( x>2.53d0 .and. z<=0.12d0 )then
+        !     p%loc%phi%now(i,j,k) = 1.0_8
+        ! else 
+        !     p%loc%phi%now(i,j,k) = -1.0_8
+        ! end if
+
+        ! dambreak -- partial failure
+        !=========================================
+        ! if( x<1.0d0 .and. z<0.6d0 )then
+        !     p%loc%phi%now(i,j,k) = 1.0_8
+        ! else 
+        !     p%loc%phi%now(i,j,k) = -1.0_8
         ! endif
-        
-        ! Milk Crown
-        !=========================================
-        !if( z <= 0.1876d0 )then    
-        !   p%loc%phi%now(i,j,k) = -z + 0.1876d0
-        !else if( dsqrt(x**2.0d0+y**2.0d0+(z-0.8d0)**2.0d0)<=0.5d0 )then
-        !   p%loc%phi%now(i,j,k) = -dsqrt(x**2.0d0+y**2.0d0+(z-0.8d0)**2.0d0)+0.5d0
-        !else 
-        !   p%loc%phi%now(i,j,k)= MAX(-z+0.1876d0,-dsqrt(x**2.0d0+y**2.0d0+(z-0.8d0)**2.0d0)+0.5d0 )
-        !end if
-        
-        !x = 0.5d0*( p%glb%x(i)+p%glb%x(i+1) )
-        !y = 0.5d0*( p%glb%y(j)+p%glb%y(j+1) )
-        !x = p%glb%x(i)
-        !y = p%glb%y(j)
-        !z = 0.5d0*( p%glb%z(k)+p%glb%z(k+1) )
-        
-        !if( dsqrt(x**2.0d0+y**2.0d0+(z-0.8d0)**2.0d0)<=0.5d0 )then
-        !   p%loc%vel%z%now(i,j,k) = -1.0d0
-        !endif 
-        
-        p%loc%vel%x%now(i,j,k) = 0.0_8
-        p%loc%vel%y%now(i,j,k) = 0.0_8
-        p%loc%vel%z%now(i,j,k) = 0.0_8
         
     end do
     end do
@@ -111,6 +99,7 @@ CHARACTER(100) :: NAME_OF_FILE
     
     call bc(p%loc%phi%now)
     call bc(p%loc%vof%now)
+    call bc(p%loc%solid%now)
     call velbc(p%loc%vel%x%now,p%loc%vel%y%now,p%loc%vel%z%now)
     
     write(*,*)"Init data finish"

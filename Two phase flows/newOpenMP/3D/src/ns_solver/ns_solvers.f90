@@ -11,7 +11,7 @@ integer(8) :: cpustart, cpuend
     !call ns_split_solver
     
     call ns_check_convergence_div
-    call ibm_bc
+    !call ibm_bc
     call node_vel
     
     call system_clock(cpuend)
@@ -24,8 +24,6 @@ use all
 implicit none
 
 call rho_mu
-call find_gradient(p%loc%mu_ten,p%loc%mu%old)
-
 if( p%glb%btn_sf > 0 )then
     call curv
 endif
