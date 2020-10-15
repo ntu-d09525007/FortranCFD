@@ -35,7 +35,7 @@ CHARACTER(100) :: NAME_OF_FILE
     do i = p%loc%is, p%loc%ie
     
         p%loc%vof%now(i,j,k) = 0.0d0
-        p%loc%ibm%solid(i,j,k) = 0.0d0
+        p%loc%ibm%solid%now(i,j,k) = 0.0d0
         p%loc%vel%x%now(i,j,k) = 0.0d0
         p%loc%vel%y%now(i,j,k) = 0.0d0
         p%loc%vel%z%now(i,j,k) = 0.0d0
@@ -51,13 +51,13 @@ CHARACTER(100) :: NAME_OF_FILE
             ! dambreak -- partial failure
             !=========================================
             ! if( x>1.0d0 .and. x<1.0d0+2.0d0*p%glb%dx .and. abs(y-1.0d0)>0.2d0 )then
-            !     p%loc%ibm%solid(i,j,k) = p%loc%ibm%solid(i,j,k) + 1.0d0/real(ug,8)**3.0d0
+            !     p%loc%ibm%solid%now(i,j,k) = p%loc%ibm%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
             ! end if
             
             ! dambreak -- rising gate
             !========================================
             if( x>1.0d0 .and. x<1.0d0+2.0d0*p%glb%dx .and. z<0.8d0 )then
-                p%loc%ibm%solid(i,j,k) = p%loc%ibm%solid(i,j,k) + 1.0d0/real(ug,8)**3.0d0
+                p%loc%ibm%solid%now(i,j,k) = p%loc%ibm%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
             endif
 
         end do
@@ -108,7 +108,7 @@ CHARACTER(100) :: NAME_OF_FILE
     
     call bc(p%loc%phi%now)
     call bc(p%loc%vof%now)
-    call bc(p%loc%ibm%solid)
+    call bc(p%loc%ibm%solid%now)
     call velbc(p%loc%vel%x%now,p%loc%vel%y%now,p%loc%vel%z%now)
     
     write(*,*)"Init data finish"

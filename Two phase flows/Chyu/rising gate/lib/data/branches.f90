@@ -40,7 +40,7 @@ end type global
 type ibm_data
 real(8) :: x,y,z
 real(8) :: u,v,w
-real(8), dimension(:,:,:), allocatable :: solid
+type(time_recorded) :: solid
 end type ibm_data
 
 type job
@@ -138,7 +138,7 @@ call p%vort_baro%alloc(is,ie,js,je,ks,ke)
 call p%vort_visc%alloc(is,ie,js,je,ks,ke)
 
 ! ibm
-allocate( p%ibm%solid(is:ie,js:ie,ks:ke) )
+call p%ibm%solid%alloc(is,ie,js,je,ks,ke)
 
 end subroutine
 

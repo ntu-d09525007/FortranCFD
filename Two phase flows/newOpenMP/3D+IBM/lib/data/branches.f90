@@ -37,11 +37,18 @@ real(8) :: ls_adv, ls_red, ppe, ns, syn
 real(8),dimension(:,:,:),allocatable :: x, y, z
 end type global
 
+type ibm_data
+real(8) :: x,y,z
+real(8) :: u,v,w
+type(time_recorded) :: solid
+end type ibm_data
+
 type job
 integer :: is, ie, js, je, ks, ke
+type(ibm_data) :: ibm
 type(dum_matrices)  :: coe
 type(time_recorded) :: heavy, delta, grad, sign
-type(time_recorded) :: phi, p, rho, mu, vof, solid
+type(time_recorded) :: phi, p, rho, mu, vof
 type(time_recorded_derivatives) :: normals
 type(time_recorded_vec) :: vel, nvel, velsrc
 !-------------------------------------------
@@ -131,7 +138,7 @@ call p%vort_baro%alloc(is,ie,js,je,ks,ke)
 call p%vort_visc%alloc(is,ie,js,je,ks,ke)
 
 ! ibm
-call p%solid%alloc(is,ie,js,je,ks,ke)
+call p%ibm%solid%alloc(is,ie,js,je,ks,ke)
 
 end subroutine
 

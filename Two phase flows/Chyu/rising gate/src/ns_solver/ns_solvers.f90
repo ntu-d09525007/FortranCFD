@@ -162,7 +162,7 @@ do k = p%loc%ks, p%loc%ke
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
 
-    p%loc%ibm%solid(i,j,k)=0.0d0
+    p%loc%ibm%solid%now(i,j,k)=0.0d0
 
     do ii = 1, ug
     do jj = 1, ug
@@ -175,7 +175,7 @@ do i = p%loc%is, p%loc%ie
         ! dambreak -- rising gate
         !========================================
         if( x>1.0d0 .and. x<1.0d0+2.0d0*p%glb%dx .and. z<0.8d0+p%loc%ibm%z .and. z>p%loc%ibm%z )then
-            p%loc%ibm%solid(i,j,k) = p%loc%ibm%solid(i,j,k) + 1.0d0/real(ug,8)**3.0d0
+            p%loc%ibm%solid%now(i,j,k) = p%loc%ibm%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
         endif
 
     end do
@@ -187,20 +187,20 @@ enddo
 enddo
 !$omp end parallel do
 
-call bc(p%loc%ibm%solid)
+call bc(p%loc%ibm%solid%now)
 
 !$omp parallel do collapse(3), private(solid)
 do k = p%loc%ks, p%loc%ke
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
 
-    solid = 0.5d0*( p%loc%ibm%solid(i,j,k)+p%loc%ibm%solid(i+1,j,k) )
+    solid = 0.5d0*( p%loc%ibm%solid%now(i,j,k)+p%loc%ibm%solid%now(i+1,j,k) )
     p%loc%vel%x%now(i,j,k) = (1.0-solid)*p%loc%vel%x%now(i,j,k)
 
-    solid = 0.5d0*( p%loc%ibm%solid(i,j,k)+p%loc%ibm%solid(i,j+1,k) )
+    solid = 0.5d0*( p%loc%ibm%solid%now(i,j,k)+p%loc%ibm%solid%now(i,j+1,k) )
     p%loc%vel%y%now(i,j,k) = (1.0-solid)*p%loc%vel%y%now(i,j,k)
 
-    solid = 0.5d0*( p%loc%ibm%solid(i,j,k)+p%loc%ibm%solid(i,j,k+1) )
+    solid = 0.5d0*( p%loc%ibm%solid%now(i,j,k)+p%loc%ibm%solid%now(i,j,k+1) )
     p%loc%vel%z%now(i,j,k) = (1.0-solid)*p%loc%vel%z%now(i,j,k) + solid*p%loc%ibm%w
 
 enddo

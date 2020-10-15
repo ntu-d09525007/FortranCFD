@@ -11,7 +11,7 @@ integer(8) :: cpustart, cpuend
     !call ns_split_solver
     
     call ns_check_convergence_div
-    !call ibm_bc
+    call ibm_bc
     call node_vel
     
     call system_clock(cpuend)
@@ -150,22 +150,58 @@ end subroutine
 subroutine ibm_bc()
 use all
 implicit none
-integer :: i,j,k
-real(8) :: solid
+integer :: i,j,k,ii,jj,kk,ug
+real(8) :: solid,x,y,z
+
+if(p%loc%ibm%z>0.4d0)p%loc%ibm%w=0.0d0
+p%loc%ibm%z = p%loc%ibm%z + p%loc%ibm%w*p%glb%dt
+
+ug=30
+!$omp parallel do collapse(3), private(ii,jj,kk,x,y,z)
+do k = p%loc%ks, p%loc%ke
+do j = p%loc%js, p%loc%je
+do i = p%loc%is, p%loc%ie
+
+    p%loc%ibm%solid%now(i,j,k)=0.0d0
+
+    do ii = 1, ug
+    do jj = 1, ug
+    do kk = 1, ug
+        
+        x = 0.5d0*( p%glb%x(i,j,k)+p%glb%x(i-1,j,k) ) + real(ii,8)*p%glb%dx/real(ug,8)
+        y = 0.5d0*( p%glb%y(i,j,k)+p%glb%y(i,j-1,k) ) + real(jj,8)*p%glb%dy/real(ug,8)
+        z = 0.5d0*( p%glb%z(i,j,k)+p%glb%z(i,j,k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
+        
+        ! dambreak -- rising gate
+        !========================================
+        if( x>1.0d0 .and. x<1.0d0+2.0d0*p%glb%dx .and. z<0.8d0+p%loc%ibm%z .and. z>p%loc%ibm%z )then
+            p%loc%ibm%solid%now(i,j,k) = p%loc%ibm%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
+        endif
+
+    end do
+    end do
+    end do
+
+enddo
+enddo
+enddo
+!$omp end parallel do
+
+call bc(p%loc%ibm%solid%now)
 
 !$omp parallel do collapse(3), private(solid)
 do k = p%loc%ks, p%loc%ke
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
 
-    solid = 0.5d0*( p%loc%solid%now(i,j,k)+p%loc%solid%now(i+1,j,k) )
+    solid = 0.5d0*( p%loc%ibm%solid%now(i,j,k)+p%loc%ibm%solid%now(i+1,j,k) )
     p%loc%vel%x%now(i,j,k) = (1.0-solid)*p%loc%vel%x%now(i,j,k)
 
-    solid = 0.5d0*( p%loc%solid%now(i,j,k)+p%loc%solid%now(i,j+1,k) )
+    solid = 0.5d0*( p%loc%ibm%solid%now(i,j,k)+p%loc%ibm%solid%now(i,j+1,k) )
     p%loc%vel%y%now(i,j,k) = (1.0-solid)*p%loc%vel%y%now(i,j,k)
 
-    solid = 0.5d0*( p%loc%solid%now(i,j,k)+p%loc%solid%now(i,j,k+1) )
-    p%loc%vel%z%now(i,j,k) = (1.0-solid)*p%loc%vel%z%now(i,j,k)
+    solid = 0.5d0*( p%loc%ibm%solid%now(i,j,k)+p%loc%ibm%solid%now(i,j,k+1) )
+    p%loc%vel%z%now(i,j,k) = (1.0-solid)*p%loc%vel%z%now(i,j,k) + solid*p%loc%ibm%w
 
 enddo
 enddo

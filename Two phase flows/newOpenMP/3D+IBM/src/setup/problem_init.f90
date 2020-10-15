@@ -35,28 +35,34 @@ CHARACTER(100) :: NAME_OF_FILE
     do i = p%loc%is, p%loc%ie
     
         p%loc%vof%now(i,j,k) = 0.0d0
-        p%loc%solid%now(i,j,k) = 0.0d0
+        p%loc%ibm%solid%now(i,j,k) = 0.0d0
         p%loc%vel%x%now(i,j,k) = 0.0d0
         p%loc%vel%y%now(i,j,k) = 0.0d0
         p%loc%vel%z%now(i,j,k) = 0.0d0
     
-        ! do ii = 1, ug
-        ! do jj = 1, ug
-        ! do kk = 1, ug
+        do ii = 1, ug
+        do jj = 1, ug
+        do kk = 1, ug
             
-        !     x = 0.5d0*( p%glb%x(i,j,k)+p%glb%x(i-1,j,k) ) + real(ii,8)*p%glb%dx/real(ug,8)
-        !     y = 0.5d0*( p%glb%y(i,j,k)+p%glb%y(i,j-1,k) ) + real(jj,8)*p%glb%dy/real(ug,8)
-        !     z = 0.5d0*( p%glb%z(i,j,k)+p%glb%z(i,j,k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
+            x = 0.5d0*( p%glb%x(i,j,k)+p%glb%x(i-1,j,k) ) + real(ii,8)*p%glb%dx/real(ug,8)
+            y = 0.5d0*( p%glb%y(i,j,k)+p%glb%y(i,j-1,k) ) + real(jj,8)*p%glb%dy/real(ug,8)
+            z = 0.5d0*( p%glb%z(i,j,k)+p%glb%z(i,j,k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
             
-        !     ! dambreak -- partial failure
-        !     !=========================================
-        !     if( x>1.0d0 .and. x<1.0d0+2.0d0*p%glb%dx .and. abs(y-1.0d0)>0.2d0 )then
-        !         p%loc%solid%now(i,j,k) = p%loc%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
-        !     end if
+            ! dambreak -- partial failure
+            !=========================================
+            ! if( x>1.0d0 .and. x<1.0d0+2.0d0*p%glb%dx .and. abs(y-1.0d0)>0.2d0 )then
+            !     p%loc%ibm%solid%now(i,j,k) = p%loc%ibm%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
+            ! end if
             
-        ! end do
-        ! end do
-        ! end do
+            ! dambreak -- rising gate
+            !========================================
+            if( x>1.0d0 .and. x<1.0d0+2.0d0*p%glb%dx .and. z<0.8d0 )then
+                p%loc%ibm%solid%now(i,j,k) = p%loc%ibm%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
+            endif
+
+        end do
+        end do
+        end do
     
         x = p%glb%x(i,j,k)
         y = p%glb%y(i,j,k)
@@ -68,7 +74,7 @@ CHARACTER(100) :: NAME_OF_FILE
         
         ! dambreak -- drybed
         !=========================================
-        if( x<=1.0d0 .and. y<=1.0d0 .and. z<=1.0d0 )then
+        if( x<=1.0d0 .and. z<=0.6d0 )then
             p%loc%phi%now(i,j,k) = 1.0_8
         else
             p%loc%phi%now(i,j,k) = -1.0_8
@@ -96,10 +102,13 @@ CHARACTER(100) :: NAME_OF_FILE
     end do
     end do
     !$omp end parallel do
+
+    p%loc%ibm%z = 0.0d0
+    p%loc%ibm%w = 0.408d0 / p%glb%U
     
     call bc(p%loc%phi%now)
     call bc(p%loc%vof%now)
-    call bc(p%loc%solid%now)
+    call bc(p%loc%ibm%solid%now)
     call velbc(p%loc%vel%x%now,p%loc%vel%y%now,p%loc%vel%z%now)
     
     write(*,*)"Init data finish"
