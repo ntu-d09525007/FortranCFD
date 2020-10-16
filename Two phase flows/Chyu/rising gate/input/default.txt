@@ -1,25 +1,25 @@
 ooo	Method to capture interface ( LS / MPLS / CLSVOF ) 
 2
 ooo	Number of threads
-20
+120
 ooo	Plot split (modify if segmentation fault occur when plotting)
-1
+2
 ooo	Name of the problem 
-40_RisingGate
+60_RisingGate
 ooo	Cells per unit length 
-40
+60
 ooo	Number of ghost cell
 3
 ooo	Range of domain in X direction
-0.0		3.0
+0.0		    3.0
 ooo	Range of domain in Y direction
-0.0		0.6
+0.0		    0.6
 ooo	Range of domain in Z direction
-0.0		1.2
+0.0		    1.2
 ooo	Time to stop / plot
-3.5		0.01
+30.0		0.5
 ooo	Crount number ( advection / redistance )
-0.005		0.1
+0.05		0.1
 ooo	PPE iteration ( tolerance / w1 / w2 / valve )
 6.0	    	1.5	    0.5    	4.0
 ooo	SRK6 iteration ( tolerance / w )
@@ -27,7 +27,7 @@ ooo	SRK6 iteration ( tolerance / w )
 ooo	Level set interface width 
 1.5
 ooo	Problem parameters ( Prescribed / L / L+U / L+T / U+T )
-2
+4
 ooo	Density / Viscosity of fluid 1 ( phi > 0 )
 995.6		0.0007972
 ooo	Density / Viscosity of fluid 2 ( phi < 0 )
