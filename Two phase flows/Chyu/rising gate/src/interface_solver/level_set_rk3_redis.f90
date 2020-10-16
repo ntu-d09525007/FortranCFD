@@ -16,9 +16,9 @@ integer(8) :: cpustart, cpuend
     time = 0.0_8
 
     if( btn .eq. 0  )then
-        timestop = 1.5d0*max(p%glb%xend-p%glb%xstart,p%glb%yend-p%glb%ystart,p%glb%zend-p%glb%zstart)
+        timestop = 2.5d0*max(p%glb%xend-p%glb%xstart,p%glb%yend-p%glb%ystart,p%glb%zend-p%glb%zstart)
     else
-        timestop = 3.0d0 * p%glb%dx
+        timestop = 2.5d0 * p%glb%dx
     end if
 
     
