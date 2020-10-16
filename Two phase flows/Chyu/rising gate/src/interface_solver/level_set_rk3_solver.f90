@@ -107,7 +107,7 @@ integer :: i,j,k
 do k = p%loc%ks, p%loc%ke
 do j = p%loc%js, p%loc%je
     !call p%loc%uccd%x%solve(p%loc%nvel%x%old(:,j,k),p%loc%phi%now(:,j,k),p%loc%tdata%x%s1(:,j,k),p%loc%tdata%x%s2(:,j,k))
-    call wenojs_flux_split(p%loc%tdata%x%s2(:,j,k),p%loc%tdata%x%s1(:,j,k),&
+    call crweno_flux_split(p%loc%tdata%x%s2(:,j,k),p%loc%tdata%x%s1(:,j,k),&
                           p%loc%tdata%x%ss2(:,j,k),p%loc%tdata%x%ss1(:,j,k),&
                           p%loc%is,p%loc%ie,p%glb%ghc)
     !call crweno_flux_split(p%loc%tdata%x%s2(:,j),p%loc%tdata%x%s1(:,j),&
@@ -121,7 +121,7 @@ end do
 do k = p%loc%ks, p%loc%ke
 do i = p%loc%is, p%loc%ie
     !call p%loc%uccd%y%solve(p%loc%nvel%y%old(i,:,k),p%loc%phi%now(i,:,k),p%loc%tdata%y%s1(i,:,k),p%loc%tdata%y%s2(i,:,k))
-    call wenojs_flux_split(p%loc%tdata%y%s2(i,:,k),p%loc%tdata%y%s1(i,:,k),&
+    call crweno_flux_split(p%loc%tdata%y%s2(i,:,k),p%loc%tdata%y%s1(i,:,k),&
                           p%loc%tdata%y%ss2(i,:,k),p%loc%tdata%y%ss1(i,:,k),&
                           p%loc%js,p%loc%je,p%glb%ghc)
     !call crweno_flux_split(p%loc%tdata%y%s2(i,:),p%loc%tdata%y%s1(i,:),&
@@ -135,7 +135,7 @@ end do
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
     !call p%loc%uccd%z%solve(p%loc%nvel%z%old(i,j,:),p%loc%phi%now(i,j,:),p%loc%tdata%z%s1(i,j,:),p%loc%tdata%z%s2(i,j,:))
-    call wenojs_flux_split(p%loc%tdata%z%s2(i,j,:),p%loc%tdata%z%s1(i,j,:),&
+    call crweno_flux_split(p%loc%tdata%z%s2(i,j,:),p%loc%tdata%z%s1(i,j,:),&
                           p%loc%tdata%z%ss2(i,j,:),p%loc%tdata%z%ss1(i,j,:),&
                           p%loc%ks,p%loc%ke,p%glb%ghc)
 end do 
