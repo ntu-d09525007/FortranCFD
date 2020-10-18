@@ -64,7 +64,7 @@ CHARACTER(100) :: NAME_OF_FILE
             
             ! dambreak
             !=========================================
-            if( x<=1.0d0 .and. y<=1.0d0 .and. z<=1.0d0 )then
+            if( x<=1.0d0 .and. z<=1.0d0 )then
                 p%of(id)%loc%phi%now(i,j,k) = 1.0_8
             else
                 p%of(id)%loc%phi%now(i,j,k) = -1.0_8
