@@ -153,7 +153,7 @@ implicit none
 integer :: i,j,k,ii,jj,kk,ug
 real(8) :: solid,x,y,z
 
-if(p%loc%ibm%z>0.4d0)p%loc%ibm%w=0.0d0
+if(p%loc%ibm%z>0.4d0/0.6d0)p%loc%ibm%w=0.0d0
 p%loc%ibm%z = p%loc%ibm%z + p%loc%ibm%w*p%glb%dt
 
 ug=30
@@ -174,7 +174,7 @@ do i = p%loc%is, p%loc%ie
         
         ! dambreak -- rising gate
         !========================================
-        if( x>1.0d0 .and. x<1.0d0+2.0d0*p%glb%dx .and. z<0.8d0+p%loc%ibm%z .and. z>p%loc%ibm%z )then
+        if( x>5.0d0/3.0d0 .and. x<5.0d0/3.0d0+2.0d0*p%glb%dx .and. z<4.0d0/3.0d0+p%loc%ibm%z .and. z>p%loc%ibm%z )then
             p%loc%ibm%solid%now(i,j,k) = p%loc%ibm%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
         endif
 

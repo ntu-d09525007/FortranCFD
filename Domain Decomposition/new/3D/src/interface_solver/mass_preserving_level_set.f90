@@ -5,10 +5,10 @@ implicit none
 integer :: i,j,k,id,iter
 real(8) :: lam, plam
 
-do iter = 1, 2
+do iter = 1, 3
     
     call p%ls_mv()
-    call p%surface_norms()
+    call p%surface_norms2()
     call pt%normals%sync
     
     lam = 0.0_8

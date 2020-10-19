@@ -10,10 +10,8 @@ end module all
 program main
 use all
 implicit none
-real(8) :: dt
 
   call problem_init
-  dt=p%glb%dt
 
   do 
         

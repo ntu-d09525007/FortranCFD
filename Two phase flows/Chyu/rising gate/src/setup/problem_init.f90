@@ -56,7 +56,7 @@ CHARACTER(100) :: NAME_OF_FILE
             
             ! dambreak -- rising gate
             !========================================
-            if( x>1.0d0 .and. x<1.0d0+2.0d0*p%glb%dx .and. z<0.8d0 )then
+            if( x>5.0d0/3.0d0 .and. x<5.0d0/3.0d0+2.0d0*p%glb%dx .and. z<4.0d0/3.0d0 )then
                 p%loc%ibm%solid%now(i,j,k) = p%loc%ibm%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
             endif
 
@@ -74,7 +74,7 @@ CHARACTER(100) :: NAME_OF_FILE
         
         ! dambreak -- drybed
         !=========================================
-        if( x<=1.0d0 .and. z<=0.6d0 )then
+        if( x<=5.0d0/3.0d0 .and. z<=1.0d0 )then
             p%loc%phi%now(i,j,k) = 1.0_8
         else
             p%loc%phi%now(i,j,k) = -1.0_8

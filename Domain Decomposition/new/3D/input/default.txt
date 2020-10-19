@@ -1,5 +1,5 @@
 ooo	Method to capture interface ( LS / MPLS / CLSVOF ) 
-1
+2
 ooo	Name of the problem 
 30_drybed
 ooo	Dimension of threads grid in X, Y, Z direction
@@ -17,7 +17,7 @@ ooo	Range of domain in Y direction
 ooo	Range of domain in Z direction
 0.0		2.0
 ooo	Time to stop / plot
-10.0		0.05
+10.0		0.5
 ooo	Crount number ( advection / redistance )
 0.01		0.5
 ooo	PPE iteration ( tolerance / w1 / w2 / valve )
@@ -33,7 +33,7 @@ ooo	Density / Viscosity of fluid 1 ( phi > 0 )
 ooo	Density / Viscosity of fluid 2 ( phi < 0 )
 1.164		0.00001860
 ooo	Surface tension of fluid 1, 2 / Using ?
-0.078		0
+0.078		1
 ooo	Gravity / Using ?
 9.81		1
 ooo	Gravity direction ( no need normalize)

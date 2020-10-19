@@ -11,11 +11,11 @@ ooo	Cells per unit length
 ooo	Number of ghost cell
 3
 ooo	Range of domain in X direction
-0.0		    3.0
+0.0		    5.0
 ooo	Range of domain in Y direction
-0.0		    0.6
+0.0		    1.0
 ooo	Range of domain in Z direction
-0.0		    1.2
+0.0		    2.0
 ooo	Time to stop / plot
 30.0		0.5
 ooo	Crount number ( advection / redistance )
@@ -33,13 +33,13 @@ ooo	Density / Viscosity of fluid 1 ( phi > 0 )
 ooo	Density / Viscosity of fluid 2 ( phi < 0 )
 1.164		0.00001860
 ooo	Surface tension of fluid 1, 2 / Using ?
-0.078		0
+0.078		1
 ooo	Gravity / Using ?
 9.81		1
 ooo	Gravity direction ( no need normalize)
 0.0	    0.0	    	-1.0
 ooo	Characteristic Length, Velocity, Time
-1.0		0.408		0.1
+0.6		0.408		0.1
 ooo	Dimensionless parameters ( Re, Fr, We )  !!! We should not be zero
 1000.0		0.4096		1.0
 ooo	Density / Viscosity ratio of fluid 1, 2

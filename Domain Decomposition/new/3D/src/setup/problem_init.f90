@@ -6,24 +6,21 @@ integer :: id, i, j, k, ug, ii,jj,kk
 real(8) :: x, y, z, err
 CHARACTER(100) :: NAME_OF_FILE
     
-    NAME_OF_FILE='d'
+    NAME_OF_FILE="default.txt"
     
-    WRITE(*,*)"============================================"
-    WRITE(*,*)'Returning the files in directory "/input" '
-    WRITE(*,*)
-    CALL SYSTEM("ls ./input")
-    WRITE(*,*)
-    WRITE(*,*)"============================================"
-    WRITE(*,*)'Selet an input file (<d> : default.txt), with full name'
-    WRITE(*,*)
-    !READ(*,*)NAME_OF_FILE
-    if( name_of_file == 'd' )name_of_file = "default.txt"
-    
+    ! WRITE(*,*)"============================================"
+    ! WRITE(*,*)'Returning the files in directory "/input" '
+    ! WRITE(*,*)
+    ! CALL SYSTEM("ls ./input")
+    ! WRITE(*,*)
+    ! WRITE(*,*)"============================================"
+    ! WRITE(*,*)'Selet an input file (<d> : default.txt), with full name'
+    ! WRITE(*,*)
+    ! READ(*,*)NAME_OF_FILE
+    !if( name_of_file == 'd' )name_of_file = "default.txt"
     
     call p%init( "./input/"//trim(name_of_file) )
-    write(*,*)"data init finish"
     call pt%init(p)
-    write(*,*)"pointer init finish"
         
     call p%show
     !---------------------------------------------------
@@ -116,20 +113,13 @@ CHARACTER(100) :: NAME_OF_FILE
 
     enddo
     !$omp end parallel do
-    
-    write(*,*)"Init data finish"
-    
+        
     call pt%phi%sync
-    write(*,*)"phi sync"
     call pt%vel%sync
-    write(*,*)"vel sync"
     call pt%vof%sync
-    write(*,*)"vof sync"
-    
-    write(*,*)"start redistancing"
+
     call level_set_rk3_redis(0)
     
-    write(*,*)"find cell center velocity"
     call p%node_vel
     call pt%nvel%sync
     call ns_init
@@ -141,7 +131,6 @@ CHARACTER(100) :: NAME_OF_FILE
     enddo
     !$omp end parallel do
 
-    write(*,*)"ns ab setup"
     call ns_ab_setup
 
     call p%ls_mv
