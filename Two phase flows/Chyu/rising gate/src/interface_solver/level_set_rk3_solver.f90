@@ -151,6 +151,16 @@ end do
 end do
 !$omp end parallel do 
 
+!$omp parallel do collapse(3) 
+do k = p%loc%ks, p%loc%ke
+do j = p%loc%js, p%loc%je
+do i = p%loc%is, p%loc%ie
+     s(i,j,k) = s(i,j,k)*(1.0d0-p%loc%ibm%solid%now(i,j,k))
+end do 
+end do
+end do
+!$omp end parallel do 
+
 end subroutine
 
 subroutine wenojs_flux_split(f,g,fp,gm,is,ie,ghc)

@@ -136,7 +136,7 @@ implicit none
 integer :: id,i,j,k
 real(8) :: fx,fxx,fy,fyy,fz,fzz,fxy,fxz,fyz
 
-call surface_norms
+call surface_norms2
 
 !$omp parallel do collapse(3), private(fx,fxx,fy,fyy,fz,fzz,fxy,fxz,fyz)
 do k = p%loc%ks, p%loc%ke
