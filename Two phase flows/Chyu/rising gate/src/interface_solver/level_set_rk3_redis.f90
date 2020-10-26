@@ -51,7 +51,7 @@ do
     end do
     !$omp end parallel do 
     
-    if( time>timestop .or.  error.le.1.0d-5) exit
+    if( time>timestop .or.  error.le.1.0d-8) exit
     
     if( mod(iter,100) .eq. 0 )then
         write(*,'("LS Init:",I8,F8.5,ES15.4)')iter,time,error

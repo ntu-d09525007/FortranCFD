@@ -5,9 +5,9 @@ ooo	Number of threads
 ooo	Plot split (modify if segmentation fault occur when plotting)
 2
 ooo	Name of the problem 
-60_RisingGate
+50_RisingGate
 ooo	Cells per unit length 
-60
+50
 ooo	Number of ghost cell
 3
 ooo	Range of domain in X direction
@@ -19,9 +19,9 @@ ooo	Range of domain in Z direction
 ooo	Time to stop / plot
 30.0		0.5
 ooo	Crount number ( advection / redistance )
-0.05		0.1
+0.01		0.25
 ooo	PPE iteration ( tolerance / w1 / w2 / valve )
-6.0	    	1.5	    0.5    	4.0
+7.0	    	1.5	    0.5    	4.0
 ooo	SRK6 iteration ( tolerance / w )
 10.0		0.5	
 ooo	Level set interface width 

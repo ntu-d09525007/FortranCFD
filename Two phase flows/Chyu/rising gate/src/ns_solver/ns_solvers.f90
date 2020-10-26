@@ -153,7 +153,11 @@ implicit none
 integer :: i,j,k,ii,jj,kk,ug
 real(8) :: solid,x,y,z
 
-if(p%loc%ibm%z>0.4d0/0.6d0)p%loc%ibm%w=0.0d0
+if(p%loc%ibm%z>0.4d0/0.6d0)then
+    p%loc%ibm%w=0.0d0
+    goto 110
+endif
+
 p%loc%ibm%z = p%loc%ibm%z + p%loc%ibm%w*p%glb%dt
 
 ug=30
@@ -187,7 +191,7 @@ enddo
 enddo
 !$omp end parallel do
 
-call bc(p%loc%ibm%solid%now)
+110 call bc(p%loc%ibm%solid%now)
 
 !$omp parallel do collapse(3), private(solid)
 do k = p%loc%ks, p%loc%ke
@@ -207,5 +211,7 @@ enddo
 enddo
 enddo
 !$omp end parallel do
+
+call velbc(p%loc%vel%x%now,p%loc%vel%y%now,p%loc%vel%z%now)
 
 end subroutine
