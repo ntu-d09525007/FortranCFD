@@ -39,7 +39,7 @@ do idz = 0, p%glb%num_of_plot-1
                        
     E_IO = VTK_DAT_XML(var_location = 'node', var_block_action = 'open')
     E_IO = VTK_VAR_XML(NC_NN = nn, varname = 'Phi', var = p%loc%phi%now(nx1:nx2,ny1:ny2,nz1:nz2) )
-    E_IO = VTK_VAR_XML(NC_NN = nn, varname = 'Solid', var = p%loc%solid%now(nx1:nx2,ny1:ny2,nz1:nz2) )
+    !E_IO = VTK_VAR_XML(NC_NN = nn, varname = 'Solid', var = p%loc%ibm%solid%now(nx1:nx2,ny1:ny2,nz1:nz2) )
     E_IO = VTK_VAR_XML(NC_NN = nn, varname = 'Pressure', var = p%loc%p%now(nx1:nx2,ny1:ny2,nz1:nz2) )
     E_IO = VTK_VAR_XML(NC_NN = nn, varname = 'Velocity', varX = p%loc%nvel%x%now(nx1:nx2,ny1:ny2,nz1:nz2),&
                                                         &varY = p%loc%nvel%y%now(nx1:nx2,ny1:ny2,nz1:nz2),&

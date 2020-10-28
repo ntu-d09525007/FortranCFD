@@ -10,7 +10,7 @@ id=0
 do iter = 1, 2
     
     call ls_mv()
-    call surface_norms()
+    call surface_norms2()
     
     lam = 0.0_8
     

@@ -106,13 +106,10 @@ integer :: i,j,k
 !$omp parallel do collapse(2)                     
 do k = p%loc%ks, p%loc%ke
 do j = p%loc%js, p%loc%je
-    !call p%loc%uccd%x%solve(p%loc%nvel%x%old(:,j,k),p%loc%phi%now(:,j,k),p%loc%tdata%x%s1(:,j,k),p%loc%tdata%x%s2(:,j,k))
-    call wenojs_flux_split(p%loc%tdata%x%s2(:,j,k),p%loc%tdata%x%s1(:,j,k),&
-                          p%loc%tdata%x%ss2(:,j,k),p%loc%tdata%x%ss1(:,j,k),&
-                          p%loc%is,p%loc%ie,p%glb%ghc)
-    !call crweno_flux_split(p%loc%tdata%x%s2(:,j),p%loc%tdata%x%s1(:,j),&
-    !                      p%loc%tdata%x%ss2(:,j),p%loc%tdata%x%ss1(:,j),&
-    !                      p%loc%is,p%loc%ie,p%glb%ghc)
+    !call p%loc%ccdsolvers%x%solve("uccd",p%loc%phi%now(:,j,k),p%loc%tdata%x%s1(:,j,k),p%loc%tdata%x%s2(:,j,k),p%loc%nvel%x%old(:,j,k))
+     call crweno_flux_split(p%loc%tdata%x%s2(:,j,k),p%loc%tdata%x%s1(:,j,k),&
+                           p%loc%tdata%x%ss2(:,j,k),p%loc%tdata%x%ss1(:,j,k),&
+                           p%loc%is,p%loc%ie,p%glb%ghc)
 end do 
 end do
 !$omp end parallel do 
@@ -120,13 +117,10 @@ end do
 !$omp parallel do collapse(2) 
 do k = p%loc%ks, p%loc%ke
 do i = p%loc%is, p%loc%ie
-    !call p%loc%uccd%y%solve(p%loc%nvel%y%old(i,:,k),p%loc%phi%now(i,:,k),p%loc%tdata%y%s1(i,:,k),p%loc%tdata%y%s2(i,:,k))
-    call wenojs_flux_split(p%loc%tdata%y%s2(i,:,k),p%loc%tdata%y%s1(i,:,k),&
-                          p%loc%tdata%y%ss2(i,:,k),p%loc%tdata%y%ss1(i,:,k),&
-                          p%loc%js,p%loc%je,p%glb%ghc)
-    !call crweno_flux_split(p%loc%tdata%y%s2(i,:),p%loc%tdata%y%s1(i,:),&
-    !                      p%loc%tdata%y%ss2(i,:),p%loc%tdata%y%ss1(i,:),&
-    !                      p%loc%js,p%loc%je,p%glb%ghc)
+    !call p%loc%ccdsolvers%y%solve("uccd",p%loc%phi%now(i,:,k),p%loc%tdata%y%s1(i,:,k),p%loc%tdata%y%s2(i,:,k),p%loc%nvel%y%old(i,:,k))
+     call crweno_flux_split(p%loc%tdata%y%s2(i,:,k),p%loc%tdata%y%s1(i,:,k),&
+                           p%loc%tdata%y%ss2(i,:,k),p%loc%tdata%y%ss1(i,:,k),&
+                           p%loc%js,p%loc%je,p%glb%ghc)
 end do 
 end do
 !$omp end parallel do 
@@ -134,24 +128,36 @@ end do
 !$omp parallel do collapse(2) 
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
-    !call p%loc%uccd%z%solve(p%loc%nvel%z%old(i,j,:),p%loc%phi%now(i,j,:),p%loc%tdata%z%s1(i,j,:),p%loc%tdata%z%s2(i,j,:))
-    call wenojs_flux_split(p%loc%tdata%z%s2(i,j,:),p%loc%tdata%z%s1(i,j,:),&
-                          p%loc%tdata%z%ss2(i,j,:),p%loc%tdata%z%ss1(i,j,:),&
-                          p%loc%ks,p%loc%ke,p%glb%ghc)
+    !call p%loc%ccdsolvers%z%solve("uccd",p%loc%phi%now(i,j,:),p%loc%tdata%z%s1(i,j,:),p%loc%tdata%z%s2(i,j,:),p%loc%nvel%z%old(i,j,:))
+    call crweno_flux_split(p%loc%tdata%z%s2(i,j,:),p%loc%tdata%z%s1(i,j,:),&
+                           p%loc%tdata%z%ss2(i,j,:),p%loc%tdata%z%ss1(i,j,:),&
+                           p%loc%ks,p%loc%ke,p%glb%ghc)
 end do 
 end do
 !$omp end parallel do 
 
-!$omp parallel do collapse(2) 
+!$omp parallel do collapse(3) 
 do k = p%loc%ks, p%loc%ke
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
-    s(i,j,k) = - (p%loc%tdata%x%ss1(i,j,k)+p%loc%tdata%x%ss2(i,j,k)-p%loc%tdata%x%ss1(i-1,j,k)-p%loc%tdata%x%ss2(i-1,j,k)) / p%glb%dx &
-              &- (p%loc%tdata%y%ss1(i,j,k)+p%loc%tdata%y%ss2(i,j,k)-p%loc%tdata%y%ss1(i,j-1,k)-p%loc%tdata%y%ss2(i,j-1,k)) / p%glb%dy &
-              &- (p%loc%tdata%z%ss1(i,j,k)+p%loc%tdata%z%ss2(i,j,k)-p%loc%tdata%z%ss1(i,j,k-1)-p%loc%tdata%z%ss2(i,j,k-1)) / p%glb%dz
-    ! s(i,j,k) = - p%loc%nvel%x%old(i,j,k)*p%loc%tdata%x%s1(i,j,k) &
-    !         &  - p%loc%nvel%y%old(i,j,k)*p%loc%tdata%y%s1(i,j,k) &
-    !         &  - p%loc%nvel%z%old(i,j,k)*p%loc%tdata%z%s1(i,j,k) 
+     s(i,j,k) = - (p%loc%tdata%x%ss1(i,j,k)+p%loc%tdata%x%ss2(i,j,k)-p%loc%tdata%x%ss1(i-1,j,k)-p%loc%tdata%x%ss2(i-1,j,k)) / p%glb%dx &
+               &- (p%loc%tdata%y%ss1(i,j,k)+p%loc%tdata%y%ss2(i,j,k)-p%loc%tdata%y%ss1(i,j-1,k)-p%loc%tdata%y%ss2(i,j-1,k)) / p%glb%dy &
+               &- (p%loc%tdata%z%ss1(i,j,k)+p%loc%tdata%z%ss2(i,j,k)-p%loc%tdata%z%ss1(i,j,k-1)-p%loc%tdata%z%ss2(i,j,k-1)) / p%glb%dz
+    !s(i,j,k) = - p%loc%nvel%x%old(i,j,k)*p%loc%tdata%x%s1(i,j,k) &
+    !        &  - p%loc%nvel%y%old(i,j,k)*p%loc%tdata%y%s1(i,j,k) &
+    !        &  - p%loc%nvel%z%old(i,j,k)*p%loc%tdata%z%s1(i,j,k) 
+end do 
+end do
+end do
+!$omp end parallel do 
+
+return
+
+!$omp parallel do collapse(3) 
+do k = p%loc%ks, p%loc%ke
+do j = p%loc%js, p%loc%je
+do i = p%loc%is, p%loc%ie
+     s(i,j,k) = s(i,j,k)*(1.0d0-p%loc%ibm%solid%now(i,j,k))
 end do 
 end do
 end do
