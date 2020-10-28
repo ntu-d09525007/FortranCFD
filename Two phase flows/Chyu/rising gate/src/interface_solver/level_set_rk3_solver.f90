@@ -151,6 +151,8 @@ end do
 end do
 !$omp end parallel do 
 
+return
+
 !$omp parallel do collapse(3) 
 do k = p%loc%ks, p%loc%ke
 do j = p%loc%js, p%loc%je
