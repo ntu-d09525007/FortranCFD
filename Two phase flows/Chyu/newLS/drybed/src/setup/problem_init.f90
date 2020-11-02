@@ -35,7 +35,7 @@ CHARACTER(100) :: NAME_OF_FILE
     do i = p%loc%is, p%loc%ie
     
         p%loc%vof%now(i,j,k) = 0.0d0
-        p%loc%solid%now(i,j,k) = 0.0d0
+        p%loc%ibm%solid%now(i,j,k) = 0.0d0
         p%loc%vel%x%now(i,j,k) = 0.0d0
         p%loc%vel%y%now(i,j,k) = 0.0d0
         p%loc%vel%z%now(i,j,k) = 0.0d0
@@ -50,10 +50,16 @@ CHARACTER(100) :: NAME_OF_FILE
             
         !     ! dambreak -- partial failure
         !     !=========================================
-        !     if( x>1.0d0 .and. x<1.0d0+2.0d0*p%glb%dx .and. abs(y-1.0d0)>0.2d0 )then
-        !         p%loc%solid%now(i,j,k) = p%loc%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
-        !     end if
+        !     ! if( x>1.0d0 .and. x<1.0d0+2.0d0*p%glb%dx .and. abs(y-1.0d0)>0.2d0 )then
+        !     !     p%loc%ibm%solid%now(i,j,k) = p%loc%ibm%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
+        !     ! end if
             
+        !     ! dambreak -- rising gate
+        !     !========================================
+        !     if( x>5.0d0/3.0d0 .and. x<5.0d0/3.0d0+2.0d0*p%glb%dx .and. z<4.0d0/3.0d0 )then
+        !         p%loc%ibm%solid%now(i,j,k) = p%loc%ibm%solid%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
+        !     endif
+
         ! end do
         ! end do
         ! end do
@@ -68,7 +74,7 @@ CHARACTER(100) :: NAME_OF_FILE
         
         ! dambreak -- drybed
         !=========================================
-        if( x<=1.0d0 .and. y<=1.0d0 .and. z<=1.0d0 )then
+        if( x<=1.0 .and. z<=1.0d0 )then
             p%loc%phi%now(i,j,k) = 1.0_8
         else
             p%loc%phi%now(i,j,k) = -1.0_8
@@ -96,10 +102,13 @@ CHARACTER(100) :: NAME_OF_FILE
     end do
     end do
     !$omp end parallel do
+
+    p%loc%ibm%z = 0.0d0
+    p%loc%ibm%w = 0.408d0 / p%glb%U
     
     call bc(p%loc%phi%now)
     call bc(p%loc%vof%now)
-    call bc(p%loc%solid%now)
+    !call bc(p%loc%ibm%solid%now)
     call velbc(p%loc%vel%x%now,p%loc%vel%y%now,p%loc%vel%z%now)
     
     write(*,*)"Init data finish"

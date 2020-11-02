@@ -33,6 +33,7 @@ do j = p%loc%js, p%loc%je
 enddo
 enddo
 !$omp end parallel do
+
 write(p%fil%damdata, *)p%glb%time, damfront, damh
 
 

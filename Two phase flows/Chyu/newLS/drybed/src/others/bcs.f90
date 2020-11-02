@@ -6,7 +6,7 @@ real(8),dimension(p%loc%is-p%glb%ghc:p%loc%ie+p%glb%ghc,&
                   p%loc%ks-p%glb%ghc:p%loc%ke+p%glb%ghc) :: dat
 integer :: i,j,k
 
-    !$omp parallel do collapse(3)
+    !$omp parallel do collapse(2)
     do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
     do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
     do i = 1, p%glb%ghc
@@ -17,7 +17,7 @@ integer :: i,j,k
     enddo
     !$omp end parallel do
 
-    !$omp parallel do collapse(3)    
+    !$omp parallel do collapse(2)    
     do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
     do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
     do j = 1, p%glb%ghc
@@ -28,7 +28,7 @@ integer :: i,j,k
     enddo
     !$omp end parallel do
 
-    !$omp parallel do collapse(3)
+    !$omp parallel do collapse(2)
     do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
     do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
     do k = 1, p%glb%ghc
