@@ -24,16 +24,22 @@ for i in range(1000):
         fp.close()
         fn = open('./'+dirname+'/'+str(i)+".pov","w")
         fn.write('#include "my setting.inc" \n\n')
-    
+
+        objnum=0
         for line in content:
             if flag1==0 and "mesh2 {" in line: flag1=1
             if flag1==1 and "matrix" in line: flag2=1
             if flag1*flag2==1 and ">" in line: flag3=1
             if flag1==1:fn.write(line)
             if flag3==1:
-                fn.write("material {milk}")
+                if objnum==1:
+                    fn.write("material {milk}")
+                else:
+                    fn.write("material {gate}")
                 fn.write("}")
-                break
+                objnum+=1
+                flag1=flag2=flag3=0
+                #break
         fn.close()
     except:
         break
