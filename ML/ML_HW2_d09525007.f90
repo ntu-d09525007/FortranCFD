@@ -72,7 +72,7 @@ integer :: tid, i, j, s, ms, index, jj
 real(8) :: data_range, tau, randnum
 real(8) :: E, Emin, mtheta, Eold, E_diff
 logical :: old, now
-real(8),allocatable :: x(:),theta(:)
+real(8),allocatable :: x(:),theta(:),y(:)
 
 out_size = 10
 
@@ -81,7 +81,7 @@ threads = omp_get_max_threads()
 call omp_set_dynamic(.false.)
 call omp_set_num_threads(threads)
 
-allocate(x(data_size),theta(data_size))
+allocate(x(data_size),theta(data_size),y(data_size))
 
 call random_seed()
 
@@ -92,6 +92,7 @@ do tid = 1, num_of_test
     do i = 1, data_size
         call random_number(randnum)
         x(i) = data_range*randnum-data_range*0.5d0
+        y(i) = sign2(x(i),tau)
     enddo
     !$omp end parallel do
 
@@ -114,7 +115,7 @@ do tid = 1, num_of_test
             E = 0.0d0
             !$omp parallel do reduction(+:E)
             do i = 1, data_size
-                if( sign2(x(i),tau) .ne. s*sign(x(i)-theta(j)) )then
+                if( y(i) .ne. s*sign(x(i)-theta(j)) )then
                     E = E + 1.0d0 / real( data_size, 8)  
                 endif
             enddo
@@ -123,8 +124,8 @@ do tid = 1, num_of_test
             E=Eold
             do i = j-1, j+1
 
-                old=(sign2(x(i),tau) .ne. s*sign(x(i)-theta(j-1)))
-                now=(sign2(x(i),tau) .ne. s*sign(x(i)-theta(j)))
+                old=(y(i) .ne. s*sign(x(i)-theta(j-1)))
+                now=(y(i) .ne. s*sign(x(i)-theta(j)))
 
                 !write(*,*)i,old,now
 
