@@ -74,7 +74,7 @@ threads = omp_get_max_threads()
 call omp_set_dynamic(.false.)
 call omp_set_num_threads(threads)
 
-allocate(x(threads),data_size),xx(out_size,data_size),&
+allocate(x(threads,data_size),xx(out_size,data_size),&
          theta(threads,data_size),Ein(num_of_test))
 
 call random_seed()
