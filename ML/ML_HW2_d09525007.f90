@@ -6,8 +6,8 @@ implicit none
 integer :: num_of_test, data_size
 real(8) :: data_range
 
-data_size = 1200
-num_of_test = 1000
+data_size = 12000
+num_of_test = 10000
 
 call dec_stump(num_of_test,data_size,2.0d0,0.0d0)
 call dec_stump(num_of_test,data_size,20.0d0,0.0d0)
@@ -22,22 +22,27 @@ implicit none
 integer :: sign2
 real(8) :: x,tau,rand
 
+if( tau < 1.0d-10 )then
+    sign2=sign(x)
+    return
+endif
+
 call random_number(rand)
     
 if( rand > tau )then
 
     if(x>0)then
-        sign2 = -1
-    else
         sign2 = 1
+    else
+        sign2 = -1
     endif
 
 else
 
     if(x>0)then
-        sign2 = 1
-    else
         sign2 = -1
+    else
+        sign2 = 1
     endif
 
 endif
@@ -62,10 +67,10 @@ use omp_lib
 use sorts
 implicit none
 integer :: num_of_test,data_size,out_size,threads
-integer :: tid, i, j, id, s
-real(8) :: data_range, tau, sum, randnum
-real(8) :: E, E_total, Emin, mtheta, ms
-real(8),allocatable :: x(:,:),theta(:,:),Ein(:),xx(:,:)
+integer :: tid, i, j, id, s, ms
+real(8) :: data_range, tau, randnum
+real(8) :: E, Emin, mtheta
+real(8),allocatable :: x(:),theta(:),Ein(:)
 
 out_size = 10
 
@@ -74,77 +79,80 @@ threads = omp_get_max_threads()
 call omp_set_dynamic(.false.)
 call omp_set_num_threads(threads)
 
-allocate(x(threads,data_size),xx(out_size,data_size),&
-         theta(threads,data_size),Ein(num_of_test))
+allocate(x(data_size),theta(data_size),Ein(num_of_test))
 
 call random_seed()
 
-!$omp parallel do private(randnum)
-do j = 1, out_size
-do i = 1, data_size
-    call random_number(randnum)
-    xx(j,i) = data_range*randnum-data_range*0.5d0
-enddo
-enddo
-!$omp end parallel do
-
-!$omp parallel do private(id,i,j,randnum,s,E,Emin), num_threads(threads)
 do tid = 1, num_of_test
 
-    id = omp_get_thread_num()
+    !$omp parallel do private(randnum)
     do i = 1, data_size
         call random_number(randnum)
-        x(id,i) = data_range*randnum-data_range*0.5d0
+        x(i) = data_range*randnum-data_range*0.5d0
     enddo
+    !$omp end parallel do
 
-    call heap_sort(x(id,:))
+    call heap_sort(x(:))
 
-    theta(tid,1) = -1.0d0
+    theta(1) = -1.0d0
+    !$omp parallel do 
     do i = 2, data_size
-        theta(id,i) = 0.5d0*( x(id,i)+x(id,i-1) )
+        theta(i) = 0.5d0*( x(i)+x(i-1) )
     enddo
+    !$omp end parallel do
 
     ! Training
 
     Emin=data_size
-    do s = -1, 1, 2
+    do s = 1, -1, -2
     do j = 1, data_size
         E = 0.0d0
+        !$omp parallel do reduction(+:E)
         do i = 1, data_size
-            if( sign2(x(id,i),tau) .ne. s*sign(x(id,i)-theta(id,j)) )then
+            if( sign2(x(i),tau) .ne. s*sign(x(i)-theta(j)) )then
                 E = E + 1.0d0
             endif
         enddo
+        !$omp end parallel do
         E = E / real( data_size, 8)                                                             
         if( E<Emin )then
             Emin=E
             ms=s
-            mtheta = theta(id,j)
+            mtheta = theta(j)
         endif
     enddo
     enddo
 
-    ! Calculate Eout
+    !write(*,'("Emin:",ES11.4,"  s:",I5,"  theta:",ES11.4)')Emin,ms,mtheta
 
+    ! Calculate Eout
     E=0.0d0
-    do i = 1, out_size
-    do j = 1, data_size
-        if( sign2(xx(i,j),tau) .ne. ms*sign(xx(i,j)-mtheta) )then
+    !$omp parallel do reduction(+:E), private(randnum)
+    do i = 1, out_size*data_size
+        call random_number(randnum)
+        randnum = data_range*randnum-data_range*0.5d0
+        if( sign(randnum) .ne. ms*sign(randnum-mtheta) )then
             E=E+1.0d0
         endif
     enddo
-    enddo
-    E=E/real(out_size*data_size,8)
+    !$omp end parallel do
+
+    E = E / real(out_size*data_size,8)
+
     Ein(tid) = E-Emin
 
-enddo
-!$omp end parallel do
+    !write(*,*)E, Ein(tid)
 
+enddo
+
+E=0.0d0
 !$omp parallel do reduction(+:E)
 do i = 1, num_of_test
     E = E + Ein(tid) / real(num_of_test,8)
 enddo
 !$omp end parallel do
+
+write(*,*)"Ein-Eout",E
 
 end subroutine
 
