@@ -9,8 +9,8 @@ real(8) :: data_range
 data_size = 12000
 num_of_test = 10000
 
-call dec_stump(num_of_test,data_size,2.0d0,0.0d0)
-call dec_stump(num_of_test,data_size,20.0d0,0.0d0)
+!call dec_stump(num_of_test,data_size,2.0d0,0.0d0)
+!call dec_stump(num_of_test,data_size,20.0d0,0.0d0)
 
 call dec_stump(num_of_test,data_size,2.0d0,0.1d0)
 call dec_stump(num_of_test,data_size,20.0d0,0.1d0)
