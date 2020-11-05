@@ -67,10 +67,11 @@ use omp_lib
 use sorts
 implicit none
 integer :: num_of_test,data_size,out_size,threads
-integer :: tid, i, j, id, s, ms
+integer :: tid, i, j, s, ms, index, jj
 real(8) :: data_range, tau, randnum
-real(8) :: E, Emin, mtheta
-real(8),allocatable :: x(:),theta(:),Ein(:)
+real(8) :: E, Emin, mtheta, Eold, E_diff
+logical :: old, now
+real(8),allocatable :: x(:),theta(:)
 
 out_size = 10
 
@@ -79,10 +80,11 @@ threads = omp_get_max_threads()
 call omp_set_dynamic(.false.)
 call omp_set_num_threads(threads)
 
-allocate(x(data_size),theta(data_size),Ein(num_of_test))
+allocate(x(data_size),theta(data_size))
 
 call random_seed()
 
+E_diff=0.0d0
 do tid = 1, num_of_test
 
     !$omp parallel do private(randnum)
@@ -106,20 +108,45 @@ do tid = 1, num_of_test
     Emin=data_size
     do s = 1, -1, -2
     do j = 1, data_size
-        E = 0.0d0
-        !$omp parallel do reduction(+:E)
-        do i = 1, data_size
-            if( sign2(x(i),tau) .ne. s*sign(x(i)-theta(j)) )then
-                E = E + 1.0d0
-            endif
-        enddo
-        !$omp end parallel do
-        E = E / real( data_size, 8)                                                             
+
+        if( J<3 .or. J>data_size-2 )then
+            E = 0.0d0
+            !$omp parallel do reduction(+:E)
+            do i = 1, data_size
+                if( sign2(x(i),tau) .ne. s*sign(x(i)-theta(j)) )then
+                    E = E + 1.0d0 / real( data_size, 8)  
+                endif
+            enddo
+            !$omp end parallel do
+        else
+            E=Eold
+            do i = j-1, j+1
+
+                old=(sign2(x(i),tau) .ne. s*sign(x(i)-theta(j-1)))
+                now=(sign2(x(i),tau) .ne. s*sign(x(i)-theta(j)))
+
+                !write(*,*)i,old,now
+
+                if( old .ne. now )then
+                    if( old )then
+                        E = E - 1.0d0 / real( data_size, 8)
+                    else
+                        E = E + 1.0d0 / real( data_size, 8)
+                    endif
+                endif
+
+            enddo
+
+        endif 
+
+        Eold=E
+
         if( E<Emin )then
             Emin=E
             ms=s
             mtheta = theta(j)
         endif
+
     enddo
     enddo
 
@@ -131,7 +158,7 @@ do tid = 1, num_of_test
     do i = 1, out_size*data_size
         call random_number(randnum)
         randnum = data_range*randnum-data_range*0.5d0
-        if( sign(randnum) .ne. ms*sign(randnum-mtheta) )then
+        if( sign2(randnum,tau) .ne. ms*sign(randnum-mtheta) )then
             E=E+1.0d0
         endif
     enddo
@@ -139,20 +166,13 @@ do tid = 1, num_of_test
 
     E = E / real(out_size*data_size,8)
 
-    Ein(tid) = E-Emin
-
-    !write(*,*)E, Ein(tid)
+    E_diff = E_diff + E-Emin
 
 enddo
 
-E=0.0d0
-!$omp parallel do reduction(+:E)
-do i = 1, num_of_test
-    E = E + Ein(tid) / real(num_of_test,8)
-enddo
-!$omp end parallel do
+write(*,*)"Eout-Ein",E_diff/real(num_of_test,8)
 
-write(*,*)"Ein-Eout",E
+pause
 
 end subroutine
 
