@@ -12,11 +12,11 @@ num_of_test = 10000
 call omp_set_dynamic(.false.)
 call omp_set_num_threads(omp_get_max_threads())
 
-call dec_stump(10000,12000,2.0d0,0.0d0)
-call dec_stump(10000,12000,20.0d0,0.0d0)
+call dec_stump(num_of_test,data_size,2.0d0,0.0d0)
+call dec_stump(num_of_test,data_size,20.0d0,0.0d0)
 
-call dec_stump(10000,12000,20.0d0,0.1d0)
-call dec_stump(10000,12000,200.0d0,0.1d0)
+call dec_stump(num_of_test,data_size,20.0d0,0.1d0)
+call dec_stump(num_of_test,data_size,200.0d0,0.1d0)
 
 contains
 
@@ -146,6 +146,8 @@ enddo
 !$omp end parallel do
 
 write(*,*)E
+
+deallocate(x,xx,theta,Ein)
 
 end subroutine
 
