@@ -13,9 +13,35 @@ call omp_set_dynamic(.false.)
 call omp_set_num_threads(omp_get_max_threads())
 
 call dec_stump(10000,12000,2.0d0,0.0d0)
-call dec_stump(100000,12000,2.0d0,0.0d0)
 
 contains
+
+function sign2(x,tau)
+implicit none
+integer :: sign2
+real(8) :: x,tau,rand
+
+call random_number(rand)
+    
+if( rand > tau )then
+
+    if(x>0)then
+        sign2 = -1
+    else
+        sign2 = 1
+    endif
+
+else
+
+    if(x>0)then
+        sign2 = 1
+    else
+        sign2 = -1
+    endif
+
+endif
+
+end function
 
 function sign(x)
 implicit none
@@ -34,16 +60,29 @@ subroutine dec_stump(num_of_test,data_size,data_range,tau)
 use omp_lib
 use sorts
 implicit none
-integer :: num_of_test,data_size
+integer :: num_of_test,data_size,out_size
 integer :: tid, i, j, id, s
 real(8) :: data_range, tau, sum, randnum
 real(8) :: E, E_total, Emin, mtheta, ms
-real(8),allocatable :: x(:,:),theta(:,:)
+real(8),allocatable :: x(:,:),theta(:,:),Ein(:),xx(:,:)
 
-allocate(x(omp_get_max_threads(),data_size),&
-         theta(omp_get_max_threads(),data_size))
+out_size = 10
+
+allocate(x(omp_get_max_threads(),data_size),xx(out_size,data_size),&
+         theta(omp_get_max_threads(),data_size),Ein(num_of_test))
 
 call random_seed()
+
+!$omp parallel do private(randnum)
+do j = 1, out_size
+do i = 1, data_size
+    call random_number(randnum)
+    xx(j,i) = data_range*randnum-data_range*0.5d0
+enddo
+enddo
+!$omp end parallel do
+
+! Training
 
 sum=0.0d0
 !$omp parallel do reduction(+:sum,E_total), private(id,i,j,randnum,s,E,Emin)
@@ -67,10 +106,11 @@ do tid = 1, num_of_test
     do j = 1, data_size
         E = 0.0d0
         do i = 1, data_size
-            if( sign(x(id,i)) .ne. s*sign(x(id,i)-theta(id,j)) )then
+            if( sign2(x(id,i),tau) .ne. s*sign(x(id,i)-theta(id,j)) )then
                 E = E + 1.0d0
             endif
         enddo
+        E = E / real( data_size, 8)
         if( E<Emin )then
             Emin=E
             ms=s
@@ -78,13 +118,29 @@ do tid = 1, num_of_test
         endif
     enddo
     enddo
-    E_total = E_total + E / real(data_size,8)
+
+    E=0.0d0
+    do i = 1, out_size
+    do j = 1, data_size
+        if( sign2(xx(i,j),tau) .ne. ms*sign(xx(i,j)-mtheta) )then
+            E=E+1.0d0
+        endif
+    enddo
+    enddo
+    E=E/real(out_size*data_size,8)
+
+    Ein(tid) = E-Emin
 
 enddo
 !$omp end parallel do
 
-write(*,'("Error:",ES11.4,I2,ES11.4)')E_total / real(num_of_test,8), ms, mtheta
+!$omp parallel do reduction(+:E)
+do i = 1, num_of_test
+    E = E + Ein(tid) / real(num_of_test,8)
+enddo
+!$omp end parallel do
 
+write(*,*)E
 
 end subroutine
 
