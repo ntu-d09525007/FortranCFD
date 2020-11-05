@@ -6,11 +6,8 @@ implicit none
 integer :: num_of_test, data_size
 real(8) :: data_range
 
-data_size = 12000
-num_of_test = 10000
-
-call omp_set_dynamic(.false.)
-call omp_set_num_threads(omp_get_max_threads())
+data_size = 1200
+num_of_test = 1000
 
 call dec_stump(num_of_test,data_size,2.0d0,0.0d0)
 call dec_stump(num_of_test,data_size,20.0d0,0.0d0)
@@ -72,6 +69,9 @@ real(8),allocatable :: x(:,:),theta(:,:),Ein(:),xx(:,:)
 
 out_size = 10
 
+call omp_set_dynamic(.false.)
+call omp_set_num_threads(omp_get_max_threads())
+
 allocate(x(omp_get_max_threads(),data_size),xx(out_size,data_size),&
          theta(omp_get_max_threads(),data_size),Ein(num_of_test))
 
@@ -86,7 +86,7 @@ enddo
 enddo
 !$omp end parallel do
 
-!$omp parallel do private(id,i,j,randnum,s,E,Emin)
+!$omp parallel do private(id,i,j,randnum,s,E,Emin), num_threads(omp_get_max_threads())
 do tid = 1, num_of_test
 
     id = omp_get_thread_num()
@@ -105,7 +105,7 @@ do tid = 1, num_of_test
     ! Training
 
     Emin=data_size
-    do s = 1, -1, 2
+    do s = -1, 1, 2
     do j = 1, data_size
         E = 0.0d0
         do i = 1, data_size
@@ -113,7 +113,7 @@ do tid = 1, num_of_test
                 E = E + 1.0d0
             endif
         enddo
-        E = E / real( data_size, 8)
+        E = E / real( data_size, 8)                                                             
         if( E<Emin )then
             Emin=E
             ms=s
@@ -133,7 +133,6 @@ do tid = 1, num_of_test
     enddo
     enddo
     E=E/real(out_size*data_size,8)
-
     Ein(tid) = E-Emin
 
 enddo
@@ -147,7 +146,7 @@ enddo
 
 write(*,*)E
 
-deallocate(x,xx,theta,Ein)
+pause
 
 end subroutine
 
