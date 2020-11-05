@@ -61,7 +61,7 @@ subroutine dec_stump(num_of_test,data_size,data_range,tau)
 use omp_lib
 use sorts
 implicit none
-integer :: num_of_test,data_size,out_size
+integer :: num_of_test,data_size,out_size,threads
 integer :: tid, i, j, id, s
 real(8) :: data_range, tau, sum, randnum
 real(8) :: E, E_total, Emin, mtheta, ms
@@ -69,11 +69,13 @@ real(8),allocatable :: x(:,:),theta(:,:),Ein(:),xx(:,:)
 
 out_size = 10
 
-call omp_set_dynamic(.false.)
-call omp_set_num_threads(omp_get_max_threads())
+threads = omp_get_max_threads()
 
-allocate(x(omp_get_max_threads(),data_size),xx(out_size,data_size),&
-         theta(omp_get_max_threads(),data_size),Ein(num_of_test))
+call omp_set_dynamic(.false.)
+call omp_set_num_threads(threads)
+
+allocate(x(threads),data_size),xx(out_size,data_size),&
+         theta(threads,data_size),Ein(num_of_test))
 
 call random_seed()
 
@@ -86,7 +88,7 @@ enddo
 enddo
 !$omp end parallel do
 
-!$omp parallel do private(id,i,j,randnum,s,E,Emin), num_threads(omp_get_max_threads())
+!$omp parallel do private(id,i,j,randnum,s,E,Emin), num_threads(threads)
 do tid = 1, num_of_test
 
     id = omp_get_thread_num()
@@ -143,10 +145,6 @@ do i = 1, num_of_test
     E = E + Ein(tid) / real(num_of_test,8)
 enddo
 !$omp end parallel do
-
-write(*,*)E
-
-pause
 
 end subroutine
 
