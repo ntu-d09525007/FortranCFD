@@ -122,7 +122,7 @@ do tid = 1, num_of_test
             !$omp end parallel do
         else
             E=Eold
-            do i = j-1, j+1
+            do i = j-2, j+2
 
                 old=(y(i) .ne. s*sign(x(i)-theta(j-1)))
                 now=(y(i) .ne. s*sign(x(i)-theta(j)))
