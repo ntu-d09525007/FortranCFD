@@ -12,6 +12,7 @@ num_of_test = 10000
 call dec_stump(num_of_test,data_size,2.0d0,0.0d0)
 call dec_stump(num_of_test,data_size,20.0d0,0.0d0)
 
+call dec_stump(num_of_test,data_size,2.0d0,0.1d0)
 call dec_stump(num_of_test,data_size,20.0d0,0.1d0)
 call dec_stump(num_of_test,data_size,200.0d0,0.1d0)
 
@@ -172,7 +173,6 @@ enddo
 
 write(*,*)"Eout-Ein",E_diff/real(num_of_test,8)
 
-pause
 
 end subroutine
 
