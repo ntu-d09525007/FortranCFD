@@ -13,6 +13,10 @@ call omp_set_dynamic(.false.)
 call omp_set_num_threads(omp_get_max_threads())
 
 call dec_stump(10000,12000,2.0d0,0.0d0)
+call dec_stump(10000,12000,20.0d0,0.0d0)
+
+call dec_stump(10000,12000,20.0d0,0.1d0)
+call dec_stump(10000,12000,200.0d0,0.1d0)
 
 contains
 
@@ -82,10 +86,7 @@ enddo
 enddo
 !$omp end parallel do
 
-! Training
-
-sum=0.0d0
-!$omp parallel do reduction(+:sum,E_total), private(id,i,j,randnum,s,E,Emin)
+!$omp parallel do private(id,i,j,randnum,s,E,Emin)
 do tid = 1, num_of_test
 
     id = omp_get_thread_num()
@@ -100,6 +101,8 @@ do tid = 1, num_of_test
     do i = 2, data_size
         theta(id,i) = 0.5d0*( x(id,i)+x(id,i-1) )
     enddo
+
+    ! Training
 
     Emin=data_size
     do s = 1, -1, 2
@@ -118,6 +121,8 @@ do tid = 1, num_of_test
         endif
     enddo
     enddo
+
+    ! Calculate Eout
 
     E=0.0d0
     do i = 1, out_size
