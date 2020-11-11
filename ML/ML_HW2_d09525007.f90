@@ -9,8 +9,8 @@ real(8) :: data_range
 data_size = 12000
 num_of_test = 10000
 
-!call dec_stump(num_of_test,data_size,2.0d0,0.0d0)
-!call dec_stump(num_of_test,data_size,20.0d0,0.0d0)
+call dec_stump(num_of_test,data_size,2.0d0,0.0d0)
+call dec_stump(num_of_test,data_size,20.0d0,0.0d0)
 
 call dec_stump(num_of_test,data_size,2.0d0,0.1d0)
 call dec_stump(num_of_test,data_size,20.0d0,0.1d0)
@@ -70,7 +70,7 @@ implicit none
 integer :: num_of_test,data_size,out_size,threads
 integer :: tid, i, j, s, ms, index, jj
 real(8) :: data_range, tau, randnum
-real(8) :: E, Emin, mtheta, Eold, E_diff
+real(8) :: E, Emin, Eina, mtheta, Eold, E_diff
 logical :: old, now
 real(8),allocatable :: x(:),theta(:),y(:)
 
@@ -83,11 +83,11 @@ call omp_set_num_threads(threads)
 
 allocate(x(data_size),theta(data_size),y(data_size))
 
-call random_seed()
-
 E_diff=0.0d0
+Eina=0.0d0
 do tid = 1, num_of_test
 
+    call random_seed()
     !$omp parallel do private(randnum)
     do i = 1, data_size
         call random_number(randnum)
@@ -154,6 +154,7 @@ do tid = 1, num_of_test
 
     !write(*,'("Emin:",ES11.4,"  s:",I5,"  theta:",ES11.4)')Emin,ms,mtheta
 
+    call random_seed()
     ! Calculate Eout
     E=0.0d0
     !$omp parallel do reduction(+:E), private(randnum)
@@ -169,11 +170,12 @@ do tid = 1, num_of_test
     E = E / real(out_size*data_size,8)
 
     E_diff = E_diff + E-Emin
+    Eina = Eina + Emin
 
 enddo
 
 write(*,*)"Eout-Ein",E_diff/real(num_of_test,8)
-
+write(*,*)Eina/real(num_of_test,8)
 
 end subroutine
 
