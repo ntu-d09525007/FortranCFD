@@ -250,20 +250,22 @@ integer(8) :: cpustart, cpuend
         end do
     enddo
     !$omp end parallel do
-    
-    call level_set_redis_init(0)
-    
-    time = 0.0d0
-    
-do
 
-    time = time + p%glb%rdt
+    call level_set_rk3_redis(0,3.0d0*p%glb%dx)
     
-    call level_set_rk3_redis_solver(0)
-    
-    if( time>3.0d0*p%glb%dx ) exit
-    
-end do 
+!    call level_set_redis_init(0)
+!    
+!    time = 0.0d0
+!    
+!do
+!
+!    time = time + p%glb%rdt
+!    
+!    call level_set_rk3_redis_solver(0)
+!    
+!    if( time>3.0d0*p%glb%dx ) exit
+!    
+!end do 
 
     !$omp parallel do private(i,j,k)
     do id = 0, p%glb%threads-1

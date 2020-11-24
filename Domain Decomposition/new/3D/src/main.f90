@@ -19,11 +19,11 @@ implicit none
         p%glb%iter = p%glb%iter + 1 
         call p%sync 
       
-        !call deforming_field_velocity
+        call deforming_field_velocity
         call p%switch
      
         call interface_solver
-        call ns_solver
+        !call ns_solver
         call plot
     
         call p%ls_mv
@@ -31,10 +31,10 @@ implicit none
             write(*,*)"========================================="
             write(*,'(A,",",I8,",",F15.6)')trim(p%glb%name),p%glb%iter,p%glb%time
             write(*,*)''
-            call print_NS_info
+            !call print_NS_info
             call print_LS_info
-            call print_CPU_info
-            call find_momentum
+            !call print_CPU_info
+            !call find_momentum
             write(*,*)"========================================="
         endif
         call output

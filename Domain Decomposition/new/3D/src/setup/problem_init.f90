@@ -43,7 +43,8 @@ CHARACTER(100) :: NAME_OF_FILE
                 y = 0.5d0*( p%glb%y(i,j,k)+p%glb%y(i,j-1,k) ) + real(jj,8)*p%glb%dy/real(ug,8)
                 z = 0.5d0*( p%glb%z(i,j,k)+p%glb%z(i,j,k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
                 
-                if( x<=1.0d0 .and. z<=1.0d0 )then
+                !if( x<=1.0d0 .and. z<=1.0d0 )then
+                if( (x-0.35)**2.0 + (y-0.35)**2.0 + (z-0.35)**2.0 < 0.15**2.0 )then
                     p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
                 end if
                 
@@ -57,15 +58,15 @@ CHARACTER(100) :: NAME_OF_FILE
             
             ! vortex
             !=========================================
-            !p%of(id)%loc%phi%now(i,j,k) = - dsqrt( (x-0.35d0)**2.0d0 + (y-0.35d0)**2.0d0 + (z-0.35d0)**2.0d0 ) + 0.15d0
+            p%of(id)%loc%phi%now(i,j,k) = - dsqrt( (x-0.35d0)**2.0d0 + (y-0.35d0)**2.0d0 + (z-0.35d0)**2.0d0 ) + 0.15d0
             
             ! dambreak
             !=========================================
-            if( x<=1.0d0 .and. z<=1.0d0 )then
-                p%of(id)%loc%phi%now(i,j,k) = 1.0_8
-            else
-                p%of(id)%loc%phi%now(i,j,k) = -1.0_8
-            end if
+            !if( x<=1.0d0 .and. z<=1.0d0 )then
+            !    p%of(id)%loc%phi%now(i,j,k) = 1.0_8
+            !else
+            !    p%of(id)%loc%phi%now(i,j,k) = -1.0_8
+            !end if
             
             ! bubble burst
             !=========================================
@@ -118,7 +119,7 @@ CHARACTER(100) :: NAME_OF_FILE
     call pt%vel%sync
     call pt%vof%sync
 
-    call level_set_rk3_redis(0)
+    !call level_set_rk3_redis(0)
     
     call p%node_vel
     call pt%nvel%sync

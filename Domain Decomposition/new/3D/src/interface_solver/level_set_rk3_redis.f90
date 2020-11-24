@@ -1,9 +1,10 @@
-subroutine level_set_rk3_redis(btn)
+subroutine level_set_rk3_redis(btn,T)
 use all
 !$ use omp_lib
 implicit none
 integer :: id,i,j,k,btn,iter
 real(8) :: time, error, timestop
+real(8), optional :: T
 integer(8) :: cpustart, cpuend
 
     call system_clock(cpustart)
@@ -15,9 +16,11 @@ integer(8) :: cpustart, cpuend
 
     if( btn .eq. 0  )then
         timestop = 1.5d0*max(p%glb%xend-p%glb%xstart,p%glb%yend-p%glb%ystart,p%glb%zend-p%glb%zstart)
-    else
+    else 
         timestop = 2.5d0 * p%glb%dx
     end if
+
+    if( present(T) ) timestop = T
     
 do
 
