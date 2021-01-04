@@ -33,7 +33,7 @@ integer(8) :: cpustart, cpuend
             
             if( p%of(id)%loc%vof%now(ii,j,k) > 1.0d0-eps .or. p%of(id)%loc%vof%now(ii,j,k) < eps )then
                
-               p%of(id)%loc%tdata%x%l1(i,j,k) = p%of(id)%loc%vof%now(ii,j,k) * p%of(id)%loc%vel%x%old(i,j,k) * p%glb%dt
+               p%of(id)%loc%tdata%x%s1(i,j,k) = p%of(id)%loc%vof%now(ii,j,k) * p%of(id)%loc%vel%x%old(i,j,k) * p%glb%dt
               
             else
             
@@ -54,21 +54,29 @@ integer(8) :: cpustart, cpuend
                 w  = abs(p%of(id)%loc%normals%x%now(ii,j,k)) + abs(p%of(id)%loc%normals%y%now(ii,j,k)) + abs(p%of(id)%loc%normals%z%now(ii,j,k))
                 w  = abs(p%of(id)%loc%normals%x%now(ii,j,k)) / w
             
-                p%of(id)%loc%tdata%x%l1(i,j,k) = 0.5d0*( p%of(id)%loc%vel%x%old(i,j,k)*p%glb%dt - alpha*p%glb%dx/beta*dlog(a4/a5) )
+                p%of(id)%loc%tdata%x%s1(i,j,k) = 0.5d0*( p%of(id)%loc%vel%x%old(i,j,k)*p%glb%dt - alpha*p%glb%dx/beta*dlog(a4/a5) )
             
-                p%of(id)%loc%tdata%x%l1(i,j,k) = p%of(id)%loc%tdata%x%l1(i,j,k)*w + ( 1.0d0 - w ) * p%of(id)%loc%vof%now(ii,j,k) * p%of(id)%loc%vel%x%old(i,j,k) * p%glb%dt
+                p%of(id)%loc%tdata%x%s1(i,j,k) = p%of(id)%loc%tdata%x%s1(i,j,k)*w + ( 1.0d0 - w ) * p%of(id)%loc%vof%now(ii,j,k) * p%of(id)%loc%vel%x%old(i,j,k) * p%glb%dt
                                                 
             endif
             
         end do
         end do
         end do
+
+    enddo
+    !$omp end parallel do
+
+    call pt%tdatax%nodes(1)%sync
+
+    !$omp parallel do 
+    do id = 0, p%glb%threads-1
         
         do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
             
-            p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) - ( p%of(id)%loc%tdata%x%l1(i,j,k) - p%of(id)%loc%tdata%x%l1(i-1,j,k) ) / p%glb%dx + &
+            p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) - ( p%of(id)%loc%tdata%x%s1(i,j,k) - p%of(id)%loc%tdata%x%s1(i-1,j,k) ) / p%glb%dx + &
                                         & p%of(id)%loc%vof%old(i,j,k) * p%glb%dt * ( p%of(id)%loc%vel%x%old(i,j,k) - p%of(id)%loc%vel%x%old(i-1,j,k) ) / p%glb%dx
             
         end do
@@ -102,7 +110,7 @@ integer(8) :: cpustart, cpuend
             
             if( p%of(id)%loc%vof%now(i,ii,k) > 1.0d0-eps .or. p%of(id)%loc%vof%now(i,ii,k) < eps )then
                
-               p%of(id)%loc%tdata%y%l1(i,j,k) = p%of(id)%loc%vof%now(i,ii,k) * p%of(id)%loc%vel%y%old(i,j,k) * p%glb%dt
+               p%of(id)%loc%tdata%y%s1(i,j,k) = p%of(id)%loc%vof%now(i,ii,k) * p%of(id)%loc%vel%y%old(i,j,k) * p%glb%dt
               
             else
             
@@ -123,21 +131,29 @@ integer(8) :: cpustart, cpuend
                 w  = abs(p%of(id)%loc%normals%x%now(i,ii,k)) + abs(p%of(id)%loc%normals%y%now(i,ii,k)) + abs(p%of(id)%loc%normals%z%now(i,ii,k))
                 w  = abs(p%of(id)%loc%normals%y%now(i,ii,k)) / w
             
-                p%of(id)%loc%tdata%y%l1(i,j,k) = 0.5d0*( p%of(id)%loc%vel%y%old(i,j,k)*p%glb%dt - alpha*p%glb%dy/beta*dlog(a4/a5) )
+                p%of(id)%loc%tdata%y%s1(i,j,k) = 0.5d0*( p%of(id)%loc%vel%y%old(i,j,k)*p%glb%dt - alpha*p%glb%dy/beta*dlog(a4/a5) )
             
-                p%of(id)%loc%tdata%y%l1(i,j,k) = p%of(id)%loc%tdata%y%l1(i,j,k)*w + ( 1.0d0 - w ) * p%of(id)%loc%vof%now(i,ii,k) * p%of(id)%loc%vel%y%old(i,j,k) * p%glb%dt
+                p%of(id)%loc%tdata%y%s1(i,j,k) = p%of(id)%loc%tdata%y%s1(i,j,k)*w + ( 1.0d0 - w ) * p%of(id)%loc%vof%now(i,ii,k) * p%of(id)%loc%vel%y%old(i,j,k) * p%glb%dt
                                                 
             endif
             
         end do
         end do
         end do
+
+    enddo
+    !$omp end parallel do
+
+    call pt%tdatay%nodes(1)%sync 
+
+    !$omp parallel do
+    do id = 0, p%glb%threads-1
         
         do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
             
-            p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) - ( p%of(id)%loc%tdata%y%l1(i,j,k) - p%of(id)%loc%tdata%y%l1(i,j-1,k) ) / p%glb%dy + &
+            p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) - ( p%of(id)%loc%tdata%y%s1(i,j,k) - p%of(id)%loc%tdata%y%s1(i,j-1,k) ) / p%glb%dy + &
                                         & p%of(id)%loc%vof%old(i,j,k) * p%glb%dt * ( p%of(id)%loc%vel%y%old(i,j,k) - p%of(id)%loc%vel%y%old(i,j-1,k) ) / p%glb%dy
             
         end do
@@ -171,7 +187,7 @@ integer(8) :: cpustart, cpuend
             
             if( p%of(id)%loc%vof%now(i,j,ii) > 1.0d0-eps .or. p%of(id)%loc%vof%now(i,j,ii) < eps )then
                
-               p%of(id)%loc%tdata%z%l1(i,j,k) = p%of(id)%loc%vof%now(i,j,ii) * p%of(id)%loc%vel%z%old(i,j,k) * p%glb%dt
+               p%of(id)%loc%tdata%z%s1(i,j,k) = p%of(id)%loc%vof%now(i,j,ii) * p%of(id)%loc%vel%z%old(i,j,k) * p%glb%dt
               
             else
             
@@ -192,21 +208,29 @@ integer(8) :: cpustart, cpuend
                 w  = abs(p%of(id)%loc%normals%x%now(i,j,ii)) + abs(p%of(id)%loc%normals%y%now(i,j,ii)) +abs(p%of(id)%loc%normals%z%now(i,j,ii))
                 w  = abs(p%of(id)%loc%normals%z%now(i,j,ii)) / w
             
-                p%of(id)%loc%tdata%z%l1(i,j,k) = 0.5d0*( p%of(id)%loc%vel%z%old(i,j,k)*p%glb%dt - alpha*p%glb%dz/beta*dlog(a4/a5) )
+                p%of(id)%loc%tdata%z%s1(i,j,k) = 0.5d0*( p%of(id)%loc%vel%z%old(i,j,k)*p%glb%dt - alpha*p%glb%dz/beta*dlog(a4/a5) )
             
-                p%of(id)%loc%tdata%z%l1(i,j,k) = p%of(id)%loc%tdata%z%l1(i,j,k)*w + ( 1.0d0 - w ) * p%of(id)%loc%vof%now(i,j,ii) * p%of(id)%loc%vel%z%old(i,j,k) * p%glb%dt
+                p%of(id)%loc%tdata%z%s1(i,j,k) = p%of(id)%loc%tdata%z%s1(i,j,k)*w + ( 1.0d0 - w ) * p%of(id)%loc%vof%now(i,j,ii) * p%of(id)%loc%vel%z%old(i,j,k) * p%glb%dt
                                                 
             endif
             
         end do
         end do
         end do
+
+    enddo
+    !$omp end parallel do
+
+    call pt%tdataz%nodes(1)%sync 
+
+    !$omp parallel do
+    do id = 0, p%glb%threads-1
         
         do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
             
-            p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) - ( p%of(id)%loc%tdata%z%l1(i,j,k) - p%of(id)%loc%tdata%z%l1(i,j,k-1) ) / p%glb%dz + &
+            p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) - ( p%of(id)%loc%tdata%z%s1(i,j,k) - p%of(id)%loc%tdata%z%s1(i,j,k-1) ) / p%glb%dz + &
                                         & p%of(id)%loc%vof%old(i,j,k) * p%glb%dt * ( p%of(id)%loc%vel%z%old(i,j,k) - p%of(id)%loc%vel%z%old(i,j,k-1) ) / p%glb%dy
             
             if(p%of(id)%loc%vof%now(i,j,k)<eps)p%of(id)%loc%vof%now(i,j,k)=0.0d0
@@ -252,20 +276,6 @@ integer(8) :: cpustart, cpuend
     !$omp end parallel do
 
     call level_set_rk3_redis(0,3.0d0*p%glb%dx)
-    
-!    call level_set_redis_init(0)
-!    
-!    time = 0.0d0
-!    
-!do
-!
-!    time = time + p%glb%rdt
-!    
-!    call level_set_rk3_redis_solver(0)
-!    
-!    if( time>3.0d0*p%glb%dx ) exit
-!    
-!end do 
 
     !$omp parallel do private(i,j,k)
     do id = 0, p%glb%threads-1

@@ -43,7 +43,7 @@ call level_set_rk3_solver
 
 if(mod(p%glb%iter,10).eq.0)then
     call clsvof_recon
-else if(mod(p%glb%iter,3).eq.0)then
+else if(mod(p%glb%iter,5).eq.0)then
     call level_set_rk3_redis(1)
 endif
 
