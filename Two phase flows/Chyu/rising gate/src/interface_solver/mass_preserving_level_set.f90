@@ -7,7 +7,7 @@ real(8) :: lam, plam
 
 id=0
 
-do iter = 1, 2
+do iter = 1, 20
     
     call ls_mv()
     call surface_norms2()
@@ -48,6 +48,8 @@ do iter = 1, 2
     !$omp end parallel do
 
     call bc(p%loc%phi%now)
+    call ls_mv()
+    if( abs(p%glb%imass-p%glb%mass)/p%glb%imass < 1.0d-12 )exit
        
 end do  
 

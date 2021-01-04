@@ -34,7 +34,7 @@ enddo
 enddo
 !$omp end parallel do
 
-write(p%fil%damdata, *)p%glb%time, damfront, damh
+write(p%fil%damdata, *)p%glb%time*p%glb%T, damfront*p%glb%L, damh*p%glb%L
 
 
 ! ! G5A, (x,y) = (0.18,1)
