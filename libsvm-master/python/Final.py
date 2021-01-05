@@ -9,6 +9,17 @@ import csv
 from svmutil import *
 import numpy as np
 
+def chunkIt(seq, num):
+    avg = len(seq) / float(num)
+    out = []
+    last = 0.0
+
+    while last < len(seq):
+        out.append(seq[int(last):int(last + avg)])
+        last += avg
+
+    return out
+
 x_raw=[]
 with open('train.csv') as f:
     contents = csv.reader(f)
@@ -152,7 +163,32 @@ for x in x_raw:
         
     x_new.append(xx)
     
-m = svm_train(cancell[0:1000], x_new[0:1000], '-s 0 -c 1 -t 2 -g 0.001')
-p_label, p_acc, p_val = svm_predict(cancell[0:1000], x_new[0:1000], m, '-q')    
+
+v=10
+xs=chunkIt(x_new,v)
+ycs=chunkIt(cancell,v)
+yards=chunkIt(adr,v)
+
+best_acc=0
+for d in [1, 2, 3, 4]:
+    for c in [2, 1, 0, -1, -2]:
+        
+        lacc=0
+        
+        for i in range(v):
+            x=[]
+            y=[]
+            for j in range(v):
+                if j!=i:
+                    x=x+xs[j]
+                    y=y+ycs[j]
+            m = svm_train(y, x, '-s 0 -t 1 -d %d -h -c %f 0 -q'%(d,pow(10,c)) )
+            p_label, p_acc, p_val = svm_predict(cancell, x_new, m, '-q') 
+            lacc=lacc+p_acc[0]
+            
+        if lacc > best_acc:
+            best_acc = lacc
+            best_d=d
+            best_c=pow(10,c)
     
-    
+print(best_acc,best_d,best_c)
