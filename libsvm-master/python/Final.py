@@ -53,51 +53,51 @@ for x in x_raw:
         
     # Deposit Type
     if x['deposit_type'] == 'No Deposit':
-        xx.extend([1,-1,-1])
+        xx.extend([1,0,0])
     elif x['deposit_type'] == 'Non refund':
-        xx.extend([-1,1,-1])
+        xx.extend([0,1,0])
     else:
-        xx.extend([-1,-1,1])
+        xx.extend([0,0,1])
         
     # Company
     if x['company'] != '':
-        xx.append(-1)
+        xx.append(0)
     else:
         xx.append(1)
         
     # Agent
     if x['agent'] != '':
-        xx.append(-1)
+        xx.append(0)
     else:
         xx.append(1)
     
     # Market Segment
     if 'Online' in x['market_segment'] :
-        xx.extend([1,-1,-1,-1])
+        xx.extend([1,0,0,0])
     elif 'Offline' in x['market_segment']:
-        xx.extend([-1,1,-1,-1])
+        xx.extend([0,1,0,0])
     elif 'Direct' in x['market_segment']:
-        xx.extend([-1,-1,1,-1])
+        xx.extend([0,0,1,0])
     else:
-        xx.extend([-1,-1,-1,1])
+        xx.extend([0,0,0,1])
         
     #Distribution Channel
     if 'T' in x['distribution_channel']:
-        xx.extend([1,-1,-1])
+        xx.extend([1,0,0])
     elif 'Direct' in x['distribution_channel']:
-        xx.extend([-1,1,-1])
+        xx.extend([0,1,0])
     else:
-        xx.extend([-1,-1,1])
+        xx.extend([0,0,1])
         
     # Customer Type
     if x['customer_type'] == 'Transient':
-        xx.extend([1,-1,-1,-1])
+        xx.extend([1,0,0,0])
     elif x['customer_type'] == 'Transient-party':
-        xx.extend([-1,1,-1,-1])
+        xx.extend([0,1,0,0])
     elif x['customer_type'] == 'Contract':
-        xx.extend([-1,-1,1,-1])
+        xx.extend([0,0,1,0])
     else:
-        xx.extend([-1,-1,-1,1])
+        xx.extend([0,0,0,1])
     
     # Booking Time
     xx.append(float(x['lead_time'])/365)
@@ -117,30 +117,30 @@ for x in x_raw:
         
     # Meals
     if x['meal']=='BB':
-        xx.extend([1,-1,-1])
+        xx.extend([1,0,0])
     elif x['meal'] =='HB':
-        xx.extend([-1,1,-1])
+        xx.extend([0,1,0])
     else:
-        xx.extend([-1,-1,1])
+        xx.extend([0,0,1])
         
     # Room Type
     if x['reserved_room_type'] == 'A':
-        xx.extend([1,-1,-1,-1])
+        xx.extend([1,0,0,0])
     elif x['reserved_room_type'] == 'D':
-        xx.extend([-1,1,-1,-1])
+        xx.extend([0,1,0,0])
     elif x['reserved_room_type'] == 'E':
-        xx.extend([-1,-1,1,-1])   
+        xx.extend([0,0,1,0])   
     else:
-        xx.extend([-1,-1,-1,1])
+        xx.extend([0,0,0,1])
         
     if x['assigned_room_type'] == 'A':
-        xx.extend([1,-1,-1,-1])
+        xx.extend([1,0,0,0])
     elif x['assigned_room_type'] == 'D':
-        xx.extend([-1,1,-1,-1])
+        xx.extend([0,1,0,0])
     elif x['assigned_room_type'] == 'E':
-        xx.extend([-1,-1,1,-1])   
+        xx.extend([0,0,1,0])   
     else:
-        xx.extend([-1,-1,-1,1])
+        xx.extend([0,0,0,1])
     
     # Stay length
     xx.append(float(x['stays_in_weekend_nights']))
@@ -150,12 +150,12 @@ for x in x_raw:
     if x['previous_cancellations']==1:
         xx.append(1)
     else:
-        xx.append(-1)
+        xx.append(0)
     
     if x['previous_bookings_not_canceled']==1:
         xx.append(1)
     else:
-        xx.append(-1)
+        xx.append(0)
         
     # Special Requests
     xx.append(float(x['total_of_special_requests']))
@@ -182,10 +182,11 @@ for d in [1, 2, 3, 4]:
                 if j!=i:
                     x=x+xs[j]
                     y=y+ycs[j]
-            m = svm_train(y, x, '-s 0 -t 1 -d %d -h -c %f 0 -q'%(d,pow(10,c)) )
-            p_label, p_acc, p_val = svm_predict(cancell, x_new, m, '-q') 
+            m = svm_train(y, x, '-s 0 -t 1 -d %d -c %f -h 0 -q'%(d,pow(10,c)) )
+            p_label, p_acc, p_val = svm_predict(cancell, x_new, m) 
             lacc=lacc+p_acc[0]
-            
+        
+        lacc=lacc/v    
         if lacc > best_acc:
             best_acc = lacc
             best_d=d
