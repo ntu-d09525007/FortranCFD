@@ -287,7 +287,7 @@ integer(8) :: cpustart, cpuend
     enddo
     !$omp end parallel do
 
-    call level_set_rk3_redis(0,2.0d0*p%glb%ls_wid)
+    call level_set_rk3_redis(0,3.0d0*p%glb%ls_wid)
 
     !$omp parallel do private(i,j,k)
     do id = 0, p%glb%threads-1
@@ -295,11 +295,12 @@ integer(8) :: cpustart, cpuend
         do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
         do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
         do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
-            if( abs(p%of(id)%loc%vof%tmp(i,j,k)) < p%glb%ls_wid )p%of(id)%loc%vof%tmp(i,j,k)=p%of(id)%loc%phi%now(i,j,k)
-            p%of(id)%loc%phi%now(i,j,k) = p%of(id)%loc%vof%tmp(i,j,k)
+            if( abs(p%of(id)%loc%vof%tmp(i,j,k)) > 1.5*p%glb%ls_wid )p%of(id)%loc%phi%now(i,j,k) = p%of(id)%loc%vof%tmp(i,j,k)
         end do
         end do
         end do
+
+        call p%of(id)%bc(0,p%of(id)%loc%phi%now)
         
     end do
     !$omp end parallel do
