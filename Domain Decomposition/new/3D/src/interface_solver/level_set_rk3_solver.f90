@@ -86,7 +86,6 @@ use all
 implicit none
 integer :: id,i,j,k
 
-
     !$omp parallel do private(i,j,k)
     do id = 0, p%glb%threads-1
         
@@ -170,8 +169,8 @@ integer :: i,j,k
                   &- (q%loc%tdata%y%ss1(i,j,k)+q%loc%tdata%y%ss2(i,j,k)-q%loc%tdata%y%ss1(i,j-1,k)-q%loc%tdata%y%ss2(i,j-1,k)) / p%glb%dy &
                   &- (q%loc%tdata%z%ss1(i,j,k)+q%loc%tdata%z%ss2(i,j,k)-q%loc%tdata%z%ss1(i,j,k-1)-q%loc%tdata%z%ss2(i,j,k-1)) / p%glb%dz
         !s(i,j,k) = - q%loc%nvel%x%old(i,j,k)*q%loc%tdata%x%s1(i,j,k) &
-        !         &  - q%loc%nvel%y%old(i,j,k)*q%loc%tdata%y%s1(i,j,k) &
-        !         &  - q%loc%nvel%z%old(i,j,k)*q%loc%tdata%z%s1(i,j,k) 
+        !        &  - q%loc%nvel%y%old(i,j,k)*q%loc%tdata%y%s1(i,j,k) &
+        !        &  - q%loc%nvel%z%old(i,j,k)*q%loc%tdata%z%s1(i,j,k) 
     end do 
     end do
     end do
