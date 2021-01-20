@@ -105,6 +105,9 @@ CHARACTER(100) :: NAME_OF_FILE
 
     p%loc%ibm%z = 0.0d0
     p%loc%ibm%w = 1.194d0 / p%glb%U
+    !p%loc%ibm%w = 0.408d0 / p%glb%U
+    !p%loc%ibm%w = 0.696d0 / p%glb%U
+    !p%loc%ibm%w = 0.952d0 / p%glb%U
     
     call bc(p%loc%phi%now)
     call bc(p%loc%vof%now)
