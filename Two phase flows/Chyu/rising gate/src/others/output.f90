@@ -14,7 +14,7 @@ k=1
 !$omp parallel do collapse(2), reduction(max:damfront)
 do j = p%loc%js, p%loc%je
 do i = p%loc%is, p%loc%ie
-    if( p%loc%phi%now(i,j,k)*p%loc%phi%now(i+1,j,k) < 0.0d0 )then
+    if( p%loc%phi%now(i,j,k)*p%loc%phi%now(i+1,j,k) < 0.0d0 .and. p%loc%phi%now(i-1,j,k) > 0.0d0 .and. p%loc%phi%now(i-2,j,k) > 0.0d0 )then
         damfront = max( damfront, p%glb%x(i,j,k) + &
              p%glb%dx*abs(p%loc%phi%now(i,j,k))/( abs(p%loc%phi%now(i,j,k))+abs(p%loc%phi%now(i+1,j,k))) )
     endif
@@ -26,7 +26,7 @@ i=1
 !$omp parallel do collapse(2), reduction(max:damh)
 do k = p%loc%ks, p%loc%ke
 do j = p%loc%js, p%loc%je
-    if( p%loc%phi%now(i,j,k)*p%loc%phi%now(i,j,k+1) < 0.0d0 )then
+    if( p%loc%phi%now(i,j,k)*p%loc%phi%now(i,j,k+1) < 0.0d0 .and. p%loc%phi%now(i,j,k-1)>0.0d0 .and. p%loc%phi%now(i,j,k-2)>0.0d0 )then
         damh = max( damh, p%glb%z(i,j,k) + &
             p%glb%dz*abs(p%loc%phi%now(i,j,k))/( abs(p%loc%phi%now(i,j,k))+abs(p%loc%phi%now(i,j,k+1))) )
     endif
