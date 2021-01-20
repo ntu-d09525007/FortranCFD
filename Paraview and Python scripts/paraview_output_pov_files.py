@@ -6,4 +6,4 @@ renderView1 = GetActiveViewOrCreate('RenderView')
 
 for i in range(len(timesteps)):
 	view.AnimationTime = timesteps[i]
-	ExportView('D:/RG30/' +str(i)+'.pov', view=renderView1)
+	ExportView('F:/Chyu/rising gate/0408/50/' +str(i+41)+'.pov', view=renderView1)
