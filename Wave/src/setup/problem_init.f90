@@ -5,6 +5,7 @@ implicit none
 integer :: id, i, j, k, ug, ii,jj,kk
 real(8) :: x, y, z, err
 CHARACTER(100) :: NAME_OF_FILE
+real(8) :: a0, e0, c, ka
     
     NAME_OF_FILE="default.txt"
     
@@ -24,6 +25,11 @@ CHARACTER(100) :: NAME_OF_FILE
         
     call p%show
     !---------------------------------------------------
+    e0=0.55
+    ka=2.0d0*dacos(-1.0d0)
+    a0=e0/ka/p%glb%L
+    c=3.7d0
+    !---------------------------------------------------
     
     ug=30
     !$omp parallel do private(i,j,k,ii,jj,kk,x,y,z)
@@ -33,72 +39,34 @@ CHARACTER(100) :: NAME_OF_FILE
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
         
-            p%of(id)%loc%vof%now(i,j,k) = 0.0d0
+            ! p%of(id)%loc%vof%now(i,j,k) = 0.0d0
         
-            do ii = 1, ug
-            do jj = 1, ug
-            do kk = 1, ug
+            ! do ii = 1, ug
+            ! do jj = 1, ug
+            ! do kk = 1, ug
                 
-                x = 0.5d0*( p%glb%x(i,j,k)+p%glb%x(i-1,j,k) ) + real(ii,8)*p%glb%dx/real(ug,8)
-                y = 0.5d0*( p%glb%y(i,j,k)+p%glb%y(i,j-1,k) ) + real(jj,8)*p%glb%dy/real(ug,8)
-                z = 0.5d0*( p%glb%z(i,j,k)+p%glb%z(i,j,k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
+            !     x = 0.5d0*( p%glb%x(i,j,k)+p%glb%x(i-1,j,k) ) + real(ii,8)*p%glb%dx/real(ug,8)
+            !     y = 0.5d0*( p%glb%y(i,j,k)+p%glb%y(i,j-1,k) ) + real(jj,8)*p%glb%dy/real(ug,8)
+            !     z = 0.5d0*( p%glb%z(i,j,k)+p%glb%z(i,j,k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
                 
-                !if( x<=1.0d0 .and. z<=1.0d0 )then
-                if( (x-0.35)**2.0 + (y-0.35)**2.0 + (z-0.35)**2.0 < 0.15**2.0 )then
-                    p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
-                end if
+            !     !if( x<=1.0d0 .and. z<=1.0d0 )then
+            !     if( (x-0.35)**2.0 + (y-0.35)**2.0 + (z-0.35)**2.0 < 0.15**2.0 )then
+            !         p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
+            !     end if
                 
-            end do
-            end do
-            end do
+            ! end do
+            ! end do
+            ! end do
         
             x = p%glb%x(i,j,k)
             y = p%glb%y(i,j,k)
             z = p%glb%z(i,j,k)
             
-            ! vortex
-            !=========================================
-            p%of(id)%loc%phi%now(i,j,k) = - dsqrt( (x-0.35d0)**2.0d0 + (y-0.35d0)**2.0d0 + (z-0.35d0)**2.0d0 ) + 0.15d0
-            
-            ! dambreak
-            !=========================================
-            !if( x<=1.0d0 .and. z<=1.0d0 )then
-            !    p%of(id)%loc%phi%now(i,j,k) = 1.0_8
-            !else
-            !    p%of(id)%loc%phi%now(i,j,k) = -1.0_8
-            !end if
-            
-            ! bubble burst
-            !=========================================
-            ! if( z<-2.0d0 )then
-                ! if( x**2.0d0 + y**2.0d0 + (z+3.2d0)**2.0d0 < 1.0d0 )then
-                    ! p%of(id)%loc%phi%now(i,j,k) = dsqrt( x**2.0d0 + y**2.0d0 + (z+3.2d0)**2.0d0 ) - 1.0d0
-                ! else
-                    ! p%of(id)%loc%phi%now(i,j,k) = min( dsqrt( x**2.0d0 + y**2.0d0 + (z+3.2d0)**2.0d0 ) - 1.0d0, -2.0-z )
-                ! endif
-            ! else
-                ! p%of(id)%loc%phi%now(i,j,k) = -2.0d0-z
-            ! endif
-            
-            ! Milk Crown
-            !=========================================
-            !if( z <= 0.1876d0 )then    
-            !   p%of(id)%loc%phi%now(i,j,k) = -z + 0.1876d0
-            !else if( dsqrt(x**2.0d0+y**2.0d0+(z-0.8d0)**2.0d0)<=0.5d0 )then
-            !   p%of(id)%loc%phi%now(i,j,k) = -dsqrt(x**2.0d0+y**2.0d0+(z-0.8d0)**2.0d0)+0.5d0
-            !else 
-            !   p%of(id)%loc%phi%now(i,j,k)= MAX(-z+0.1876d0,-dsqrt(x**2.0d0+y**2.0d0+(z-0.8d0)**2.0d0)+0.5d0 )
-            !end if
-            
-            !x = 0.5d0*( p%glb%x(i)+p%glb%x(i+1) )
-            !y = 0.5d0*( p%glb%y(j)+p%glb%y(j+1) )
-            !x = p%glb%x(i)
-            !y = p%glb%y(j)
-            !z = 0.5d0*( p%glb%z(k)+p%glb%z(k+1) )
-            
-            !if( dsqrt(x**2.0d0+y**2.0d0+(z-0.8d0)**2.0d0)<=0.5d0 )then
-            !   p%of(id)%loc%vel%z%now(i,j,k) = -1.0d0
-            !endif 
+            if( z<a0*dcos(ka*x)+0.5d0*a0*e0*dcos(2.0*ka*x)+3.0d0/8.0d0*a0*e0**2.0d0*dcos(3.0d0*ka*x) )then
+                p%of(id)%loc%phi%now(i,j,k) = 1.0d0
+            else
+                p%of(id)%loc%phi%now(i,j,k) = -1.0d0
+            endif
             
             p%of(id)%loc%vel%x%now(i,j,k) = 0.0_8
             p%of(id)%loc%vel%y%now(i,j,k) = 0.0_8
@@ -119,7 +87,7 @@ CHARACTER(100) :: NAME_OF_FILE
     call pt%vel%sync
     call pt%vof%sync
 
-    !call level_set_rk3_redis(0)
+    call level_set_rk3_redis(0)
     
     call p%node_vel
     call pt%nvel%sync
@@ -144,6 +112,7 @@ CHARACTER(100) :: NAME_OF_FILE
     write(*,*) "plotting"
     call plot
     call p%plot
+    stop
 
     p%glb%ls_adv = 0.0d0
     p%glb%ls_red = 0.0d0

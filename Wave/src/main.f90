@@ -19,11 +19,11 @@ implicit none
         p%glb%iter = p%glb%iter + 1 
         call p%sync 
       
-        call deforming_field_velocity
+        !call deforming_field_velocity
         call p%switch
      
         call interface_solver
-        !call ns_solver
+        call ns_solver
         call plot
     
         call p%ls_mv

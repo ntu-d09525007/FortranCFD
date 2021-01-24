@@ -14,7 +14,7 @@ implicit none
 integer :: iter,initer,relax_iter
 integer :: id,i,j,k
 
-relax_iter = 3
+!relax_iter = 3
 
 call ns_ab_adv_source
     
@@ -35,11 +35,11 @@ end do
 
 call ns_check_convergence_vel
 
-if( p%glb%iter<relax_iter )then
-    call ppe_sor_solver(1.0d-8)
-else
-    call ppe_mg_solver(iter)
-endif
+! if( p%glb%iter<relax_iter )then
+!     call ppe_sor_solver(1.0d-8)
+! else
+     call ppe_mg_solver(iter)
+! endif
     
 end subroutine
 
@@ -101,12 +101,10 @@ do id = 0, p%glb%threads-1
     end do
     end do 
     end do
-        
-    call p%of(id)%velbc(p%of(id)%loc%vel%x%now,p%of(id)%loc%vel%y%now,p%of(id)%loc%vel%z%now)
     
 enddo        
 !$omp end parallel do
     
-call pt%vel%sync
+call ns_velbc
     
 end subroutine

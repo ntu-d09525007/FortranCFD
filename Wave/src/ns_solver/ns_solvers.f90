@@ -12,8 +12,7 @@ integer(8) :: cpustart, cpuend
     call ns_ab_solver_mg
     
     call ns_check_convergence_div
-    call p%node_vel
-    call pt%nvel%sync
+    call ns_nvel
     
     call system_clock(cpuend)
     p%glb%ns = p%glb%ns + real(cpuend-cpustart,kind=8)/real(p%glb%cpurate,kind=8)

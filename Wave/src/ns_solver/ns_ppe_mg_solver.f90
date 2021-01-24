@@ -166,7 +166,7 @@ implicit none
 integer :: id,i,j,k,iter
 real(8) :: pi,x,y
 
-if(iter==0)then
+if(iter>3)then
     !$omp parallel do private(i,j,k)
     do id = 0, p%glb%threads-1
         
@@ -272,11 +272,9 @@ real(8) :: src
         enddo
         enddo
         
-        call p%of(id)%velbc(p%of(id)%loc%vel%x%now,p%of(id)%loc%vel%y%now,p%of(id)%loc%vel%z%now)
-    
     enddo
     !$omp end parallel do
     
-    call pt%vel%sync
+    call ns_velbc
     
 end subroutine

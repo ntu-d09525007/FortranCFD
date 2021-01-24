@@ -1,0 +1,415 @@
+subroutine job_vel_bc(p,u,v,w)
+! doi.org/10.1063/1.1761178
+implicit none
+class(job) :: p
+integer :: i,j,k
+real(8), dimension(p%loc%is-p%glb%ghc:p%loc%ie+p%glb%ghc,&
+                  &p%loc%js-p%glb%ghc:p%loc%je+p%glb%ghc,&
+                  &p%loc%ks-p%glb%ghc:p%loc%ke+p%glb%ghc) :: u,v,w
+!==========================================
+!  X-direction velocity boundary condition
+!==========================================
+
+if( p%loc%idx == 0 )then
+
+    if( p%glb%ubc(1) == 1 )then
+    
+        do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+        do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
+        do i = 1, p%glb%ghc
+            u(p%loc%is-i,j,k) = - u(p%loc%is-2+i,j,k)
+            v(p%loc%is-i,j,k) = - v(p%loc%is-1+i,j,k)
+            w(p%loc%is-i,j,k) = - w(p%loc%is-1+i,j,k)
+        end do  
+        u(p%loc%is-1,j,k) = 0.0d0
+        end do
+        end do
+    
+    else if ( p%glb%ubc(1) == 2)then
+
+        do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+        do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
+        do i = 1, p%glb%ghc
+            u(p%loc%is-i,j,k) = u(p%loc%is-2+i,j,k)
+            v(p%loc%is-i,j,k) = v(p%loc%is-1+i,j,k)
+            w(p%loc%is-i,j,k) = w(p%loc%is-1+i,j,k)
+        end do  
+        u(p%loc%is-1,j,k) = 0.0d0
+        end do
+        end do
+                
+    endif
+
+endif
+
+if ( p%loc%idx == p%glb%grid_x-1 )then
+
+     if( p%glb%ubc(2) == 1 )then
+    
+        do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+        do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
+        do i = 1, p%glb%ghc
+            u(p%loc%ie+i,j,k) = - u(p%loc%ie-i,j,k)
+            v(p%loc%ie+i,j,k) = - v(p%loc%ie+1-i,j,k)
+            w(p%loc%ie+i,j,k) = - w(p%loc%ie+1-i,j,k)
+        end do  
+        u(p%loc%ie,j,k) = 0.0d0
+        end do
+        end do
+    
+    else if ( p%glb%ubc(2) == 2)then
+
+        do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+        do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
+        do i = 1, p%glb%ghc
+            u(p%loc%ie+i,j,k) = u(p%loc%ie-i,j,k)
+            v(p%loc%ie+i,j,k) = v(p%loc%ie+1-i,j,k)
+            w(p%loc%ie+i,j,k) = w(p%loc%ie+1-i,j,k)
+        end do  
+        u(p%loc%ie,j,k) = 0.0d0
+        end do
+        end do
+                
+    endif
+        
+endif
+
+!==========================================
+!  Y-direction velocity boundary condition
+!==========================================
+
+if( p%loc%idy==0 )then
+
+    if( p%glb%vbc(1) == 1 )then
+    
+        do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+        do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+        do j = 1, p%glb%ghc
+            u(i,p%loc%js-j,k) = - u(i,p%loc%js-1+j,k)
+            v(i,p%loc%js-j,k) = - v(i,p%loc%js-2+j,k)
+            w(i,p%loc%js-j,k) = - w(i,p%loc%js-1+j,k)
+        enddo
+        v(i,p%loc%js-1,k) = 0.0d0
+        enddo
+        enddo
+            
+    else if ( p%glb%vbc(1) == 2 )then
+
+        do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+        do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+        do j = 1, p%glb%ghc
+            u(i,p%loc%js-j,k) = u(i,p%loc%js-1+j,k)
+            v(i,p%loc%js-j,k) = v(i,p%loc%js-2+j,k)
+            w(i,p%loc%js-j,k) = w(i,p%loc%js-1+j,k)
+        enddo
+        v(i,p%loc%js-1,k) = 0.0d0
+        enddo
+        enddo
+
+    endif
+
+endif
+    
+if (p%loc%idy==p%glb%grid_y-1)then
+
+    if( p%glb%vbc(2) == 1 )then
+    
+        do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+        do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+        do j = 1, p%glb%ghc
+            u(i,p%loc%je+j,k) = - u(i,p%loc%je+1-j,k)
+            v(i,p%loc%je+j,k) = - v(i,p%loc%je-j,k)
+            w(i,p%loc%je+j,k) = - w(i,p%loc%je+1-j,k)
+        enddo
+        v(i,p%loc%je,k) = 0.0d0
+        enddo
+        enddo
+            
+    else if ( p%glb%vbc(2) == 2 )then
+
+        do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+        do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+        do j = 1, p%glb%ghc
+            u(i,p%loc%je+j,k) = u(i,p%loc%je+1-j,k)
+            v(i,p%loc%je+j,k) = v(i,p%loc%je-j,k)
+            w(i,p%loc%je+j,k) = w(i,p%loc%je+1-j,k)
+        enddo
+        v(i,p%loc%je,k) = 0.0d0
+        enddo
+        enddo
+                
+    endif
+    
+endif
+!==========================================
+!  Z-direction velocity boundary condition
+!==========================================
+
+if( p%loc%idz==0 )then
+
+    if( p%glb%wbc(1) == 1 )then
+    
+        do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
+        do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+        do k = 1, p%glb%ghc
+            u(i,j,p%loc%ks-k) = - u(i,j,p%loc%ks-1+k)
+            v(i,j,p%loc%ks-k) = - v(i,j,p%loc%ks-1+k)
+            w(i,j,p%loc%ks-k) = - w(i,j,p%loc%ks-2+k)
+        enddo
+        w(i,j,p%loc%ks-1)=0.0d0
+        enddo
+        enddo
+            
+    else if ( p%glb%wbc(1) == 2 )then
+
+        do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
+        do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+        do k = 1, p%glb%ghc
+            u(i,j,p%loc%ks-k) = u(i,j,p%loc%ks-1+k)
+            v(i,j,p%loc%ks-k) = v(i,j,p%loc%ks-1+k)
+            w(i,j,p%loc%ks-k) = w(i,j,p%loc%ks-2+k)
+        enddo
+        w(i,j,p%loc%ks-1)=0.0d0
+        enddo
+        enddo
+                
+    endif
+
+endif
+
+if (p%loc%idz==p%glb%grid_z-1)then
+
+    if( p%glb%wbc(2) == 1 )then
+    
+        do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
+        do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+        do k = 1, p%glb%ghc
+            u(i,j,p%loc%ke+k) = - u(i,j,p%loc%ke+1-k)
+            v(i,j,p%loc%ke+k) = - v(i,j,p%loc%ke+1-k)
+            w(i,j,p%loc%ke+k) = - w(i,j,p%loc%ke-k)
+        enddo
+        w(i,j,p%loc%ke)=0.0d0
+        enddo
+        enddo
+            
+    else if ( p%glb%wbc(2) == 2 )then
+
+        do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
+        do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+        do k = 1, p%glb%ghc
+            u(i,j,p%loc%ke+k) = u(i,j,p%loc%ke+1-k)
+            v(i,j,p%loc%ke+k) = v(i,j,p%loc%ke+1-k)
+            w(i,j,p%loc%ke+k) = w(i,j,p%loc%ke-k)
+        enddo
+        w(i,j,p%loc%ke)=0.0d0
+        enddo
+        enddo
+                
+    endif
+    
+endif
+
+end subroutine
+                  
+subroutine job_nvel_bc(p,u,v,w)
+! doi.org/10.1063/1.1761178
+implicit none
+class(job) :: p
+real(8), dimension(p%loc%is-p%glb%ghc:p%loc%ie+p%glb%ghc,&
+                  &p%loc%js-p%glb%ghc:p%loc%je+p%glb%ghc,&
+                  &p%loc%ks-p%glb%ghc:p%loc%ke+p%glb%ghc) :: u,v,w
+integer :: i,j,k
+
+    !==========================================
+    !  X-direction velocity boundary condition
+    !==========================================
+
+    if( p%loc%idx == 0 )then
+    
+        if( p%glb%ubc(1) == 1 )then
+        
+            do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+            do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc       
+            do i = 1, p%glb%ghc
+                u(p%loc%is-i,j,k) = - u(p%loc%is-1+i,j,k)
+                v(p%loc%is-i,j,k) = - v(p%loc%is-1+i,j,k)
+                w(p%loc%is-i,j,k) = - w(p%loc%is-1+i,j,k)
+            end do  
+            end do
+            end do
+        
+        else if ( p%glb%ubc(1) == 2)then
+
+            do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+            do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc       
+            do i = 1, p%glb%ghc
+                u(p%loc%is-i,j,k) = u(p%loc%is-1+i,j,k)
+                v(p%loc%is-i,j,k) = v(p%loc%is-1+i,j,k)
+                w(p%loc%is-i,j,k) = w(p%loc%is-1+i,j,k)
+            end do  
+            end do
+            end do
+                    
+        endif
+    
+    endif 
+    
+    if ( p%loc%idx == p%glb%grid_x-1 )then
+    
+        if( p%glb%ubc(2) == 1 )then
+        
+            do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+            do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc       
+            do i = 1, p%glb%ghc
+                u(p%loc%ie+i,j,k) = - u(p%loc%ie+1-i,j,k)
+                v(p%loc%ie+i,j,k) = - v(p%loc%ie+1-i,j,k)
+                w(p%loc%ie+i,j,k) = - w(p%loc%ie+1-i,j,k)
+            end do  
+            end do
+            end do
+        
+        else if ( p%glb%ubc(2) == 2)then
+
+            do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+            do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc       
+            do i = 1, p%glb%ghc
+                u(p%loc%ie+i,j,k) = u(p%loc%ie+1-i,j,k)
+                v(p%loc%ie+i,j,k) = v(p%loc%ie+1-i,j,k)
+                w(p%loc%ie+i,j,k) = w(p%loc%ie+1-i,j,k)
+            end do  
+            end do
+            end do
+                    
+        endif
+            
+    endif
+
+    !==========================================
+    !  Y-direction velocity boundary condition
+    !==========================================
+    
+    if( p%loc%idy==0 )then
+    
+        if( p%glb%vbc(1) == 1 )then
+            
+            do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+            do j = 1, p%glb%ghc
+            do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+                u(i,p%loc%js-j,k) = - u(i,p%loc%js-1+j,k)
+                v(i,p%loc%js-j,k) = - v(i,p%loc%js-1+j,k)
+                w(i,p%loc%js-j,k) = - w(i,p%loc%js-1+j,k)
+            enddo
+            enddo
+            enddo
+                    
+        else if ( p%glb%vbc(1) == 2 )then
+
+            do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+            do j = 1, p%glb%ghc
+            do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+                u(i,p%loc%js-j,k) = u(i,p%loc%js-1+j,k)
+                v(i,p%loc%js-j,k) = v(i,p%loc%js-1+j,k)
+                w(i,p%loc%js-j,k) = w(i,p%loc%js-1+j,k)
+            enddo
+            enddo
+            enddo
+                        
+        endif
+    
+    endif
+    
+    if (p%loc%idy==p%glb%grid_y-1)then
+    
+        if( p%glb%vbc(2) == 1 )then
+            
+            do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+            do j = 1, p%glb%ghc
+            do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+                u(i,p%loc%je+j,k) = - u(i,p%loc%je+1-j,k)
+                v(i,p%loc%je+j,k) = - v(i,p%loc%je+1-j,k)
+                w(i,p%loc%je+j,k) = - w(i,p%loc%je+1-j,k)
+            enddo
+            enddo
+            enddo
+                    
+        else if ( p%glb%vbc(2) == 2 )then
+
+            do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
+            do j = 1, p%glb%ghc
+            do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+                u(i,p%loc%je+j,k) = u(i,p%loc%je+1-j,k)
+                v(i,p%loc%je+j,k) = v(i,p%loc%je+1-j,k)
+                w(i,p%loc%je+j,k) = w(i,p%loc%je+1-j,k)
+            enddo
+            enddo
+            enddo
+                        
+        endif
+    
+    endif
+    
+    !==========================================
+    !  Z-direction velocity boundary condition
+    !==========================================
+    
+    if( p%loc%idz==0 )then
+    
+        if( p%glb%wbc(1) == 1 )then
+            
+            do k = 1, p%glb%ghc
+            do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
+            do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+                u(i,j,p%loc%ks-k) = - u(i,j,p%loc%ks-1+k)
+                v(i,j,p%loc%ks-k) = - v(i,j,p%loc%ks-1+k)
+                w(i,j,p%loc%ks-k) = - w(i,j,p%loc%ks-1+k)
+            enddo
+            enddo
+            enddo
+
+        else if ( p%glb%wbc(1) == 2 )then
+
+            do k = 1, p%glb%ghc
+            do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
+            do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+                u(i,j,p%loc%ks-k) =  u(i,j,p%loc%ks-1+k)
+                v(i,j,p%loc%ks-k) =  v(i,j,p%loc%ks-1+k)
+                w(i,j,p%loc%ks-k) =  w(i,j,p%loc%ks-1+k)
+            enddo
+            enddo
+            enddo
+                        
+        endif
+
+    endif
+    
+    if (p%loc%idz==p%glb%grid_z-1)then
+
+        if( p%glb%wbc(2) == 1 )then
+
+            do k = 1, p%glb%ghc
+            do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
+            do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+                u(i,j,p%loc%ke+k) = - u(i,j,p%loc%ke+1-k)
+                v(i,j,p%loc%ke+k) = - v(i,j,p%loc%ke+1-k)
+                w(i,j,p%loc%ke+k) = - w(i,j,p%loc%ke+1-k)
+            enddo
+            enddo
+            enddo
+                    
+        else if ( p%glb%wbc(2) == 2 )then
+
+            do k = 1, p%glb%ghc
+            do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
+            do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
+                u(i,j,p%loc%ke+k) =  u(i,j,p%loc%ke+1-k)
+                v(i,j,p%loc%ke+k) =  v(i,j,p%loc%ke+1-k)
+                w(i,j,p%loc%ke+k) =  w(i,j,p%loc%ke+1-k)
+            enddo
+            enddo
+            enddo
+                        
+        endif
+    
+    endif 
+    
+end subroutine

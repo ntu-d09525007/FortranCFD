@@ -11,6 +11,7 @@ type pointer_parent
 integer :: gx, gy, gz
 integer(8) :: cpurate
 real(8) :: cputime
+logical :: xper, yper, zper
 type(pointer_child),allocatable :: of(:,:,:)
 contains
 procedure init => ptrpart_init
@@ -42,6 +43,7 @@ type pointer_mg_parent
 integer :: gx, gy, gz
 integer(8) :: cpurate
 real(8) :: cputime
+logical :: xper, yper, zper
 type(pointer_mg_child2),allocatable :: of(:,:,:)
 contains
 procedure init => ptrmgpart_init
@@ -63,6 +65,10 @@ integer :: idx,idy,idz,id
     p%gx = src%glb%grid_x
     p%gy = src%glb%grid_y
     p%gz = src%glb%grid_z
+
+    p%xper = src%glb%xper
+    p%yper = src%glb%yper
+    p%zper = src%glb%zper
     
     allocate( p%of(0:p%gx-1,0:p%gy-1,0:p%gz-1) )
     
@@ -119,6 +125,10 @@ p%cpurate = src%glb%cpurate
 p%gx = src%glb%grid_x
 p%gy = src%glb%grid_y
 p%gz = src%glb%grid_z
+
+p%xper = src%glb%xper
+p%yper = src%glb%yper
+p%zper = src%glb%zper
 
 allocate( p%of(0:p%gx-1,0:p%gy-1,0:p%gz-1) )
 
@@ -234,6 +244,77 @@ integer(8) :: cpustart, cpuend
     end do
     end do
     !$omp end parallel do
+
+    if(p%xper)then
+
+        !$omp parallel do private(i,j,k), collapse(2)
+        do idz = 0, p%gz-1
+        do idy = 0, p%gy-1
+
+            do k = p%of(0,idy,idz)%ks - ghc, p%of(0,idy,idz)%ke + ghc
+            do j = p%of(0,idy,idz)%js - ghc, p%of(0,idy,idz)%je + ghc
+            do i = 1, ghc
+
+                p%of(0,idy,idz)%dat(1-i,j,k) = p%of(p%gx-1,idy,idz)%dat(p%of(p%gx-1,idy,idz)%ie+1-i,j,k)
+                p%of(p%gx-1,idy,idz)%dat(p%of(p%gx-1,idy,idz)%ie+i,j,k) = p%of(0,idy,idz)%dat(i,j,k)
+
+            enddo
+            enddo
+            enddo
+
+        enddo
+        enddo
+        !$omp end parallel do
+
+    endif
+
+    if(p%yper)then
+
+        !$omp parallel do private(i,j,k), collapse(2)
+        do idz = 0, p%gz-1
+        do idx = 0, p%gx-1
+
+            do k = p%of(idx,0,idz)%ks - ghc, p%of(idx,0,idz)%ke + ghc
+            do i = p%of(idx,0,idz)%is - ghc, p%of(idx,0,idz)%ie + ghc
+            do j = 1, ghc
+
+                p%of(idx,0,idz)%dat(i,1-j,k) = p%of(idx,p%gy-1,idz)%dat(i,p%of(idx,p%gy-1,idz)%je+1-j,k)
+                p%of(idx,p%gy-1,idz)%dat(i,p%of(idx,p%gy-1,idz)%je+j,k) = p%of(idx,0,idz)%dat(i,j,k)
+
+            enddo
+            enddo
+            enddo
+
+        enddo
+        enddo
+        !$omp end parallel do
+
+
+    endif
+
+    if(p%zper)then
+
+        !$omp parallel do private(i,j,k), collapse(2)
+        do idy = 0, p%gy-1
+        do idx = 0, p%gx-1
+
+            do j = p%of(idx,0,idz)%js - ghc, p%of(idx,0,idz)%je + ghc
+            do i = p%of(idx,0,idz)%is - ghc, p%of(idx,0,idz)%ie + ghc
+            do k = 1, ghc
+
+                p%of(idx,idy,0)%dat(i,j,1-k) = p%of(idx,idy,p%gz-1)%dat(i,j,p%of(idx,idy,p%gz-1)%ke+1-k)
+                p%of(idx,idy,p%gz-1)%dat(i,j,p%of(idx,idy,p%gz-1)%ke+k) = p%of(idx,idy,0)%dat(i,j,k)
+
+            enddo
+            enddo
+            enddo
+
+        enddo
+        enddo
+        !$omp end parallel do
+
+
+    endif
     
     call system_clock(cpuend)
     p%cputime = p%cputime + real(cpuend-cpustart,kind=8)/real(p%cpurate,kind=8)
@@ -256,7 +337,7 @@ integer :: comp
     call system_clock(cpuend)
     p%cputime = p%cputime + real(cpuend-cpustart,kind=8)/real(p%cpurate,kind=8)
     
-end subroutine 
+end subroutine
 
 subroutine ptrmgpart_sync(p,level)
 implicit none
@@ -366,6 +447,69 @@ enddo
 enddo
 enddo
 !$omp end parallel do
+
+if(p%xper)then
+
+    !$omp parallel do private(i,j,k), collapse(2)
+    do idz = 0, p%gz-1
+    do idy = 0, p%gy-1
+
+        do k = 1, n
+        do j = 1, n
+
+            p%of(0,idy,idz)%at(level)%dat(0,j,k) = p%of(p%gx-1,idy,idz)%at(level)%dat(n,j,k)
+            p%of(p%gx-1,idy,idz)%at(level)%dat(n+1,j,k) = p%of(0,idy,idz)%at(level)%dat(1,j,k)
+
+        enddo
+        enddo
+
+    enddo
+    enddo
+    !$omp end parallel do
+
+endif
+
+if(p%yper)then
+
+    !$omp parallel do private(i,j,k), collapse(2)
+    do idz = 0, p%gz-1
+    do idx = 0, p%gx-1
+
+        do k = 1, n
+        do i = 1, n
+
+            p%of(idx,0,idz)%at(level)%dat(i,0,k) = p%of(idx,p%gy-1,idz)%at(level)%dat(i,n,k)
+            p%of(idx,p%gy-1,idz)%at(level)%dat(i,n+1,k) = p%of(idx,0,idz)%at(level)%dat(i,1,k)
+
+        enddo
+        enddo
+
+    enddo
+    enddo
+    !$omp end parallel do
+
+endif
+
+if(p%zper)then
+
+    !$omp parallel do private(i,j,k), collapse(2)
+    do idy = 0, p%gy-1
+    do idx = 0, p%gx-1
+
+        do j = 1, n
+        do i = 1, n
+
+            p%of(idx,idy,0)%at(level)%dat(i,j,0) = p%of(idx,idy,p%gz-1)%at(level)%dat(i,j,n)
+            p%of(idx,idy,p%gz-1)%at(level)%dat(i,j,n+1) = p%of(idx,idy,0)%at(level)%dat(i,j,1)
+
+        enddo
+        enddo
+
+    enddo
+    enddo
+    !$omp end parallel do
+
+endif
 
 call system_clock(cpuend)
 p%cputime = p%cputime + real(cpuend-cpustart,kind=8)/real(p%cpurate,kind=8)

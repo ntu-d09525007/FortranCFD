@@ -66,8 +66,11 @@ integer :: id, level
     write(*,'(A20,I5,A3,I5,A3,I5)')"Grids:",p%glb%node_x,"x",p%glb%node_y,"x",p%glb%node_z
     write(*,'(A20,I5,A3,I5,A3,I5)')"Threads Grid:",p%glb%grid_x,"x",p%glb%grid_y,"x",p%glb%grid_z
     write(*,'(A20,I5)')"Multigrid level:",p%glb%level
-    
     write(*,'(A20,I8)')"Overlap layer",p%of(id)%glb%ghc
+    write(*,'(A20,L5)')"X Periodic:",p%glb%xper
+    write(*,'(A20,L5)')"Y Periodic:",p%glb%yper
+    write(*,'(A20,L5)')"Z Periodic:",p%glb%zper
+
     ! write(*,*)" --- SubDomain Information  --- "
     ! do id = 0, p%glb%threads-1
     !    write(*,'("ID ",I2,": (",I2,",",I2,",",I2,")")')ID,p%of(id)%loc%idx,p%of(id)%loc%idy,p%of(id)%loc%idz
@@ -94,6 +97,7 @@ subroutine manager_read(p,path)
 implicit none
 class(manager) :: p
 character(*) :: path
+integer :: x,y,z
 
  open(unit=526,file=trim(path),status='old')
  
@@ -149,7 +153,29 @@ character(*) :: path
  read(526,*)p%glb%vbc(1), p%glb%vbc(2)
  read(526,*)
  read(526,*)p%glb%wbc(1), p%glb%wbc(2) 
- 
+ read(526,*)
+ read(526,*)x,y,z
+
+
+ if( x==1 )then
+    p%glb%xper = .true.
+ else
+    p%glb%xper = .false.
+ endif
+
+ if( y==1 )then
+    p%glb%yper = .true.
+ else
+    p%glb%yper = .false.
+ endif
+
+ if( z==1 )then
+    p%glb%zper = .true.
+ else
+    p%glb%zper = .false.
+ endif
+
+
  close(unit=526)
  
 end subroutine
