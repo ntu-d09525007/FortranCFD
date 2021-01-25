@@ -13,17 +13,13 @@ call ppe_mg_solver_init
 call ppe_mg_solver_src(input)
 call multigrid_residual(1,.true.)
 
-do iter = 1, 50
+do iter = 1, 100
 
     p%glb%piter=p%glb%piter+1
     
-    !if(iter==1)then
-    !    call multigrid_full_V_cycle(.false.,5)
-    !else
-        call multigrid_v_cycle(.false.)
-    !endif
-    
+    !call multigrid_full_V_cycle(.false.,5)
     !call multigrid_w_cycle(.false.)
+    call multigrid_v_cycle(.false.)   
     
     call multigrid_residual(1,.false.)
 
@@ -32,17 +28,14 @@ do iter = 1, 50
     if( grow < 1.0d0 )then
         if( p%of(0)%loc%mg(1)%l2norm < p%glb%p_tol )then
             goto 115
-        else
-            call ppe_sor_solver(1.0d-8)
-            return
         endif
     else if ( p%of(0)%loc%mg(1)%l2norm < p%glb%p_tol*0.001d0 ) then
         goto 115
     endif
    
-    !if(mod(iter,10).eq.0)then
-    !    write(*,*)"Final:",iter,p%of(0)%loc%mg(1)%l2norm
-    !endif
+    if(mod(iter,10).eq.0)then
+        write(*,*)"Final:",iter,p%of(0)%loc%mg(1)%l2norm
+    endif
     
 enddo
 
@@ -166,7 +159,7 @@ implicit none
 integer :: id,i,j,k,iter
 real(8) :: pi,x,y
 
-if(iter>3)then
+! if(iter>3)then
     !$omp parallel do private(i,j,k)
     do id = 0, p%glb%threads-1
         
@@ -180,21 +173,21 @@ if(iter>3)then
         
     enddo
     !$omp end parallel do
-else
-    !$omp parallel do private(i,j,k)
-    do id = 0, p%glb%threads-1
+! else
+!     !$omp parallel do private(i,j,k)
+!     do id = 0, p%glb%threads-1
         
-        do k = p%of(id)%loc%ks-p%of(id)%glb%ghc, p%of(id)%loc%ke+p%of(id)%glb%ghc
-        do j = p%of(id)%loc%js-p%of(id)%glb%ghc, p%of(id)%loc%je+p%of(id)%glb%ghc
-        do i = p%of(id)%loc%is-p%of(id)%glb%ghc, p%of(id)%loc%ie+p%of(id)%glb%ghc   
-            p%of(id)%loc%p%tmp(i,j,k) = p%of(id)%loc%p%now(i,j,k) 
-        enddo
-        enddo
-        enddo
+!         do k = p%of(id)%loc%ks-p%of(id)%glb%ghc, p%of(id)%loc%ke+p%of(id)%glb%ghc
+!         do j = p%of(id)%loc%js-p%of(id)%glb%ghc, p%of(id)%loc%je+p%of(id)%glb%ghc
+!         do i = p%of(id)%loc%is-p%of(id)%glb%ghc, p%of(id)%loc%ie+p%of(id)%glb%ghc   
+!             p%of(id)%loc%p%tmp(i,j,k) = p%of(id)%loc%p%now(i,j,k) 
+!         enddo
+!         enddo
+!         enddo
         
-    enddo
-    !$omp end parallel do
-endif
+!     enddo
+!     !$omp end parallel do
+! endif
 
 
 !$omp parallel do private(i,j,k)

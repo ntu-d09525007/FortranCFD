@@ -112,8 +112,7 @@ real(8) :: a0, e0, c, ka
     write(*,*) "plotting"
     call plot
     call p%plot
-    stop
-
+    
     p%glb%ls_adv = 0.0d0
     p%glb%ls_red = 0.0d0
     p%glb%ppe    = 0.0d0

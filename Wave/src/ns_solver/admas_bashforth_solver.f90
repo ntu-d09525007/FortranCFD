@@ -14,13 +14,13 @@ implicit none
 integer :: iter,initer,relax_iter
 integer :: id,i,j,k
 
-!relax_iter = 3
+relax_iter = 3
 
 call ns_ab_adv_source
     
 iter=0
 p%glb%piter=0
-    
+
 do 
     
     iter=iter+1 
@@ -35,11 +35,11 @@ end do
 
 call ns_check_convergence_vel
 
-! if( p%glb%iter<relax_iter )then
-!     call ppe_sor_solver(1.0d-8)
-! else
-     call ppe_mg_solver(iter)
-! endif
+if( p%glb%iter<relax_iter )then
+    call ppe_sor_solver(1.0d-7)
+else
+    call ppe_mg_solver(iter)
+endif
     
 end subroutine
 

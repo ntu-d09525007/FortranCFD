@@ -65,7 +65,7 @@ a0=e0/ka/p%glb%U
 c=3.7d0
 w=c/ka
 
-!$omp parallel do private(i,j,k,x,y,z), collapse(3)
+!$omp parallel do private(i,j,k,x,y,z)
 do id = 0, p%glb%threads-1
 
     do k = p%of(id)%loc%ks, p%of(id)%loc%ke

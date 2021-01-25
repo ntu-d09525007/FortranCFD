@@ -155,10 +155,12 @@ end subroutine
 subroutine ptrpart_sync(p)
 implicit none
 class(pointer_parent) :: p
-integer :: idx,idy,idz,i,j,k
+integer :: idx,idy,idz,i,j,k,ghc
 integer(8) :: cpustart, cpuend
 
     call system_clock(cpustart)
+
+    ghc = p%of(0,0,0)%ghc
 
     !$omp parallel do private(i,j,k), collapse(3)
     do idz = 0, p%gz-1
