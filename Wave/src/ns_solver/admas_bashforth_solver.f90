@@ -35,11 +35,11 @@ end do
 
 call ns_check_convergence_vel
 
-if( p%glb%iter<relax_iter )then
-    call ppe_sor_solver(1.0d-7)
-else
-    call ppe_mg_solver(iter)
-endif
+! if( p%glb%iter<relax_iter )then
+!     call ppe_sor_solver(1.0d-7)
+! else
+     call ppe_mg_solver(p%glb%piter)
+! endif
     
 end subroutine
 

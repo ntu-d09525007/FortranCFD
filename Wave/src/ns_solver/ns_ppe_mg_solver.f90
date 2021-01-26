@@ -160,7 +160,7 @@ implicit none
 integer :: id,i,j,k,iter
 real(8) :: pi,x,y
 
-! if(iter>3)then
+if(iter>3)then
     !$omp parallel do private(i,j,k)
     do id = 0, p%glb%threads-1
         
@@ -174,21 +174,21 @@ real(8) :: pi,x,y
         
     enddo
     !$omp end parallel do
-! else
-!     !$omp parallel do private(i,j,k)
-!     do id = 0, p%glb%threads-1
+else
+    !$omp parallel do private(i,j,k)
+    do id = 0, p%glb%threads-1
         
-!         do k = p%of(id)%loc%ks-p%of(id)%glb%ghc, p%of(id)%loc%ke+p%of(id)%glb%ghc
-!         do j = p%of(id)%loc%js-p%of(id)%glb%ghc, p%of(id)%loc%je+p%of(id)%glb%ghc
-!         do i = p%of(id)%loc%is-p%of(id)%glb%ghc, p%of(id)%loc%ie+p%of(id)%glb%ghc   
-!             p%of(id)%loc%p%tmp(i,j,k) = p%of(id)%loc%p%now(i,j,k) 
-!         enddo
-!         enddo
-!         enddo
+        do k = p%of(id)%loc%ks-p%of(id)%glb%ghc, p%of(id)%loc%ke+p%of(id)%glb%ghc
+        do j = p%of(id)%loc%js-p%of(id)%glb%ghc, p%of(id)%loc%je+p%of(id)%glb%ghc
+        do i = p%of(id)%loc%is-p%of(id)%glb%ghc, p%of(id)%loc%ie+p%of(id)%glb%ghc   
+            p%of(id)%loc%p%tmp(i,j,k) = p%of(id)%loc%p%now(i,j,k) 
+        enddo
+        enddo
+        enddo
         
-!     enddo
-!     !$omp end parallel do
-! endif
+    enddo
+    !$omp end parallel do
+endif
 
 
 !$omp parallel do private(i,j,k)
