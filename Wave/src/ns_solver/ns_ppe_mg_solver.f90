@@ -26,7 +26,7 @@ do iter = 1, 100
 
     grow = p%of(0)%loc%mg(1)%l2norm / p%of(0)%loc%mg(1)%l2norm0
     
-    if( grow > 10.0d0 )then
+    if( grow > 1.0d0 )then
         if( p%of(0)%loc%mg(1)%l2norm < p%glb%p_tol )then
             goto 115
         endif
@@ -34,9 +34,9 @@ do iter = 1, 100
         goto 115
     endif
    
-    !if(mod(iter,10).eq.0)then
-    !    write(*,*)"Final:",iter,p%of(0)%loc%mg(1)%l2norm
-    !endif
+    if(mod(iter,10).eq.0)then
+        write(*,*)"Final:",iter,p%of(0)%loc%mg(1)%l2norm
+    endif
     
 enddo
 

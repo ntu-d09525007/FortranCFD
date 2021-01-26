@@ -1,0 +1,80 @@
+nohup: ignoring input
+ finish read data from file
+ finish allocating nmumber of jobs
+ finish allocating public grids
+ finish allocating private grids
+ finish assigning grid data
+ finsih numeric setting
+ finish calculating problem parameters
+ finish assinging problem parameters to job
+ finish initializing job data
+Local A size     8     2     2     2
+Global A size   480     8     6    10
+       I matrix         1         8
+       J matrix         1         6
+       K matrix         1        10
+ finish initializing multigrid exact solver
+  --- Problem information --- 
+  Number of computing threads:   60
+64_drybed           
+                 dx:     0.01562500
+                 dy:     0.01562500
+                 dz:     0.01562500
+                 dt:     0.00015625
+                 Re:      2294.8663
+                 We:     47315.4359
+                 Fr:         0.0151
+      Density ratio:    0.0012
+    Viscosity ratio:    0.0153
+              Grids:  128  x   96  x  160
+       Threads Grid:    4  x    3  x    5
+    Multigrid level:    5
+       Overlap layer       3
+         X Periodic:    T
+         Y Periodic:    T
+         Z Periodic:    F
+LS Init:     100 0.78125     7.8125E-03
+LS Init:     200 1.56250     7.8125E-03
+LS Init:     300 2.34375     3.0449E-05
+LS Init:     400 3.12500     6.5667E-06
+ plotting
+PPE iter:    5000,error:  1.9160300E-03
+PPE iter:   10000,error:  2.1732415E-04
+PPE iter:   15000,error:  2.7522125E-05
+PPE iter:   20000,error:  4.4012819E-06
+PPE iter:   25000,error:  1.1521654E-06
+PPE iter:   30000,error:  5.0292936E-07
+PPE iter:   35000,error:  2.9308803E-07
+PPE iter:   40000,error:  1.7673719E-07
+PPE iter:   45000,error:  1.0670229E-07
+PPE iter:    5000,error:  4.1188425E-06
+PPE iter:   10000,error:  3.7115315E-07
+PPE iter:    5000,error:  5.9178105E-07
+PPE iter:   10000,error:  5.9312459E-08
+PPE iter:   15000,error:  1.9129425E-08
+PPE iter:    5000,error:  4.0545351E-07
+PPE iter:   10000,error:  5.3829140E-08
+PPE iter:   15000,error:  1.7947372E-08
+PPE iter:    5000,error:  2.6191884E-07
+PPE iter:   10000,error:  2.6685385E-08
+ =========================================
+Iter:         5
+Difference :     6.4541E-03     2.8887E-04
+Divergence :     3.2497E-05     7.2802E-06
+PPE iters  :          13680
+PPE error  :     9.9998E-09
+ =========================================
+PPE iter:    5000,error:  1.8106723E-07
+PPE iter:   10000,error:  1.2962879E-08
+PPE iter:    5000,error:  1.3032057E-07
+PPE iter:    5000,error:  9.6237862E-08
+PPE iter:    5000,error:  7.2726394E-08
+PPE iter:    5000,error:  5.5695097E-08
+ =========================================
+Iter:        10
+Difference :     5.2585E-03     2.7062E-04
+Divergence :     1.4964E-06     3.0184E-07
+PPE iters  :           7934
+PPE error  :     9.9974E-09
+ =========================================
+PPE iter:    5000,error:  4.2708677E-08
