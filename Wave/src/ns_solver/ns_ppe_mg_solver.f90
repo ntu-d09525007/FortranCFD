@@ -11,11 +11,12 @@ call system_clock(cpustart)
 
 call ppe_mg_solver_init
 call ppe_mg_solver_src(input)
-call multigrid_residual(1,.true.)
 
 do iter = 1, 100
 
     p%glb%piter=p%glb%piter+1
+
+    call multigrid_residual(1,.true.)
     
     !call multigrid_full_V_cycle(.false.,5)
     !call multigrid_w_cycle(.false.)
@@ -23,9 +24,9 @@ do iter = 1, 100
     
     call multigrid_residual(1,.false.)
 
-    grow = p%of(0)%loc%mg(1)%l2norm0 / p%of(0)%loc%mg(1)%l2norm
+    grow = p%of(0)%loc%mg(1)%l2norm / p%of(0)%loc%mg(1)%l2norm0
     
-    if( grow < 1.0d0 )then
+    if( grow > 10.0d0 )then
         if( p%of(0)%loc%mg(1)%l2norm < p%glb%p_tol )then
             goto 115
         endif
@@ -33,9 +34,9 @@ do iter = 1, 100
         goto 115
     endif
    
-    if(mod(iter,10).eq.0)then
-        write(*,*)"Final:",iter,p%of(0)%loc%mg(1)%l2norm
-    endif
+    !if(mod(iter,10).eq.0)then
+    !    write(*,*)"Final:",iter,p%of(0)%loc%mg(1)%l2norm
+    !endif
     
 enddo
 

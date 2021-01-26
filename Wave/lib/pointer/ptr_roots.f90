@@ -450,68 +450,68 @@ enddo
 enddo
 !$omp end parallel do
 
-if(p%xper)then
+! if(p%xper)then
 
-    !$omp parallel do private(i,j,k), collapse(2)
-    do idz = 0, p%gz-1
-    do idy = 0, p%gy-1
+!     !$omp parallel do private(i,j,k), collapse(2)
+!     do idz = 0, p%gz-1
+!     do idy = 0, p%gy-1
 
-        do k = 1, n
-        do j = 1, n
+!         do k = 1, n
+!         do j = 1, n
 
-            p%of(0,idy,idz)%at(level)%dat(0,j,k) = p%of(p%gx-1,idy,idz)%at(level)%dat(n,j,k)
-            p%of(p%gx-1,idy,idz)%at(level)%dat(n+1,j,k) = p%of(0,idy,idz)%at(level)%dat(1,j,k)
+!             p%of(0,idy,idz)%at(level)%dat(0,j,k) = p%of(p%gx-1,idy,idz)%at(level)%dat(n,j,k)
+!             p%of(p%gx-1,idy,idz)%at(level)%dat(n+1,j,k) = p%of(0,idy,idz)%at(level)%dat(1,j,k)
 
-        enddo
-        enddo
+!         enddo
+!         enddo
 
-    enddo
-    enddo
-    !$omp end parallel do
+!     enddo
+!     enddo
+!     !$omp end parallel do
 
-endif
+! endif
 
-if(p%yper)then
+! if(p%yper)then
 
-    !$omp parallel do private(i,j,k), collapse(2)
-    do idz = 0, p%gz-1
-    do idx = 0, p%gx-1
+!     !$omp parallel do private(i,j,k), collapse(2)
+!     do idz = 0, p%gz-1
+!     do idx = 0, p%gx-1
 
-        do k = 1, n
-        do i = 1, n
+!         do k = 1, n
+!         do i = 1, n
 
-            p%of(idx,0,idz)%at(level)%dat(i,0,k) = p%of(idx,p%gy-1,idz)%at(level)%dat(i,n,k)
-            p%of(idx,p%gy-1,idz)%at(level)%dat(i,n+1,k) = p%of(idx,0,idz)%at(level)%dat(i,1,k)
+!             p%of(idx,0,idz)%at(level)%dat(i,0,k) = p%of(idx,p%gy-1,idz)%at(level)%dat(i,n,k)
+!             p%of(idx,p%gy-1,idz)%at(level)%dat(i,n+1,k) = p%of(idx,0,idz)%at(level)%dat(i,1,k)
 
-        enddo
-        enddo
+!         enddo
+!         enddo
 
-    enddo
-    enddo
-    !$omp end parallel do
+!     enddo
+!     enddo
+!     !$omp end parallel do
 
-endif
+! endif
 
-if(p%zper)then
+! if(p%zper)then
 
-    !$omp parallel do private(i,j,k), collapse(2)
-    do idy = 0, p%gy-1
-    do idx = 0, p%gx-1
+!     !$omp parallel do private(i,j,k), collapse(2)
+!     do idy = 0, p%gy-1
+!     do idx = 0, p%gx-1
 
-        do j = 1, n
-        do i = 1, n
+!         do j = 1, n
+!         do i = 1, n
 
-            p%of(idx,idy,0)%at(level)%dat(i,j,0) = p%of(idx,idy,p%gz-1)%at(level)%dat(i,j,n)
-            p%of(idx,idy,p%gz-1)%at(level)%dat(i,j,n+1) = p%of(idx,idy,0)%at(level)%dat(i,j,1)
+!             p%of(idx,idy,0)%at(level)%dat(i,j,0) = p%of(idx,idy,p%gz-1)%at(level)%dat(i,j,n)
+!             p%of(idx,idy,p%gz-1)%at(level)%dat(i,j,n+1) = p%of(idx,idy,0)%at(level)%dat(i,j,1)
 
-        enddo
-        enddo
+!         enddo
+!         enddo
 
-    enddo
-    enddo
-    !$omp end parallel do
+!     enddo
+!     enddo
+!     !$omp end parallel do
 
-endif
+! endif
 
 call system_clock(cpuend)
 p%cputime = p%cputime + real(cpuend-cpustart,kind=8)/real(p%cpurate,kind=8)
