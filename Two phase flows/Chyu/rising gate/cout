@@ -1,2 +1,0 @@
-nohup: ignoring input
-./RUN: error while loading shared libraries: libmkl_intel_lp64.so.1: cannot open shared object file: No such file or directory
