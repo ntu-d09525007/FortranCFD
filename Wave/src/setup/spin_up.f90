@@ -27,7 +27,7 @@ do
         do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie 
-            if( p%of(id)%loc%phi%now(i,j,k) < 0.0d0 )then
+            if( p%of(id)%loc%phi%now(i,j,k) < 0.0d0 .and. p%glb%z(i,j,k)<1.95 )then
                 norm = max( abs( p%of(id)%loc%vel%x%now(i,j,k)-p%of(id)%loc%vel%x%old(i,j,k) ), norm)
                 norm = max( abs( p%of(id)%loc%vel%y%now(i,j,k)-p%of(id)%loc%vel%y%old(i,j,k) ), norm)
                 norm = max( abs( p%of(id)%loc%vel%z%now(i,j,k)-p%of(id)%loc%vel%z%old(i,j,k) ), norm)
