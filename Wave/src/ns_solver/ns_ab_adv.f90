@@ -47,6 +47,11 @@ do id = 0, p%glb%threads-1
         zp = 0.5d0*(-p%of(id)%loc%vel%x%old(i,j,k+2)+4.0d0*p%of(id)%loc%vel%x%old(i,j,k+1)-3.0d0*p%of(id)%loc%vel%x%old(i,j,k))/p%glb%dz
         zm = 0.5d0*( p%of(id)%loc%vel%x%old(i,j,k-2)-4.0d0*p%of(id)%loc%vel%x%old(i,j,k-1)+3.0d0*p%of(id)%loc%vel%x%old(i,j,k))/p%glb%dz
         
+        if(k==p%glb%node_z)then
+            zp=1.0d0
+            zm=1.0d0
+        endif
+
         p%of(id)%loc%velsrc%x%now(i,j,k) = - ((u+abs(u))*xm+(u-abs(u))*xp)/2.0d0 &
                                         &  - ((v+abs(v))*ym+(v-abs(v))*yp)/2.0d0 &
                                         &  - ((w+abs(w))*zm+(w-abs(w))*zp)/2.0d0  
@@ -66,6 +71,11 @@ do id = 0, p%glb%threads-1
         zp = 0.5d0*(-p%of(id)%loc%vel%y%old(i,j,k+2)+4.0d0*p%of(id)%loc%vel%y%old(i,j,k+1)-3.0d0*p%of(id)%loc%vel%y%old(i,j,k))/p%glb%dz
         zm = 0.5d0*( p%of(id)%loc%vel%y%old(i,j,k-2)-4.0d0*p%of(id)%loc%vel%y%old(i,j,k-1)+3.0d0*p%of(id)%loc%vel%y%old(i,j,k))/p%glb%dz
             
+        if(k==p%glb%node_z)then
+            zp=0.0d0
+            zm=0.0d0
+        endif
+
         p%of(id)%loc%velsrc%y%now(i,j,k) = - ((u+abs(u))*xm+(u-abs(u))*xp)/2.0d0 &
                                         &  - ((v+abs(v))*ym+(v-abs(v))*yp)/2.0d0 &
                                         &  - ((w+abs(w))*zm+(w-abs(w))*zp)/2.0d0
@@ -75,6 +85,10 @@ do id = 0, p%glb%threads-1
         u = p%of(id)%loc%tdata%x%s2(i,j,k)
         v = p%of(id)%loc%tdata%y%s2(i,j,k)
         w = p%of(id)%loc%vel%z%old(i,j,k)
+
+        if(k==p%glb%node_z)then
+            w=0.0d0
+        endif
             
         xp = 0.5d0*(-p%of(id)%loc%vel%z%old(i+2,j,k)+4.0d0*p%of(id)%loc%vel%z%old(i+1,j,k)-3.0d0*p%of(id)%loc%vel%z%old(i,j,k))/p%glb%dx 
         xm = 0.5d0*( p%of(id)%loc%vel%z%old(i-2,j,k)-4.0d0*p%of(id)%loc%vel%z%old(i-1,j,k)+3.0d0*p%of(id)%loc%vel%z%old(i,j,k))/p%glb%dx

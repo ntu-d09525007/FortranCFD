@@ -248,7 +248,7 @@ integer(8) :: cpustart, cpuend
     !$omp end parallel do
 
     if(p%xper)then
-
+        
         !$omp parallel do private(i,j,k), collapse(2)
         do idz = 0, p%gz-1
         do idy = 0, p%gy-1

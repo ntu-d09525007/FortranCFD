@@ -42,6 +42,10 @@ real(8) :: ux,uy,uz,vx,wx,phix,phiy,phiz,dif_x,dif_y,dif_z,curv
             ux = 0.5d0*( p%of(id)%loc%vel%x%old(i+1,j,k)-p%of(id)%loc%vel%x%old(i-1,j,k) )/p%glb%dx
             uy = 0.5d0*( p%of(id)%loc%vel%x%old(i,j+1,k)-p%of(id)%loc%vel%x%old(i,j-1,k) )/p%glb%dy
             uz = 0.5d0*( p%of(id)%loc%vel%x%old(i,j,k+1)-p%of(id)%loc%vel%x%old(i,j,k-1) )/p%glb%dz
+
+            if(k==p%glb%node_z)then
+                uz=1.0d0
+            endif
     
             vx = 0.5d0*( p%of(id)%loc%vel%y%old(i+1,j,k)-p%of(id)%loc%vel%y%old(i,j,k)+p%of(id)%loc%vel%y%old(i+1,j-1,k)-p%of(id)%loc%vel%y%old(i,j-1,k) )/p%glb%dx
             wx = 0.5d0*( p%of(id)%loc%vel%z%old(i+1,j,k)-p%of(id)%loc%vel%z%old(i,j,k)+p%of(id)%loc%vel%z%old(i+1,j,k-1)-p%of(id)%loc%vel%z%old(i,j,k-1) )/p%glb%dx
@@ -73,6 +77,10 @@ real(8) :: ux,uy,uz,vx,wx,phix,phiy,phiz,dif_x,dif_y,dif_z,curv
             uy = 0.5d0*( p%of(id)%loc%vel%x%tmp(i,j+1,k)-p%of(id)%loc%vel%x%tmp(i,j-1,k) )/p%glb%dy
             uz = 0.5d0*( p%of(id)%loc%vel%x%tmp(i,j,k+1)-p%of(id)%loc%vel%x%tmp(i,j,k-1) )/p%glb%dz
     
+            if(k==p%glb%node_z)then
+                uz=1.0d0
+            endif
+
             vx = 0.5d0*( p%of(id)%loc%vel%y%tmp(i+1,j,k)-p%of(id)%loc%vel%y%tmp(i,j,k)+p%of(id)%loc%vel%y%tmp(i+1,j-1,k)-p%of(id)%loc%vel%y%tmp(i,j-1,k) )/p%glb%dx
             wx = 0.5d0*( p%of(id)%loc%vel%z%tmp(i+1,j,k)-p%of(id)%loc%vel%z%tmp(i,j,k)+p%of(id)%loc%vel%z%tmp(i+1,j,k-1)-p%of(id)%loc%vel%z%tmp(i,j,k-1) )/p%glb%dx
     
@@ -127,6 +135,10 @@ real(8) :: vx,vy,vz,wy,uy,phix,phiy,phiz,dif_x,dif_y,dif_z,curv
             vy = 0.5d0*( p%of(id)%loc%vel%y%old(i,j+1,k)-p%of(id)%loc%vel%y%old(i,j-1,k) )/p%glb%dy
             vz = 0.5d0*( p%of(id)%loc%vel%y%old(i,j,k+1)-p%of(id)%loc%vel%y%old(i,j,k-1) )/p%glb%dz
     
+            if(k==p%glb%node_z)then
+                vz=0.0d0
+            endif
+
             uy = 0.5d0*( p%of(id)%loc%vel%x%old(i,j+1,k)-p%of(id)%loc%vel%x%old(i,j,k)+p%of(id)%loc%vel%x%old(i-1,j+1,k)-p%of(id)%loc%vel%x%old(i-1,j,k) )/p%glb%dy
             wy = 0.5d0*( p%of(id)%loc%vel%z%old(i,j+1,k)-p%of(id)%loc%vel%z%old(i,j,k)+p%of(id)%loc%vel%z%old(i,j+1,k-1)-p%of(id)%loc%vel%z%old(i,j,k-1) )/p%glb%dy
     
@@ -157,6 +169,10 @@ real(8) :: vx,vy,vz,wy,uy,phix,phiy,phiz,dif_x,dif_y,dif_z,curv
             vy = 0.5d0*( p%of(id)%loc%vel%y%tmp(i,j+1,k)-p%of(id)%loc%vel%y%tmp(i,j-1,k) )/p%glb%dy
             vz = 0.5d0*( p%of(id)%loc%vel%y%tmp(i,j,k+1)-p%of(id)%loc%vel%y%tmp(i,j,k-1) )/p%glb%dz
     
+            if(k==p%glb%node_z)then
+                vz=0.0d0
+            endif
+
             uy = 0.5d0*( p%of(id)%loc%vel%x%tmp(i,j+1,k)-p%of(id)%loc%vel%x%tmp(i,j,k)+p%of(id)%loc%vel%x%tmp(i-1,j+1,k)-p%of(id)%loc%vel%x%tmp(i-1,j,k) )/p%glb%dy
             wy = 0.5d0*( p%of(id)%loc%vel%z%tmp(i,j+1,k)-p%of(id)%loc%vel%z%tmp(i,j,k)+p%of(id)%loc%vel%z%tmp(i,j+1,k-1)-p%of(id)%loc%vel%z%tmp(i,j,k-1) )/p%glb%dy
     
