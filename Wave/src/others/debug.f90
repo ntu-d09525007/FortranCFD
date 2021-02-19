@@ -3,21 +3,23 @@ use all
 !$ use omp_lib
 implicit none
 integer :: id,i,j,k
-real(8) :: momx,momy,momz,dv
+real(8) :: momx,momy,momz,dv,heavy
     
     momx=0.0;momy=0.0;momz=0.0
     dv = p%glb%dx*p%glb%dy*p%glb%dz
     
-    !$omp parallel do private(i,j,k), reduction(+:momx,momy,momz)
+    !$omp parallel do private(i,j,k,heavy), reduction(+:momx,momy,momz)
     do id = 0, p%glb%threads-1
         
         do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
+
+            heavy = 1.0d0 - p%of(id)%loc%heavy%now(i,j,k)
         
-            momx = momx + p%of(id)%loc%heavy%now(i,j,k)*p%of(id)%loc%vel%x%now(i,j,k)*dv
-            momy = momy + p%of(id)%loc%heavy%now(i,j,k)*p%of(id)%loc%vel%y%now(i,j,k)*dv
-            momz = momz + p%of(id)%loc%heavy%now(i,j,k)*p%of(id)%loc%vel%z%now(i,j,k)*dv
+            momx = momx + heavy*p%of(id)%loc%vel%x%now(i,j,k)*dv
+            momy = momy + heavy*p%of(id)%loc%vel%y%now(i,j,k)*dv
+            momz = momz + heavy*p%of(id)%loc%vel%z%now(i,j,k)*dv
             
         end do
         end do

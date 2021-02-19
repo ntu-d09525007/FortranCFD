@@ -16,8 +16,6 @@ real(8) :: norm, norm2
 call problem_init
 call spin_up
 
-p%glb%iter=0
-
 do 
     
     p%glb%time = p%glb%time + p%glb%dt 
