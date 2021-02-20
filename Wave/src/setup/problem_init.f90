@@ -5,7 +5,7 @@ implicit none
 integer :: id, i, j, k, ug, ii,jj,kk
 real(8) :: x, y, z, err
 CHARACTER(100) :: NAME_OF_FILE
-real(8) :: a0, e0, c, ka
+real(8) :: a0, e0, c, ka, w
     
     NAME_OF_FILE="default.txt"
     
@@ -27,8 +27,9 @@ real(8) :: a0, e0, c, ka
     !---------------------------------------------------
     e0=0.55
     ka=2.0d0*dacos(-1.0d0)
-    a0=e0/ka/p%glb%L
     c=3.7d0
+    w=c*ka
+    a0=e0/ka
     !---------------------------------------------------
     
     ug=30
@@ -78,17 +79,44 @@ real(8) :: a0, e0, c, ka
         
         call p%of(id)%bc(0,p%of(id)%loc%phi%now)
         call p%of(id)%bc(0,p%of(id)%loc%vof%now)
-        call p%of(id)%velbc(p%of(id)%loc%vel%x%now,p%of(id)%loc%vel%y%now,p%of(id)%loc%vel%z%now)
 
+        call p%of(id)%bc(0,p%of(id)%loc%vel%x%now)
+        call p%of(id)%bc(0,p%of(id)%loc%vel%y%now)
+        call p%of(id)%bc(0,p%of(id)%loc%vel%z%now)
     enddo
     !$omp end parallel do
-        
-    call pt%phi%sync
+
     call pt%vel%sync
+    call pt%phi%sync
     call pt%vof%sync
 
     call level_set_rk3_redis(0)
-    
+
+    !$omp parallel do private(i,j,k,x,y,z)
+    do id = 0, p%glb%threads-1
+
+        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
+        do j = p%of(id)%loc%js, p%of(id)%loc%je
+        do i = p%of(id)%loc%is, p%of(id)%loc%ie 
+
+            x = p%glb%x(i,j,k)
+            y = p%glb%y(i,j,k)
+            z = p%glb%z(i,j,k)
+
+            if( p%of(id)%loc%phi%now(i,j,k) > 0.0d0 )then
+                p%of(id)%loc%vel%x%now(i,j,k) = a0*w*dexp(ka*z)*dcos(ka*(x-c*p%glb%time+0.5d0*p%glb%dx))
+                p%of(id)%loc%vel%y%now(i,j,k) = 0.0d0
+                p%of(id)%loc%vel%z%now(i,j,k) = a0*w*dexp(ka*z)*dsin(ka*(x-c*p%glb%time))
+            endif
+
+        enddo
+        enddo
+        enddo
+
+    enddo
+    !$omp end parallel do
+    call pt%vel%sync
+
     call p%node_vel
     call pt%nvel%sync
     call ns_init
@@ -118,5 +146,9 @@ real(8) :: a0, e0, c, ka
     p%glb%ppe    = 0.0d0
     p%glb%ns     = 0.0d0
     p%glb%syn    = 0.0d0
+
+    p%glb%iter = 0
+    p%glb%time = 0.0d0
+
         
 end subroutine

@@ -15,7 +15,7 @@ real(8) :: momx,momy,momz,dv,heavy
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
 
-            heavy = 1.0d0 - p%of(id)%loc%heavy%now(i,j,k)
+            heavy = p%of(id)%loc%heavy%now(i,j,k)
         
             momx = momx + heavy*p%of(id)%loc%vel%x%now(i,j,k)*dv
             momy = momy + heavy*p%of(id)%loc%vel%y%now(i,j,k)*dv

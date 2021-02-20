@@ -14,7 +14,7 @@ integer :: iter,id,i,j,k
 real(8) :: norm, norm2
 
 call problem_init
-call spin_up
+!call spin_up
 
 do 
     
@@ -37,7 +37,8 @@ do
         call print_NS_info
         call print_LS_info
         call print_CPU_info
-        !call find_momentum
+        call find_momentum
+        call Stokes_Wave_3rd_error
         write(*,*)"========================================="
     endif
     call output
