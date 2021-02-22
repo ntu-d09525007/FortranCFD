@@ -300,8 +300,8 @@ integer(8) :: cpustart, cpuend
         do idy = 0, p%gy-1
         do idx = 0, p%gx-1
 
-            do j = p%of(idx,0,idz)%js - ghc, p%of(idx,0,idz)%je + ghc
-            do i = p%of(idx,0,idz)%is - ghc, p%of(idx,0,idz)%ie + ghc
+            do j = p%of(idx,idy,0)%js - ghc, p%of(idx,idy,0)%je + ghc
+            do i = p%of(idx,idy,0)%is - ghc, p%of(idx,idy,0)%ie + ghc
             do k = 1, ghc
 
                 p%of(idx,idy,0)%dat(i,j,1-k) = p%of(idx,idy,p%gz-1)%dat(i,j,p%of(idx,idy,p%gz-1)%ke+1-k)
