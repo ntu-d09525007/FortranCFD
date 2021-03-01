@@ -1,6 +1,5 @@
 include './setup/problem_init.f90'
 include './setup/velocity.f90'
-include './setup/spin_up.f90'
 include './setup/Stokes_wave_solution.f90'
 include './interface_solver/interface_solver.f90'
 include './interface_solver/clsvof.f90'

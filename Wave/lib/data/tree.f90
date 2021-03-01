@@ -3,6 +3,12 @@ module tree
 use branches
 implicit none
 
+type wave
+real(8) :: c, wavelength, amplitude
+real(8) :: k, w
+real(8) :: L, U
+end type wave
+
 type filemanager
 integer :: ls_mv, damdata
 end type filemanager
@@ -16,6 +22,7 @@ real(8),dimension(:),allocatable :: B, work, error, sol
 end type multigrid
 
 type manager
+type(wave) :: wa
 type(global) :: glb
 type(filemanager) :: fil
 type(job),allocatable :: of(:)
@@ -155,7 +162,9 @@ integer :: x,y,z
  read(526,*)p%glb%wbc(1), p%glb%wbc(2) 
  read(526,*)
  read(526,*)x,y,z
-
+ real(526,*)
+ real(526,*)p%wa%phase_speed, p%wa%wavelength, p%wa%amplitude
+ close(unit=526)
 
  if( x==1 )then
     p%glb%xper = .true.
@@ -174,9 +183,6 @@ integer :: x,y,z
  else
     p%glb%zper = .false.
  endif
-
-
- close(unit=526)
  
 end subroutine
 
@@ -337,6 +343,12 @@ real(8) :: mag
         call p%mg_setup
         write(*,*)"finish initializing multigrid exact solver"
     endif
+
+    ! ----- Wave papmeters setup --------
+    p%wa%k = 2.0d0 * dacos(-1.0d0)
+    p%wa%w = p%wa%phase_speed / p%glb%U * p%wa%k
+    p%wa%L = p%wa%amplitude / p%glb%L 
+    p%wa%U = p%wa%L * p%wa%w
     
 end subroutine
 

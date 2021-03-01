@@ -5,7 +5,7 @@ implicit none
 integer :: id, i, j, k, ug, ii,jj,kk
 real(8) :: x, y, z, err
 CHARACTER(100) :: NAME_OF_FILE
-real(8) :: a0, e0, c, ka, w
+real(8) :: kx, kz
     
     NAME_OF_FILE="default.txt"
     
@@ -24,46 +24,22 @@ real(8) :: a0, e0, c, ka, w
     call pt%init(p)
         
     call p%show
-    !---------------------------------------------------
-    e0=0.55
-    ka=2.0d0*dacos(-1.0d0)
-    c=3.7d0
-    w=c*ka
-    a0=e0/ka
-    !---------------------------------------------------
     
     ug=30
-    !$omp parallel do private(i,j,k,ii,jj,kk,x,y,z)
+    !$omp parallel do private(i,j,k,ii,jj,kk,x,y,z,theta)
     do id = 0, p%glb%threads-1
         
         do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
         
-            ! p%of(id)%loc%vof%now(i,j,k) = 0.0d0
-        
-            ! do ii = 1, ug
-            ! do jj = 1, ug
-            ! do kk = 1, ug
-                
-            !     x = 0.5d0*( p%glb%x(i,j,k)+p%glb%x(i-1,j,k) ) + real(ii,8)*p%glb%dx/real(ug,8)
-            !     y = 0.5d0*( p%glb%y(i,j,k)+p%glb%y(i,j-1,k) ) + real(jj,8)*p%glb%dy/real(ug,8)
-            !     z = 0.5d0*( p%glb%z(i,j,k)+p%glb%z(i,j,k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
-                
-            !     !if( x<=1.0d0 .and. z<=1.0d0 )then
-            !     if( (x-0.35)**2.0 + (y-0.35)**2.0 + (z-0.35)**2.0 < 0.15**2.0 )then
-            !         p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) + 1.0d0/real(ug,8)**3.0d0
-            !     end if
-                
-            ! end do
-            ! end do
-            ! end do
-        
             x = p%glb%x(i,j,k)
             y = p%glb%y(i,j,k)
             z = p%glb%z(i,j,k)
+
+            kx = p%wa%k * x
             
-            if( z<a0*dcos(ka*x)+0.5d0*a0*e0*dcos(2.0*ka*x)+3.0d0/8.0d0*a0*e0**2.0d0*dcos(3.0d0*ka*x) )then
+            if( z < p%wa%L * dcos(kx) )then
                 p%of(id)%loc%phi%now(i,j,k) = 1.0d0
             else
                 p%of(id)%loc%phi%now(i,j,k) = -1.0d0
@@ -92,7 +68,7 @@ real(8) :: a0, e0, c, ka, w
 
     call level_set_rk3_redis(0)
 
-    !$omp parallel do private(i,j,k,x,y,z)
+    !$omp parallel do private(i,j,k,x,y,z,kx,kz)
     do id = 0, p%glb%threads-1
 
         do k = p%of(id)%loc%ks, p%of(id)%loc%ke
@@ -103,10 +79,13 @@ real(8) :: a0, e0, c, ka, w
             y = p%glb%y(i,j,k)
             z = p%glb%z(i,j,k)
 
+            kx = p%wa%k * x
+            kz = p%wa%k * z
+
             if( p%of(id)%loc%phi%now(i,j,k) > 0.0d0 )then
-                p%of(id)%loc%vel%x%now(i,j,k) = a0*w*dexp(ka*z)*dcos(ka*(x-c*p%glb%time+0.5d0*p%glb%dx))
+                p%of(id)%loc%vel%x%now(i,j,k) = p%wa%U * dexp(kz) * dcos(kx)
                 p%of(id)%loc%vel%y%now(i,j,k) = 0.0d0
-                p%of(id)%loc%vel%z%now(i,j,k) = a0*w*dexp(ka*z)*dsin(ka*(x-c*p%glb%time))
+                p%of(id)%loc%vel%z%now(i,j,k) = p%wa%U * dexp(kz) * dsin(kx)
             endif
 
         enddo
