@@ -4,7 +4,7 @@ use branches
 implicit none
 
 type wave
-real(8) :: c, wavelength, amplitude
+real(8) :: phase_speed, wavelength, amplitude
 real(8) :: k, w
 real(8) :: L, U
 end type wave
@@ -162,8 +162,8 @@ integer :: x,y,z
  read(526,*)p%glb%wbc(1), p%glb%wbc(2) 
  read(526,*)
  read(526,*)x,y,z
- real(526,*)
- real(526,*)p%wa%phase_speed, p%wa%wavelength, p%wa%amplitude
+ read(526,*)
+ read(526,*)p%wa%phase_speed, p%wa%wavelength, p%wa%amplitude
  close(unit=526)
 
  if( x==1 )then
@@ -345,7 +345,7 @@ real(8) :: mag
     endif
 
     ! ----- Wave papmeters setup --------
-    p%wa%k = 2.0d0 * dacos(-1.0d0)
+    p%wa%k = 2.0d0 * dacos(-1.0d0) * p%glb%L / p%wa%wavelength
     p%wa%w = p%wa%phase_speed / p%glb%U * p%wa%k
     p%wa%L = p%wa%amplitude / p%glb%L 
     p%wa%U = p%wa%L * p%wa%w

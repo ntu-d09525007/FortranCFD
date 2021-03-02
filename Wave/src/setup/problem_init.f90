@@ -26,7 +26,7 @@ real(8) :: kx, kz
     call p%show
     
     ug=30
-    !$omp parallel do private(i,j,k,ii,jj,kk,x,y,z,theta)
+    !$omp parallel do private(i,j,k,ii,jj,kk,x,y,z,kx)
     do id = 0, p%glb%threads-1
         
         do k = p%of(id)%loc%ks, p%of(id)%loc%ke
