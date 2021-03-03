@@ -14,7 +14,6 @@ integer :: iter,id,i,j,k
 real(8) :: norm, norm2
 
 call problem_init
-!call spin_up
 
 do 
     

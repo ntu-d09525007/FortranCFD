@@ -66,37 +66,61 @@ real(8) :: dx,dy,dz
         if(p%mg%i(i)>1)then
             p%mg%A(i, p%mg%node(p%mg%i(i)-1,p%mg%j(i),p%mg%k(i)) ) = 1.0d0/dx**2.0d0
         else
-            p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dx**2.0d0
+            if(p%glb%xper)then
+                p%mg%A(i, p%mg%node(imax,p%mg%j(i),p%mg%k(i)) ) = 1.0d0/dx**2.0d0
+            else
+                p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dx**2.0d0
+            endif
         endif
         
         if(p%mg%i(i)<p%mg%nx)then
             p%mg%A(i, p%mg%node(p%mg%i(i)+1,p%mg%j(i),p%mg%k(i)) ) = 1.0d0/dx**2.0d0
         else
-            p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dx**2.0d0
+            if(p%glb%xper)then
+                p%mg%A(i, p%mg%node(1,p%mg%j(i),p%mg%k(i)) ) = 1.0d0/dx**2.0d0
+            else
+                p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dx**2.0d0
+            endif
         endif
         
         if(p%mg%j(i)>1)then
             p%mg%A(i, p%mg%node(p%mg%i(i),p%mg%j(i)-1,p%mg%k(i)) ) = 1.0d0/dy**2.0d0
         else
-            p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dy**2.0d0
+            if(p%glb%yper)then
+                p%mg%A(i, p%mg%node(p%mg%i(i),jmax,p%mg%k(i)) ) = 1.0d0/dy**2.0d0
+            else
+                p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dy**2.0d0
+            endif
         endif
         
         if(p%mg%j(i)<p%mg%ny)then
             p%mg%A(i, p%mg%node(p%mg%i(i),p%mg%j(i)+1,p%mg%k(i)) ) = 1.0d0/dy**2.0d0
         else
-            p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dy**2.0d0
+            if(p%glb%yper)then
+                p%mg%A(i, p%mg%node(p%mg%i(i),1,p%mg%k(i)) ) = 1.0d0/dy**2.0d0
+            else
+                p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dy**2.0d0
+            endif
         endif   
 
         if(p%mg%k(i)>1)then
             p%mg%A(i, p%mg%node(p%mg%i(i),p%mg%j(i),p%mg%k(i)-1) ) = 1.0d0/dz**2.0d0
         else
-            p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dz**2.0d0
+            if(p%glb%zper)then
+                p%mg%A(i, p%mg%node(p%mg%i(i),p%mg%j(i),kmax) ) = 1.0d0/dz**2.0d0
+            else
+                p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dz**2.0d0
+            endif
         endif
         
         if(p%mg%k(i)<p%mg%nz)then
             p%mg%A(i, p%mg%node(p%mg%i(i),p%mg%j(i),p%mg%k(i)+1) ) = 1.0d0/dz**2.0d0
         else
-            p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dz**2.0d0
+            if(p%glb%zper)then
+                p%mg%A(i, p%mg%node(p%mg%i(i),p%mg%j(i),1) ) = 1.0d0/dz**2.0d0
+            else
+                p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dz**2.0d0
+            endif
         endif   
         
     end do

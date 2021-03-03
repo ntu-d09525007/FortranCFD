@@ -3,19 +3,20 @@ use all
 implicit none
 integer(8) :: cpustart, cpuend
 
-    call system_clock(cpustart)
-    
-    call ns_init
-    
-    !call ns_ab_solver_SOR
-    !call ns_split_solver
-    call ns_ab_solver_mg
-    
-    call ns_check_convergence_div
-    call ns_nvel
-    
-    call system_clock(cpuend)
-    p%glb%ns = p%glb%ns + real(cpuend-cpustart,kind=8)/real(p%glb%cpurate,kind=8)
+call system_clock(cpustart)
+
+call ns_init
+
+!call ns_ab_solver_SOR
+call ns_ab_solver
+
+call ns_check_convergence_div
+
+call p%node_vel
+call pt%nvel%sync
+
+call system_clock(cpuend)
+p%glb%ns = p%glb%ns + real(cpuend-cpustart,kind=8)/real(p%glb%cpurate,kind=8)
     
 end subroutine
 

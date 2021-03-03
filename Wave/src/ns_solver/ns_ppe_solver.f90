@@ -200,36 +200,34 @@ use all
 !$ use omp_lib
 implicit none
 integer :: id,i,j,k
-real(8) :: px,py,pz,rho,ux,vy,wz
+real(8) :: px,py,pz,rho
 
-    !$omp parallel do private(i,j,k,px,py,pz,rho)
-    do id = 0, p%glb%threads-1
+!$omp parallel do private(i,j,k,px,py,pz,rho)
+do id = 0, p%glb%threads-1
+    
+    do k = p%of(id)%loc%ks, p%of(id)%loc%ke
+    do j = p%of(id)%loc%js, p%of(id)%loc%je
+    do i = p%of(id)%loc%is, p%of(id)%loc%ie
         
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
-        do j = p%of(id)%loc%js, p%of(id)%loc%je
-        do i = p%of(id)%loc%is, p%of(id)%loc%ie
-            
-            rho = (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i+1,j,k))/2.0d0
-            px  = (p%of(id)%loc%p%now(i+1,j,k)-p%of(id)%loc%p%now(i,j,k)) / p%glb%dx  
-            p%of(id)%loc%vel%x%now(i,j,k) = p%of(id)%loc%vel%x%now(i,j,k) - p%glb%dt*px/rho
-            
-            rho = (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j+1,k))/2.0d0
-            py  = (p%of(id)%loc%p%now(i,j+1,k)-p%of(id)%loc%p%now(i,j,k)) / p%glb%dy        
-            p%of(id)%loc%vel%y%now(i,j,k) = p%of(id)%loc%vel%y%now(i,j,k) - p%glb%dt*py/rho
-            
-            rho = (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j,k+1))/2.0d0
-            pz  = (p%of(id)%loc%p%now(i,j,k+1)-p%of(id)%loc%p%now(i,j,k)) / p%glb%dz        
-            p%of(id)%loc%vel%z%now(i,j,k) = p%of(id)%loc%vel%z%now(i,j,k) - p%glb%dt*pz/rho
-            
-        end do
-        end do
-        end do
-    
-        call p%of(id)%velbc(p%of(id)%loc%vel%x%now,p%of(id)%loc%vel%y%now,p%of(id)%loc%vel%z%now)
-      
-    enddo       
-    !$omp end parallel do
-    
-    call pt%vel%sync
+        rho = (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i+1,j,k))/2.0d0
+        px  = (p%of(id)%loc%p%now(i+1,j,k)-p%of(id)%loc%p%now(i,j,k)) / p%glb%dx  
+        p%of(id)%loc%vel%x%now(i,j,k) = p%of(id)%loc%vel%x%now(i,j,k) - p%glb%dt*px/rho
+        
+        rho = (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j+1,k))/2.0d0
+        py  = (p%of(id)%loc%p%now(i,j+1,k)-p%of(id)%loc%p%now(i,j,k)) / p%glb%dy        
+        p%of(id)%loc%vel%y%now(i,j,k) = p%of(id)%loc%vel%y%now(i,j,k) - p%glb%dt*py/rho
+        
+        rho = (p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j,k+1))/2.0d0
+        pz  = (p%of(id)%loc%p%now(i,j,k+1)-p%of(id)%loc%p%now(i,j,k)) / p%glb%dz        
+        p%of(id)%loc%vel%z%now(i,j,k) = p%of(id)%loc%vel%z%now(i,j,k) - p%glb%dt*pz/rho
+        
+    end do
+    end do
+    end do
+
+enddo       
+!$omp end parallel do
+
+call ns_velbc
     
 end subroutine

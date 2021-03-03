@@ -14,7 +14,7 @@ call ppe_mg_solver_src(input)
 
 initer=0
 
-110 do iter = 1, 30
+110 do iter = 1, 100
 
     p%glb%piter=p%glb%piter+1
 
@@ -56,7 +56,7 @@ call ppe_mg_correction
 
 call system_clock(cpuend)
 p%glb%ppe = p%glb%ppe + real(cpuend-cpustart,kind=8)/real(p%glb%cpurate,kind=8)
-    
+
 end subroutine
 
 subroutine ppe_mg_solver_init
@@ -239,39 +239,39 @@ implicit none
 integer :: id,i,j,k
 real(8) :: src
 
-    !$omp parallel do private(i,j,k,src)
-    do id = 0, p%glb%threads-1
+!$omp parallel do private(i,j,k,src)
+do id = 0, p%glb%threads-1
+    
+    do k = p%of(id)%loc%ks, p%of(id)%loc%ke
+    do j = p%of(id)%loc%js, p%of(id)%loc%je
+    do i = p%of(id)%loc%is, p%of(id)%loc%ie
         
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
-        do j = p%of(id)%loc%js, p%of(id)%loc%je
-        do i = p%of(id)%loc%is, p%of(id)%loc%ie
-            
-            src = 1.0d0 / p%glb%rho_12 * ( p%of(id)%loc%p%now(i+1,j,k) - p%of(id)%loc%p%now(i,j,k) )/p%glb%dx
-            src = src + ( 2.0d0/(p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i+1,j,k)) - 1.0d0/p%glb%rho_12 ) * &
-            & ( p%of(id)%loc%p%tmp(i+1,j,k) - p%of(id)%loc%p%tmp(i,j,k) )/p%glb%dx
-            
-            p%of(id)%loc%vel%x%now(i,j,k) = p%of(id)%loc%vel%x%now(i,j,k) - src * p%glb%dt
-            
-            src = 1.0d0 / p%glb%rho_12 * ( p%of(id)%loc%p%now(i,j+1,k) - p%of(id)%loc%p%now(i,j,k) )/p%glb%dy
-            src = src + ( 2.0d0/(p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j+1,k)) - 1.0d0/p%glb%rho_12 ) * &
-            & ( p%of(id)%loc%p%tmp(i,j+1,k) - p%of(id)%loc%p%tmp(i,j,k) )/p%glb%dy
-            
-            p%of(id)%loc%vel%y%now(i,j,k) = p%of(id)%loc%vel%y%now(i,j,k) - src * p%glb%dt
-            
-            src = 1.0d0 / p%glb%rho_12 * ( p%of(id)%loc%p%now(i,j,k+1) - p%of(id)%loc%p%now(i,j,k) )/p%glb%dz
-            src = src + ( 2.0d0/(p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j,k+1)) - 1.0d0/p%glb%rho_12 ) * &
-            & ( p%of(id)%loc%p%tmp(i,j,k+1) - p%of(id)%loc%p%tmp(i,j,k) )/p%glb%dz
-            
-            p%of(id)%loc%vel%z%now(i,j,k) = p%of(id)%loc%vel%z%now(i,j,k) - src * p%glb%dt
-            
-        enddo
-        enddo
-        enddo
+        src = 1.0d0 / p%glb%rho_12 * ( p%of(id)%loc%p%now(i+1,j,k) - p%of(id)%loc%p%now(i,j,k) )/p%glb%dx
+        src = src + ( 2.0d0/(p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i+1,j,k)) - 1.0d0/p%glb%rho_12 ) * &
+        & ( p%of(id)%loc%p%tmp(i+1,j,k) - p%of(id)%loc%p%tmp(i,j,k) )/p%glb%dx
+        
+        p%of(id)%loc%vel%x%now(i,j,k) = p%of(id)%loc%vel%x%now(i,j,k) - src * p%glb%dt
+        
+        src = 1.0d0 / p%glb%rho_12 * ( p%of(id)%loc%p%now(i,j+1,k) - p%of(id)%loc%p%now(i,j,k) )/p%glb%dy
+        src = src + ( 2.0d0/(p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j+1,k)) - 1.0d0/p%glb%rho_12 ) * &
+        & ( p%of(id)%loc%p%tmp(i,j+1,k) - p%of(id)%loc%p%tmp(i,j,k) )/p%glb%dy
+        
+        p%of(id)%loc%vel%y%now(i,j,k) = p%of(id)%loc%vel%y%now(i,j,k) - src * p%glb%dt
+        
+        src = 1.0d0 / p%glb%rho_12 * ( p%of(id)%loc%p%now(i,j,k+1) - p%of(id)%loc%p%now(i,j,k) )/p%glb%dz
+        src = src + ( 2.0d0/(p%of(id)%loc%rho%now(i,j,k)+p%of(id)%loc%rho%now(i,j,k+1)) - 1.0d0/p%glb%rho_12 ) * &
+        & ( p%of(id)%loc%p%tmp(i,j,k+1) - p%of(id)%loc%p%tmp(i,j,k) )/p%glb%dz
+        
+        p%of(id)%loc%vel%z%now(i,j,k) = p%of(id)%loc%vel%z%now(i,j,k) - src * p%glb%dt
         
     enddo
-    !$omp end parallel do
+    enddo
+    enddo
     
-    call ns_velbc
+enddo
+!$omp end parallel do
+
+call ns_velbc
     
 end subroutine
 

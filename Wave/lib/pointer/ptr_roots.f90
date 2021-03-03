@@ -17,6 +17,7 @@ contains
 procedure init => ptrpart_init
 procedure sync => ptrpart_sync
 procedure reset => ptrpart_reset
+procedure check_per =>ptrpart_check_periodic
 end type pointer_parent
 
 type pointer_vector_parent
@@ -28,6 +29,7 @@ contains
 procedure init => ptrvecpart_init
 procedure sync => ptrvecpart_sync
 procedure reset => ptrvecpart_reset
+procedure check_per =>ptrvecpart_check_periodic
 end type pointer_vector_parent
 
 type pointer_mg_child
@@ -256,10 +258,8 @@ integer(8) :: cpustart, cpuend
             do k = p%of(0,idy,idz)%ks - ghc, p%of(0,idy,idz)%ke + ghc
             do j = p%of(0,idy,idz)%js - ghc, p%of(0,idy,idz)%je + ghc
             do i = 1, ghc
-
                 p%of(0,idy,idz)%dat(1-i,j,k) = p%of(p%gx-1,idy,idz)%dat(p%of(p%gx-1,idy,idz)%ie+1-i,j,k)
                 p%of(p%gx-1,idy,idz)%dat(p%of(p%gx-1,idy,idz)%ie+i,j,k) = p%of(0,idy,idz)%dat(i,j,k)
-
             enddo
             enddo
             enddo
@@ -279,10 +279,8 @@ integer(8) :: cpustart, cpuend
             do k = p%of(idx,0,idz)%ks - ghc, p%of(idx,0,idz)%ke + ghc
             do i = p%of(idx,0,idz)%is - ghc, p%of(idx,0,idz)%ie + ghc
             do j = 1, ghc
-
                 p%of(idx,0,idz)%dat(i,1-j,k) = p%of(idx,p%gy-1,idz)%dat(i,p%of(idx,p%gy-1,idz)%je+1-j,k)
                 p%of(idx,p%gy-1,idz)%dat(i,p%of(idx,p%gy-1,idz)%je+j,k) = p%of(idx,0,idz)%dat(i,j,k)
-
             enddo
             enddo
             enddo
@@ -303,10 +301,8 @@ integer(8) :: cpustart, cpuend
             do j = p%of(idx,idy,0)%js - ghc, p%of(idx,idy,0)%je + ghc
             do i = p%of(idx,idy,0)%is - ghc, p%of(idx,idy,0)%ie + ghc
             do k = 1, ghc
-
                 p%of(idx,idy,0)%dat(i,j,1-k) = p%of(idx,idy,p%gz-1)%dat(i,j,p%of(idx,idy,p%gz-1)%ke+1-k)
                 p%of(idx,idy,p%gz-1)%dat(i,j,p%of(idx,idy,p%gz-1)%ke+k) = p%of(idx,idy,0)%dat(i,j,k)
-
             enddo
             enddo
             enddo
@@ -320,6 +316,103 @@ integer(8) :: cpustart, cpuend
     
     call system_clock(cpuend)
     p%cputime = p%cputime + real(cpuend-cpustart,kind=8)/real(p%cpurate,kind=8)
+
+end subroutine
+
+subroutine ptrpart_check_periodic(p)
+implicit none
+class(pointer_parent) :: p
+integer :: idx,idy,idz,i,j,k,ghc
+real(8) :: errx,erry,errz
+
+ghc = p%of(0,0,0)%ghc
+
+if(p%xper)then
+    
+    errx=0.0d0        
+    !$omp parallel do private(i,j,k), collapse(2), reduction(+:errx)
+    do idz = 0, p%gz-1
+    do idy = 0, p%gy-1
+
+        do k = p%of(0,idy,idz)%ks - ghc, p%of(0,idy,idz)%ke + ghc
+        do j = p%of(0,idy,idz)%js - ghc, p%of(0,idy,idz)%je + ghc
+        do i = 1, ghc
+
+            errx = errx + (p%of(0,idy,idz)%dat(1-i,j,k)-p%of(p%gx-1,idy,idz)%dat(p%of(p%gx-1,idy,idz)%ie+1-i,j,k))**2.0d0
+            errx = errx + (p%of(p%gx-1,idy,idz)%dat(p%of(p%gx-1,idy,idz)%ie+i,j,k)-p%of(0,idy,idz)%dat(i,j,k))**2.0d0
+            
+        enddo
+        enddo
+        enddo
+
+    enddo
+    enddo
+    !$omp end parallel do
+
+endif
+
+if(p%yper)then
+
+    erry=0.0d0
+    !$omp parallel do private(i,j,k), collapse(2), reduction(+:erry)
+    do idz = 0, p%gz-1
+    do idx = 0, p%gx-1
+
+        do k = p%of(idx,0,idz)%ks - ghc, p%of(idx,0,idz)%ke + ghc
+        do i = p%of(idx,0,idz)%is - ghc, p%of(idx,0,idz)%ie + ghc
+        do j = 1, ghc
+
+            erry = erry + (p%of(idx,0,idz)%dat(i,1-j,k)-p%of(idx,p%gy-1,idz)%dat(i,p%of(idx,p%gy-1,idz)%je+1-j,k))**2.0d0
+            erry = erry + (p%of(idx,p%gy-1,idz)%dat(i,p%of(idx,p%gy-1,idz)%je+j,k)-p%of(idx,0,idz)%dat(i,j,k))**2.0d0
+
+        enddo
+        enddo
+        enddo
+
+    enddo
+    enddo
+    !$omp end parallel do
+
+endif
+
+if(p%zper)then
+
+    errz=0.0d0
+    !$omp parallel do private(i,j,k), collapse(2), reduction(+:errz)
+    do idy = 0, p%gy-1
+    do idx = 0, p%gx-1
+
+        do j = p%of(idx,idy,0)%js - ghc, p%of(idx,idy,0)%je + ghc
+        do i = p%of(idx,idy,0)%is - ghc, p%of(idx,idy,0)%ie + ghc
+        do k = 1, ghc
+
+            errz = errz + (p%of(idx,idy,0)%dat(i,j,1-k)-p%of(idx,idy,p%gz-1)%dat(i,j,p%of(idx,idy,p%gz-1)%ke+1-k))**2.0d0
+            errz = errz + (p%of(idx,idy,p%gz-1)%dat(i,j,p%of(idx,idy,p%gz-1)%ke+k)-p%of(idx,idy,0)%dat(i,j,k))**2.0d0
+
+        enddo
+        enddo
+        enddo
+
+    enddo
+    enddo
+    !$omp end parallel do
+
+endif
+
+write(*,*)errx+erry+errz
+
+end subroutine
+
+subroutine ptrvecpart_check_periodic(p)
+implicit none
+class(pointer_vector_parent) :: p
+integer :: id,i,j,k
+integer(8) :: cpustart, cpuend
+integer :: comp
+
+do comp = 1, p%num
+    call p%nodes(comp)%check_per
+enddo
 
 end subroutine
 
@@ -450,68 +543,62 @@ enddo
 enddo
 !$omp end parallel do
 
-! if(p%xper)then
+if(p%xper)then
+        
+    !$omp parallel do private(i,j,k), collapse(2)
+    do idz = 0, p%gz-1
+    do idy = 0, p%gy-1
 
-!     !$omp parallel do private(i,j,k), collapse(2)
-!     do idz = 0, p%gz-1
-!     do idy = 0, p%gy-1
+        do k = 1, n
+        do j = 1, n
+            p%of(0,idy,idz)%at(level)%dat(0,j,k) = p%of(p%gx-1,idy,idz)%at(level)%dat(n,j,k)
+            p%of(p%gx-1,idy,idz)%at(level)%dat(n+1,j,k) = p%of(0,idy,idz)%at(level)%dat(1,j,k)
+        enddo
+        enddo
 
-!         do k = 1, n
-!         do j = 1, n
+    enddo
+    enddo
+    !$omp end parallel do
 
-!             p%of(0,idy,idz)%at(level)%dat(0,j,k) = p%of(p%gx-1,idy,idz)%at(level)%dat(n,j,k)
-!             p%of(p%gx-1,idy,idz)%at(level)%dat(n+1,j,k) = p%of(0,idy,idz)%at(level)%dat(1,j,k)
+endif
 
-!         enddo
-!         enddo
+if(p%yper)then
+        
+    !$omp parallel do private(i,j,k), collapse(2)
+    do idz = 0, p%gz-1
+    do idx = 0, p%gx-1
 
-!     enddo
-!     enddo
-!     !$omp end parallel do
+        do k = 1, n
+        do i = 1, n
+            p%of(idx,0,idz)%at(level)%dat(i,0,k) = p%of(idx,p%gy-1,idz)%at(level)%dat(i,n,k)
+            p%of(idx,p%gy-1,idz)%at(level)%dat(i,n+1,k) = p%of(idx,0,idz)%at(level)%dat(i,1,k)
+        enddo
+        enddo
 
-! endif
+    enddo
+    enddo
+    !$omp end parallel do
 
-! if(p%yper)then
+endif
 
-!     !$omp parallel do private(i,j,k), collapse(2)
-!     do idz = 0, p%gz-1
-!     do idx = 0, p%gx-1
+if(p%zper)then
+        
+    !$omp parallel do private(i,j,k), collapse(2)
+    do idy = 0, p%gy-1
+    do idx = 0, p%gx-1
 
-!         do k = 1, n
-!         do i = 1, n
+        do j = 1, n
+        do i = 1, n
+            p%of(idx,idy,0)%at(level)%dat(i,j,0) = p%of(idx,idy,p%gz-1)%at(level)%dat(i,j,n)
+            p%of(idx,idy,p%gz-1)%at(level)%dat(i,j,n+1) = p%of(idx,idy,0)%at(level)%dat(i,j,1)
+        enddo
+        enddo
 
-!             p%of(idx,0,idz)%at(level)%dat(i,0,k) = p%of(idx,p%gy-1,idz)%at(level)%dat(i,n,k)
-!             p%of(idx,p%gy-1,idz)%at(level)%dat(i,n+1,k) = p%of(idx,0,idz)%at(level)%dat(i,1,k)
+    enddo
+    enddo
+    !$omp end parallel do
 
-!         enddo
-!         enddo
-
-!     enddo
-!     enddo
-!     !$omp end parallel do
-
-! endif
-
-! if(p%zper)then
-
-!     !$omp parallel do private(i,j,k), collapse(2)
-!     do idy = 0, p%gy-1
-!     do idx = 0, p%gx-1
-
-!         do j = 1, n
-!         do i = 1, n
-
-!             p%of(idx,idy,0)%at(level)%dat(i,j,0) = p%of(idx,idy,p%gz-1)%at(level)%dat(i,j,n)
-!             p%of(idx,idy,p%gz-1)%at(level)%dat(i,j,n+1) = p%of(idx,idy,0)%at(level)%dat(i,j,1)
-
-!         enddo
-!         enddo
-
-!     enddo
-!     enddo
-!     !$omp end parallel do
-
-! endif
+endif
 
 call system_clock(cpuend)
 p%cputime = p%cputime + real(cpuend-cpustart,kind=8)/real(p%cpurate,kind=8)
