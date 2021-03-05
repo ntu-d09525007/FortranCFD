@@ -51,6 +51,6 @@ ooo	Velocity boundary condition in Y direction ( no-slip / slip / non-reflective
 ooo	Velocity boundary condition in Z direction ( no-slip / slip / non-reflective )
 1	1
 ooo	Periodic ( X, Y, Z )
-1	1	0
+0	0	0
 ooo	Phase speed  / Wave length / Wave Amplitude
 3.19		5.0		0.3

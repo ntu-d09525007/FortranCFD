@@ -22,9 +22,8 @@ do iter = 1, 5
     
 end do
 
-call ppe_mg_solver(p%glb%piter)
-
 call ns_check_convergence_vel
+call ppe_mg_solver(p%glb%piter)
     
 end subroutine
 
