@@ -96,35 +96,35 @@ integer :: id,i,j,k
                                     &       p%of(id)%loc%coe%f(i,j,k) + p%of(id)%loc%coe%b(i,j,k) + &
                                     &       p%of(id)%loc%coe%u(i,j,k) + p%of(id)%loc%coe%d(i,j,k) )
                             
-            if( i==1 )then
-                p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%l(i,j,k)
-                p%of(id)%loc%coe%l(i,j,k)=0.0d0
-            endif
+            ! if( i==1 )then
+            !     p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%l(i,j,k)
+            !     p%of(id)%loc%coe%l(i,j,k)=0.0d0
+            ! endif
             
-            if( i==p%glb%node_x )then
-                p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%r(i,j,k)
-                p%of(id)%loc%coe%r(i,j,k)=0.0d0
-            endif
+            ! if( i==p%glb%node_x )then
+            !     p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%r(i,j,k)
+            !     p%of(id)%loc%coe%r(i,j,k)=0.0d0
+            ! endif
             
-            if( j==1 )then
-                p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%b(i,j,k)
-                p%of(id)%loc%coe%b(i,j,k)=0.0d0
-            endif
+            ! if( j==1 )then
+            !     p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%b(i,j,k)
+            !     p%of(id)%loc%coe%b(i,j,k)=0.0d0
+            ! endif
             
-            if( j==p%glb%node_y )then
-                p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%f(i,j,k)
-                p%of(id)%loc%coe%f(i,j,k)=0.0d0
-            endif
+            ! if( j==p%glb%node_y )then
+            !     p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%f(i,j,k)
+            !     p%of(id)%loc%coe%f(i,j,k)=0.0d0
+            ! endif
             
-            if( k==1 )then
-                p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%d(i,j,k)
-                p%of(id)%loc%coe%d(i,j,k)=0.0d0
-            endif
+            ! if( k==1 )then
+            !     p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%d(i,j,k)
+            !     p%of(id)%loc%coe%d(i,j,k)=0.0d0
+            ! endif
             
-            if( k==p%glb%node_z )then
-                p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%u(i,j,k)
-                p%of(id)%loc%coe%u(i,j,k)=0.0d0
-            endif
+            ! if( k==p%glb%node_z )then
+            !     p%of(id)%loc%coe%c(i,j,k)=p%of(id)%loc%coe%c(i,j,k)+p%of(id)%loc%coe%u(i,j,k)
+            !     p%of(id)%loc%coe%u(i,j,k)=0.0d0
+            ! endif
             
         end do
         end do

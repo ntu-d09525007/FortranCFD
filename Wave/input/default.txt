@@ -3,11 +3,11 @@ ooo	Method to capture interface ( LS / MPLS / CLSVOF )
 ooo	Name of the problem 
 64_Wave
 ooo	Dimension of threads grid in X, Y, Z direction
-4	2	4
+2	1	2
 ooo	Multigrid level
--1
+5
 ooo	Cells per unit length 
-64
+32
 ooo	Number of ghost cell
 3
 ooo	Range of domain in X direction
