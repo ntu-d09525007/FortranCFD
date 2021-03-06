@@ -124,6 +124,10 @@ real(8) :: dx,dy,dz
         endif   
         
     end do
+
+    ! do i = 1, p%mg%n
+    !     write(*,'("(",I2,",",I2,",",I2,")  ",20F7.2)')p%mg%i(i),p%mg%j(i),p%mg%k(i),p%mg%A(i,:)
+    ! enddo
     
     end subroutine
 
