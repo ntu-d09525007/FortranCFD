@@ -43,7 +43,7 @@ contains
 subroutine dum_matrices_alloc(p,is,ie,js,je)
 implicit none
 class(dum_matrices) :: p
-integer, intent(in) :: is,ie,js,jese
+integer, intent(in) :: is,ie,js,je
 
 p%is = is; p%ie = ie
 p%js = js; p%je = je
@@ -75,15 +75,11 @@ p%js = js; p%je = je
 
 call p%x%alloc(is,ie,js,je)
 call p%y%alloc(is,ie,js,je)
-call p%z%alloc(is,ie,js,je)
 
 call p%xx%alloc(is,ie,js,je)
 call p%yy%alloc(is,ie,js,je)
-call p%zz%alloc(is,ie,js,je)
 
 call p%xy%alloc(is,ie,js,je)
-call p%xz%alloc(is,ie,js,je)
-call p%yz%alloc(is,ie,js,je)
 
 call p%curv%alloc(is,ie,js,je)
 
@@ -99,7 +95,6 @@ p%js = js; p%je = je
 
 call p%x%alloc(is,ie,js,je)
 call p%y%alloc(is,ie,js,je)
-call p%z%alloc(is,ie,js,je)
 
 end subroutine
 

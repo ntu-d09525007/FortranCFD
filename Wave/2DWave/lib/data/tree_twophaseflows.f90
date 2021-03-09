@@ -206,9 +206,6 @@ do id = 0, p%glb%threads-1
     
     call p%of(id)%bc(0,p%of(id)%loc%normals%y%now)
     call p%of(id)%bc(0,p%of(id)%loc%normals%yy%now)
-   
-    call p%of(id)%bc(0,p%of(id)%loc%normals%z%now)
-    call p%of(id)%bc(0,p%of(id)%loc%normals%zz%now)
      
     call p%of(id)%bc(0,p%of(id)%loc%normals%xy%now)
  
@@ -241,7 +238,6 @@ do id = 0, p%glb%threads-1
 
         p%of(id)%loc%normals%curv%now(i,j) = ( fyy*fx**2.0d0+fxx*fy**2.0d0 - 2.0d0*fxy*fx*fy ) / (fx**2.0d0+fy**2.0d0+1.0d-12)**1.5d0      
 
-    end do
     end do
     end do
     

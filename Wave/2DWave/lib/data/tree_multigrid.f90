@@ -57,40 +57,40 @@ real(8) :: dx,dy
     do i = 1, p%mg%n
     
         if(p%mg%i(i)>1)then
-            p%mg%A(i, p%mg%node(p%mg%i(i)-1,p%mg%j(i),p%mg%k(i)) ) = 1.0d0/dx**2.0d0
+            p%mg%A(i, p%mg%node(p%mg%i(i)-1,p%mg%j(i)) ) = 1.0d0/dx**2.0d0
         else
             if(p%glb%xper)then
-                p%mg%A(i, p%mg%node(imax,p%mg%j(i),p%mg%k(i)) ) = 1.0d0/dx**2.0d0
+                p%mg%A(i, p%mg%node(imax,p%mg%j(i)) ) = 1.0d0/dx**2.0d0
             else
                 p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dx**2.0d0
             endif
         endif
         
         if(p%mg%i(i)<p%mg%nx)then
-            p%mg%A(i, p%mg%node(p%mg%i(i)+1,p%mg%j(i),p%mg%k(i)) ) = 1.0d0/dx**2.0d0
+            p%mg%A(i, p%mg%node(p%mg%i(i)+1,p%mg%j(i)) ) = 1.0d0/dx**2.0d0
         else
             if(p%glb%xper)then
-                p%mg%A(i, p%mg%node(1,p%mg%j(i),p%mg%k(i)) ) = 1.0d0/dx**2.0d0
+                p%mg%A(i, p%mg%node(1,p%mg%j(i)) ) = 1.0d0/dx**2.0d0
             else
                 p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dx**2.0d0
             endif
         endif
         
         if(p%mg%j(i)>1)then
-            p%mg%A(i, p%mg%node(p%mg%i(i),p%mg%j(i)-1,p%mg%k(i)) ) = 1.0d0/dy**2.0d0
+            p%mg%A(i, p%mg%node(p%mg%i(i),p%mg%j(i)-1) ) = 1.0d0/dy**2.0d0
         else
             if(p%glb%yper)then
-                p%mg%A(i, p%mg%node(p%mg%i(i),jmax,p%mg%k(i)) ) = 1.0d0/dy**2.0d0
+                p%mg%A(i, p%mg%node(p%mg%i(i),jmax) ) = 1.0d0/dy**2.0d0
             else
                 p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dy**2.0d0
             endif
         endif
         
         if(p%mg%j(i)<p%mg%ny)then
-            p%mg%A(i, p%mg%node(p%mg%i(i),p%mg%j(i)+1,p%mg%k(i)) ) = 1.0d0/dy**2.0d0
+            p%mg%A(i, p%mg%node(p%mg%i(i),p%mg%j(i)+1) ) = 1.0d0/dy**2.0d0
         else
             if(p%glb%yper)then
-                p%mg%A(i, p%mg%node(p%mg%i(i),1,p%mg%k(i)) ) = 1.0d0/dy**2.0d0
+                p%mg%A(i, p%mg%node(p%mg%i(i),1) ) = 1.0d0/dy**2.0d0
             else
                 p%mg%A(i,i) = p%mg%A(i,i) + 1.0d0/dy**2.0d0
             endif
@@ -107,8 +107,8 @@ real(8) :: dx,dy
 subroutine manager_mg_solve_exact(p,show)
 implicit none
 class(manager) :: p
-integer :: i,j,k,id,level
-integer :: ii,jj,kk,ind,info
+integer :: i,j,id,level
+integer :: ii,jj,ind,info
 real(8) :: error, tmp
 logical :: show
 
@@ -119,8 +119,7 @@ do i = 1, p%mg%n
     ind = i - id*p%of(0)%loc%mg(level)%n
     ii = p%of(id)%loc%mg(level)%i(ind)
     jj = p%of(id)%loc%mg(level)%j(ind)
-    kk = p%of(id)%loc%mg(level)%k(ind)
-    p%mg%B(i) = p%of(id)%loc%mg(level)%src(ii,jj,kk)
+    p%mg%B(i) = p%of(id)%loc%mg(level)%src(ii,jj)
 enddo
 
 do i = 1, p%mg%n
@@ -137,8 +136,7 @@ do i = 1, p%mg%n
     ind = i - id*p%of(0)%loc%mg(level)%n
     ii = p%of(id)%loc%mg(level)%i(ind)
     jj = p%of(id)%loc%mg(level)%j(ind)
-    kk = p%of(id)%loc%mg(level)%k(ind)
-    p%of(id)%loc%mg(level)%sol(ii,jj,kk) = p%mg%B(i) 
+    p%of(id)%loc%mg(level)%sol(ii,jj) = p%mg%B(i) 
 enddo
 
 call p%mg_find_error(show)
@@ -147,8 +145,8 @@ end subroutine
 
 subroutine manager_mg_find_error(p,show)
 class(manager) :: p
-integer :: i,j,k,id,level
-integer :: ii,jj,kk,ind,info
+integer :: i,j,id,level
+integer :: ii,jj,ind,info
 real(8) :: error, tmp
 logical :: show
 
@@ -159,8 +157,7 @@ do i = 1, p%mg%n
     ind = i - id*p%of(0)%loc%mg(level)%n
     ii = p%of(id)%loc%mg(level)%i(ind)
     jj = p%of(id)%loc%mg(level)%j(ind)
-    kk = p%of(id)%loc%mg(level)%k(ind)
-    p%mg%sol(i) = p%of(id)%loc%mg(level)%sol(ii,jj,kk)
+    p%mg%sol(i) = p%of(id)%loc%mg(level)%sol(ii,jj)
 enddo
 
 error=0.0d0
@@ -169,8 +166,7 @@ do i = 1, p%mg%n
     ind = i - id*p%of(0)%loc%mg(level)%n
     ii = p%of(id)%loc%mg(level)%i(ind)
     jj = p%of(id)%loc%mg(level)%j(ind)
-    kk = p%of(id)%loc%mg(level)%k(ind) 
-    tmp= p%of(id)%loc%mg(level)%src(ii,jj,kk)
+    tmp= p%of(id)%loc%mg(level)%src(ii,jj)
     do j = 1, p%mg%n
         tmp = tmp - p%mg%A(i,j)*p%mg%sol(j)
     enddo
@@ -186,8 +182,8 @@ end subroutine
 subroutine manager_mg_solve_correct(p)
 implicit none
 class(manager) :: p
-integer :: i,j,k,id,level
-integer :: ii,jj,kk,ind,info
+integer :: i,j,id,level
+integer :: ii,jj,ind,info
 
 level = p%glb%level
 
@@ -205,8 +201,7 @@ do i = 1, p%mg%n
     ind = i - id*p%of(0)%loc%mg(level)%n
     ii = p%of(id)%loc%mg(level)%i(ind)
     jj = p%of(id)%loc%mg(level)%j(ind)
-    kk = p%of(id)%loc%mg(level)%k(ind)
-    p%of(id)%loc%mg(level)%sol(ii,jj,kk) = p%of(id)%loc%mg(level)%sol(ii,jj,kk) + p%mg%error(i) 
+    p%of(id)%loc%mg(level)%sol(ii,jj) = p%of(id)%loc%mg(level)%sol(ii,jj) + p%mg%error(i) 
 enddo
 
 end subroutine

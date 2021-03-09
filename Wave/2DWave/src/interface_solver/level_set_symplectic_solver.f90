@@ -2,7 +2,7 @@ subroutine level_set_symplectic_solver()
 use all
 !$ use omp_lib
 implicit none
-integer :: i,j,k,id,iter
+integer :: i,j,id,iter
 integer(8) :: cpustart, cpuend
 real(8) :: err,perr
 
@@ -42,16 +42,15 @@ real(8) :: err,perr
         
     end do
     
-    !$omp parallel do private(i,j,k)
+    !$omp parallel do private(i,j)
     do id = 0, p%glb%threads-1
         
-        call p%of(id)%loc%tdata%final_srk4()
+        call p%of(id)%loc%tdata%final_srk6()
+        !call p%of(id)%loc%tdata%final_srk4()
         
-        do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
         do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
         do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
-            p%of(id)%loc%phi%now(i,j,k) = p%of(id)%loc%tdata%x%target(i,j,k)
-        end do
+            p%of(id)%loc%phi%now(i,j) = p%of(id)%loc%tdata%x%target(i,j)
         end do
         end do
         
@@ -72,10 +71,10 @@ subroutine level_set_source(btn)
 use all 
 !$ use omp_lib
 implicit none
-integer :: i,j,k,id
+integer :: i,j,id
 logical :: btn
 
-    !$omp parallel do private(i,j,k)
+    !$omp parallel do private(i,j)
     do id = 0, p%glb%threads-1
         
         call p%of(id)%bc(0,p%of(id)%loc%tdata%x%s1)
@@ -87,88 +86,53 @@ logical :: btn
     
     call pt%tdatax%sync
     
-    !$omp parallel do private(i,j,k)
+    !$omp parallel do private(i,j)
     do id = 0, p%glb%threads-1
         
         ! calculate x derivatives
-        do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
         do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
         
             call p%of(id)%loc%ccdsolvers%x%solve("srkccd",&
-                &p%of(id)%loc%tdata%x%s1(:,j,k),p%of(id)%loc%tdata%x%ss1(:,j,k),p%of(id)%loc%nvel%x%tmp(:,j,k),p%of(id)%loc%nvel%x%old(:,j,k))
+                &p%of(id)%loc%tdata%x%s1(:,j),p%of(id)%loc%tdata%x%ss1(:,j),p%of(id)%loc%nvel%x%tmp(:,j),p%of(id)%loc%nvel%x%old(:,j))
                                         
             call p%of(id)%loc%ccdsolvers%x%solve("srkccd",&
-                &p%of(id)%loc%tdata%x%s2(:,j,k),p%of(id)%loc%tdata%x%ss2(:,j,k),p%of(id)%loc%nvel%x%tmp(:,j,k),p%of(id)%loc%nvel%x%old(:,j,k))
+                &p%of(id)%loc%tdata%x%s2(:,j),p%of(id)%loc%tdata%x%ss2(:,j),p%of(id)%loc%nvel%x%tmp(:,j),p%of(id)%loc%nvel%x%old(:,j))
                                         
             call p%of(id)%loc%ccdsolvers%x%solve("srkccd",&
-               &p%of(id)%loc%tdata%x%s3(:,j,k),p%of(id)%loc%tdata%x%ss3(:,j,k),p%of(id)%loc%nvel%x%tmp(:,j,k),p%of(id)%loc%nvel%x%old(:,j,k))
+               &p%of(id)%loc%tdata%x%s3(:,j),p%of(id)%loc%tdata%x%ss3(:,j),p%of(id)%loc%nvel%x%tmp(:,j),p%of(id)%loc%nvel%x%old(:,j))
             
         end do
-        end do
         
-        do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
         do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
         do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
             
-            p%of(id)%loc%tdata%x%l1(i,j,k) = - p%of(id)%loc%tdata%x%ss1(i,j,k) * p%of(id)%loc%nvel%x%old(i,j,k)
-            p%of(id)%loc%tdata%x%l2(i,j,k) = - p%of(id)%loc%tdata%x%ss2(i,j,k) * p%of(id)%loc%nvel%x%old(i,j,k)
-            p%of(id)%loc%tdata%x%l3(i,j,k) = - p%of(id)%loc%tdata%x%ss3(i,j,k) * p%of(id)%loc%nvel%x%old(i,j,k)
+            p%of(id)%loc%tdata%x%l1(i,j) = - p%of(id)%loc%tdata%x%ss1(i,j) * p%of(id)%loc%nvel%x%old(i,j)
+            p%of(id)%loc%tdata%x%l2(i,j) = - p%of(id)%loc%tdata%x%ss2(i,j) * p%of(id)%loc%nvel%x%old(i,j)
+            p%of(id)%loc%tdata%x%l3(i,j) = - p%of(id)%loc%tdata%x%ss3(i,j) * p%of(id)%loc%nvel%x%old(i,j)
             
-        end do
         end do
         end do
         
         ! calculate y derivatives
-        do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
         do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
             
             call p%of(id)%loc%ccdsolvers%y%solve("srkccd",&
-                &p%of(id)%loc%tdata%x%s1(i,:,k),p%of(id)%loc%tdata%x%ss1(i,:,k),p%of(id)%loc%nvel%y%tmp(i,:,k),p%of(id)%loc%nvel%y%old(i,:,k))
+                &p%of(id)%loc%tdata%x%s1(i,:),p%of(id)%loc%tdata%x%ss1(i,:),p%of(id)%loc%nvel%y%tmp(i,:),p%of(id)%loc%nvel%y%old(i,:))
                                         
             call p%of(id)%loc%ccdsolvers%y%solve("srkccd",&
-                &p%of(id)%loc%tdata%x%s2(i,:,k),p%of(id)%loc%tdata%x%ss2(i,:,k),p%of(id)%loc%nvel%y%tmp(i,:,k),p%of(id)%loc%nvel%y%old(i,:,k))
+                &p%of(id)%loc%tdata%x%s2(i,:),p%of(id)%loc%tdata%x%ss2(i,:),p%of(id)%loc%nvel%y%tmp(i,:),p%of(id)%loc%nvel%y%old(i,:))
                                         
             call p%of(id)%loc%ccdsolvers%y%solve("srkccd",&
-               &p%of(id)%loc%tdata%x%s3(i,:,k),p%of(id)%loc%tdata%x%ss3(i,:,k),p%of(id)%loc%nvel%y%tmp(i,:,k),p%of(id)%loc%nvel%y%old(i,:,k))
-        end do
+               &p%of(id)%loc%tdata%x%s3(i,:),p%of(id)%loc%tdata%x%ss3(i,:),p%of(id)%loc%nvel%y%tmp(i,:),p%of(id)%loc%nvel%y%old(i,:))
         end do
         
-        do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
         do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
         do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
         
-            p%of(id)%loc%tdata%x%l1(i,j,k) = p%of(id)%loc%tdata%x%l1(i,j,k) - p%of(id)%loc%tdata%x%ss1(i,j,k) * p%of(id)%loc%nvel%y%old(i,j,k)
-            p%of(id)%loc%tdata%x%l2(i,j,k) = p%of(id)%loc%tdata%x%l2(i,j,k) - p%of(id)%loc%tdata%x%ss2(i,j,k) * p%of(id)%loc%nvel%y%old(i,j,k)
-            p%of(id)%loc%tdata%x%l3(i,j,k) = p%of(id)%loc%tdata%x%l3(i,j,k) - p%of(id)%loc%tdata%x%ss3(i,j,k) * p%of(id)%loc%nvel%y%old(i,j,k)
+            p%of(id)%loc%tdata%x%l1(i,j) = p%of(id)%loc%tdata%x%l1(i,j) - p%of(id)%loc%tdata%x%ss1(i,j) * p%of(id)%loc%nvel%y%old(i,j)
+            p%of(id)%loc%tdata%x%l2(i,j) = p%of(id)%loc%tdata%x%l2(i,j) - p%of(id)%loc%tdata%x%ss2(i,j) * p%of(id)%loc%nvel%y%old(i,j)
+            p%of(id)%loc%tdata%x%l3(i,j) = p%of(id)%loc%tdata%x%l3(i,j) - p%of(id)%loc%tdata%x%ss3(i,j) * p%of(id)%loc%nvel%y%old(i,j)
             
-        end do
-        end do
-        end do
-
-        ! calculate z derivatives
-        do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
-        do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
-            
-            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",&
-                    &p%of(id)%loc%tdata%x%s1(i,j,:),p%of(id)%loc%tdata%x%ss1(i,j,:),p%of(id)%loc%nvel%z%tmp(i,j,:),p%of(id)%loc%nvel%z%old(i,j,:))
-
-            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",&
-                    &p%of(id)%loc%tdata%x%s2(i,j,:),p%of(id)%loc%tdata%x%ss2(i,j,:),p%of(id)%loc%nvel%z%tmp(i,j,:),p%of(id)%loc%nvel%z%old(i,j,:))
-
-            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",&
-                   &p%of(id)%loc%tdata%x%s3(i,j,:),p%of(id)%loc%tdata%x%ss3(i,j,:),p%of(id)%loc%nvel%z%tmp(i,j,:),p%of(id)%loc%nvel%z%old(i,j,:))
-        end do
-        end do
-        
-        do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
-        do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
-        do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
-        
-            p%of(id)%loc%tdata%x%l1(i,j,k) = p%of(id)%loc%tdata%x%l1(i,j,k) - p%of(id)%loc%tdata%x%ss1(i,j,k) * p%of(id)%loc%nvel%z%old(i,j,k)
-            p%of(id)%loc%tdata%x%l2(i,j,k) = p%of(id)%loc%tdata%x%l2(i,j,k) - p%of(id)%loc%tdata%x%ss2(i,j,k) * p%of(id)%loc%nvel%z%old(i,j,k)
-            p%of(id)%loc%tdata%x%l3(i,j,k) = p%of(id)%loc%tdata%x%l3(i,j,k) - p%of(id)%loc%tdata%x%ss3(i,j,k) * p%of(id)%loc%nvel%z%old(i,j,k)
-            
-        end do
         end do
         end do
     

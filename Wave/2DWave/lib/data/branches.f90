@@ -64,8 +64,6 @@ procedure bc => job_bc
 procedure velbc => job_vel_bc
 procedure nvelbc => job_nvel_bc
 procedure find_stag_vel => job_find_stag_vel
-procedure find_tensor => job_find_tensor
-procedure find_gradient => job_find_gradient
 end type job
 
 contains
@@ -240,6 +238,8 @@ do i = p%loc%is, p%loc%ie
 
 end do
 end do
+
+end subroutine
 
 end module branches
 

@@ -32,7 +32,7 @@ procedure solve => root_solve
 end type ccd_root
 
 type ccd_manager
-type(ccd_root) :: x,y,z
+type(ccd_root) :: x,y
 contains
 procedure init => ccd_manager_init
 end type ccd_manager
@@ -397,15 +397,14 @@ call p%uccd%decom(.true.)
 
 end subroutine
 
-subroutine ccd_manager_init(p,is,ie,js,je,ks,ke,dx,dy,dz,dt)
+subroutine ccd_manager_init(p,is,ie,js,je,dx,dy,dt)
 implicit none
 class(ccd_manager) :: p
-integer :: is,ie,js,je,ks,ke
-real(8) :: dx,dy,dz,dt
+integer :: is,ie,js,je
+real(8) :: dx,dy,dt
 
 call p%x%init(is,ie,dx,dt)
-call p%y%init(is,ie,dx,dt)
-call p%z%init(is,ie,dx,dt)
+call p%y%init(js,je,dx,dt)
 
 end subroutine
 
@@ -451,7 +450,7 @@ select case (trim(type))
             fxx(i) = 0.5d0*( p%srkccd%ssu(i)+p%srkccd%ssd(i) )
         enddo
     case default
-        stop "Something wrong when call CCD-type solvers"
+        stop "Something wrong when calling CCD-type solvers"
 end select
 
 end subroutine
