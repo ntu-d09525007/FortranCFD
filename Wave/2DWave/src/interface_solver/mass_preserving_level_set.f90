@@ -19,11 +19,11 @@ do iter = 1, 3
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
         
-            p%of(id)%loc%grad%now(i,j,k) = dsqrt( p%of(id)%loc%normals%x%now(i,j,k)**2.0_8 + &
-                                                & p%of(id)%loc%normals%y%now(i,j,k)**2.0_8 )
+            p%of(id)%loc%grad%now(i,j) = dsqrt( p%of(id)%loc%normals%x%now(i,j)**2.0_8 + &
+                                                & p%of(id)%loc%normals%y%now(i,j)**2.0_8 )
             
-            plam =  p%of(id)%loc%delta%now(i,j,k)**2.0_8 * p%of(id)%loc%grad%now(i,j,k) 
-            plam = plam * ( 2.0_8*(1.0_8-p%glb%rho_12)*p%of(id)%loc%heavy%now(i,j,k) + p%glb%rho_12 ) * p%glb%dx * p%glb%dy
+            plam =  p%of(id)%loc%delta%now(i,j)**2.0_8 * p%of(id)%loc%grad%now(i,j) 
+            plam = plam * ( 2.0_8*(1.0_8-p%glb%rho_12)*p%of(id)%loc%heavy%now(i,j) + p%glb%rho_12 ) * p%glb%dx * p%glb%dy
             
             lam = lam + plam
             
@@ -41,7 +41,7 @@ do iter = 1, 3
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
         
-            p%of(id)%loc%phi%now(i,j,k) = p%of(id)%loc%phi%now(i,j,k) + lam * p%of(id)%loc%delta%now(i,j,k) * p%of(id)%loc%grad%now(i,j,k)
+            p%of(id)%loc%phi%now(i,j) = p%of(id)%loc%phi%now(i,j) + lam * p%of(id)%loc%delta%now(i,j) * p%of(id)%loc%grad%now(i,j)
             
         end do
         end do

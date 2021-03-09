@@ -404,8 +404,8 @@ integer :: is,ie,js,je,ks,ke
 real(8) :: dx,dy,dz,dt
 
 call p%x%init(is,ie,dx,dt)
-call p%y%init(is,ie,dx,dt)
-call p%z%init(is,ie,dx,dt)
+call p%y%init(js,je,dx,dt)
+call p%z%init(ks,ke,dx,dt)
 
 end subroutine
 

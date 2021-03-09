@@ -2,10 +2,9 @@ subroutine problem_init()
 use all
 !$ use omp_lib
 implicit none
-integer :: id, i, j, k, ug, ii,jj,kk
-real(8) :: x, y, z, err
+integer :: id,i,j,ug,ii,jj
+real(8) :: x,y,err
 CHARACTER(100) :: NAME_OF_FILE
-real(8) :: kx, kz
     
     NAME_OF_FILE="default.txt"
     
@@ -26,30 +25,24 @@ real(8) :: kx, kz
     call p%show
     
     ug=30
-    !$omp parallel do private(i,j,k,ii,jj,kk,x,y,z,kx)
+    !$omp parallel do private(i,j,ii,jj,x,y)
     do id = 0, p%glb%threads-1
         
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
         
-            x = p%glb%x(i,j,k)
-            y = p%glb%y(i,j,k)
-            z = p%glb%z(i,j,k)
-
-            kx = p%wa%k * x
+            x = p%glb%x(i,j)
+            y = p%glb%y(i,j)
             
-            if( z < p%wa%L * dcos(kx) )then
-                p%of(id)%loc%phi%now(i,j,k) = 1.0d0
+            if( x<=1.0d0 .and. y<=1.0d0 )then
+                p%of(id)%loc%phi%now(i,j) = 1.0d0
             else
-                p%of(id)%loc%phi%now(i,j,k) = -1.0d0
+                p%of(id)%loc%phi%now(i,j) = -1.0d0
             endif
             
-            p%of(id)%loc%vel%x%now(i,j,k) = 0.0_8
-            p%of(id)%loc%vel%y%now(i,j,k) = 0.0_8
-            p%of(id)%loc%vel%z%now(i,j,k) = 0.0_8
-            
-        end do
+            p%of(id)%loc%vel%x%now(i,j) = 0.0_8
+            p%of(id)%loc%vel%y%now(i,j) = 0.0_8
+
         end do
         end do
         
@@ -58,7 +51,7 @@ real(8) :: kx, kz
 
         call p%of(id)%bc(0,p%of(id)%loc%vel%x%now)
         call p%of(id)%bc(0,p%of(id)%loc%vel%y%now)
-        call p%of(id)%bc(0,p%of(id)%loc%vel%z%now)
+
     enddo
     !$omp end parallel do
 
@@ -67,34 +60,6 @@ real(8) :: kx, kz
     call pt%vof%sync
 
     call level_set_rk3_redis(0)
-
-    !$omp parallel do private(i,j,k,x,y,z,kx,kz)
-    do id = 0, p%glb%threads-1
-
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
-        do j = p%of(id)%loc%js, p%of(id)%loc%je
-        do i = p%of(id)%loc%is, p%of(id)%loc%ie 
-
-            x = p%glb%x(i,j,k)
-            y = p%glb%y(i,j,k)
-            z = p%glb%z(i,j,k)
-
-            kx = p%wa%k * x
-            kz = p%wa%k * z
-
-            if( p%of(id)%loc%phi%now(i,j,k) > 0.0d0 )then
-                p%of(id)%loc%vel%x%now(i,j,k) = p%wa%U * dexp(kz) * dcos(kx)
-                p%of(id)%loc%vel%y%now(i,j,k) = 0.0d0
-                p%of(id)%loc%vel%z%now(i,j,k) = p%wa%U * dexp(kz) * dsin(kx)
-            endif
-
-        enddo
-        enddo
-        enddo
-
-    enddo
-    !$omp end parallel do
-    call pt%vel%sync
 
     call p%node_vel
     call pt%nvel%sync
@@ -128,6 +93,5 @@ real(8) :: kx, kz
 
     p%glb%iter = 0
     p%glb%time = 0.0d0
-
         
 end subroutine

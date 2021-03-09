@@ -37,7 +37,6 @@ do
         call print_LS_info
         call print_CPU_info
         call find_momentum
-        call Stokes_wave_error
         write(*,*)"========================================="
     endif
     call output

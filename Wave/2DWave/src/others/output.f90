@@ -1,43 +1,10 @@
 subroutine output()
 use all
 implicit none
-integer :: i,j,k,id
-real(8) :: damfront, damh
+integer :: id
+
     ! level set method, loss of volume/mass in percentage
     write(p%fil%ls_mv,*)p%glb%time,100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass,100.0d0*(p%glb%ivol-p%glb%vol)/p%glb%ivol
-
-    damfront = 0.0d0; damh=0.0d0
-    !$omp parallel do private(i,j,k), reduction(max:damfront,damh)
-    do id = 0, p%glb%threads-1
-        
-        if( p%of(id)%loc%idz==0 )then
-            k=1
-            do j = p%of(id)%loc%js, p%of(id)%loc%je
-            do i = p%of(id)%loc%is, p%of(id)%loc%ie
-                if( p%of(id)%loc%phi%now(i,j,k)*p%of(id)%loc%phi%now(i+1,j,k) < 0.0d0 )then
-                    damfront = max( damfront, p%glb%x(i,j,k) + &
-                        p%glb%dx*abs(p%of(id)%loc%phi%now(i,j,k))/( abs(p%of(id)%loc%phi%now(i,j,k))+abs(p%of(id)%loc%phi%now(i+1,j,k))) )
-                endif
-            enddo
-            enddo   
-        endif
-
-        if( p%of(id)%loc%idx==0 )then
-            i=1
-            do k = p%of(id)%loc%ks, p%of(id)%loc%ke
-            do j = p%of(id)%loc%js, p%of(id)%loc%je
-                if( p%of(id)%loc%phi%now(i,j,k)*p%of(id)%loc%phi%now(i,j,k+1) < 0.0d0 )then
-                    damh = max( damh, p%glb%z(i,j,k) + &
-                        p%glb%dz*abs(p%of(id)%loc%phi%now(i,j,k))/( abs(p%of(id)%loc%phi%now(i,j,k))+abs(p%of(id)%loc%phi%now(i,j,k+1))) )
-                endif
-            enddo
-            enddo
-        endif
-
-    enddo
-    !$omp end parallel do 
-
-    write(p%fil%damdata, *)p%glb%time, damfront, damh
 
 end subroutine
 
@@ -79,4 +46,5 @@ real(8) :: total, totald
                                                 &,100.0d0*p%glb%ppe/total,100.0d0*(p%glb%ns-p%glb%ppe)/total
         write(*,*)''
         write(*,'(A18,F17.2,"%")')"Data Sync:",totald/total*100.0d0
+        
 end subroutine

@@ -2,38 +2,29 @@ subroutine multigrid_relax(level,num)
 use all
 implicit none
 integer :: relax_iter, num, id, level
-integer :: i,j,k
-real(8) :: dx,dy,dz,a
+integer :: i,j
+real(8) :: dx,dy,a
 
 dx = p%of(0)%loc%mg(level)%dx
 dy = p%of(0)%loc%mg(level)%dy
-dz = p%of(0)%loc%mg(level)%dz
 
-a = -2.0d0/dx**2.0d0 -2.0d0/dy**2.0d0 -2.0d0/dz**2.0d0
-!a = -2.0d0/dx**2.0d0 -2.0d0/dy**2.0d0
+a = -2.0d0/dx**2.0d0 -2.0d0/dy**2.0d0 
 
 do relax_iter = 1, num
 
     call pt%mg%sync(level) 
         
-    !$omp parallel do private(i,j,k)
+    !$omp parallel do private(i,j)
     do id = 0, p%glb%threads-1      
         
-        do k = 1, p%of(id)%loc%mg(level)%nz
         do j = 1, p%of(id)%loc%mg(level)%ny
         do i = 1, p%of(id)%loc%mg(level)%nx
-    
-            ! 3D
-            p%of(id)%loc%mg(level)%sol(i,j,k) = ( p%of(id)%loc%mg(level)%src(i,j,k) &
-            & - (p%of(id)%loc%mg(level)%sol(i+1,j,k)+p%of(id)%loc%mg(level)%sol(i-1,j,k))/dx**2.0d0 &
-            & - (p%of(id)%loc%mg(level)%sol(i,j+1,k)+p%of(id)%loc%mg(level)%sol(i,j-1,k))/dy**2.0d0 &
-            & - (p%of(id)%loc%mg(level)%sol(i,j,k+1)+p%of(id)%loc%mg(level)%sol(i,j,k-1))/dz**2.0d0 ) / a
                 
             ! 2D
-            ! p%of(id)%loc%mg(level)%sol(i,j,k) = ( p%of(id)%loc%mg(level)%src(i,j,k) &
-            ! & - (p%of(id)%loc%mg(level)%sol(i+1,j,k)+p%of(id)%loc%mg(level)%sol(i-1,j,k))/dx**2.0d0 &
-            ! & - (p%of(id)%loc%mg(level)%sol(i,j+1,k)+p%of(id)%loc%mg(level)%sol(i,j-1,k))/dy**2.0d0 )/a
-        enddo
+            p%of(id)%loc%mg(level)%sol(i,j) = ( p%of(id)%loc%mg(level)%src(i,j) &
+            & - (p%of(id)%loc%mg(level)%sol(i+1,j)+p%of(id)%loc%mg(level)%sol(i-1,j))/dx**2.0d0 &
+            & - (p%of(id)%loc%mg(level)%sol(i,j+1)+p%of(id)%loc%mg(level)%sol(i,j-1))/dy**2.0d0 )/a
+
         enddo
         enddo
 
@@ -52,33 +43,24 @@ subroutine multigrid_restriction(level)
 use all
 implicit none
 integer :: id,level
-integer :: i,j,k
+integer :: i,j
 
 call multigrid_relax(level,2)
 call multigrid_residual(level,.false.)
 
-!$omp parallel do private(i,j,k)
+!$omp parallel do private(i,j)
 do id = 0, p%glb%threads-1      
     
-    do k = 1, p%of(id)%loc%mg(level+1)%nz
     do j = 1, p%of(id)%loc%mg(level+1)%ny
     do i = 1, p%of(id)%loc%mg(level+1)%nx
-    
-        ! 3D
-        p%of(id)%loc%mg(level+1)%src(i,j,k) = &
-        &( p%of(id)%loc%mg(level)%res(2*i-1,2*j-1,2*k-1)+p%of(id)%loc%mg(level)%res(2*i,2*j-1,2*k-1)+ &
-        &  p%of(id)%loc%mg(level)%res(2*i-1,2*j  ,2*k-1)+p%of(id)%loc%mg(level)%res(2*i,2*j  ,2*k-1)+ &
-        &  p%of(id)%loc%mg(level)%res(2*i-1,2*j-1,2*k)  +p%of(id)%loc%mg(level)%res(2*i,2*j-1,2*k  )+ &
-        &  p%of(id)%loc%mg(level)%res(2*i-1,2*j  ,2*k)  +p%of(id)%loc%mg(level)%res(2*i,2*j  ,2*k  )) / 8.0d0
         
         ! 2D
-        ! p%of(id)%loc%mg(level+1)%src(i,j,k) = &
-         ! &( p%of(id)%loc%mg(level)%res(2*i-1,2*j-1,2*k-1)+p%of(id)%loc%mg(level)%res(2*i,2*j-1,2*k-1)+ &
-         ! &  p%of(id)%loc%mg(level)%res(2*i-1,2*j  ,2*k-1)+p%of(id)%loc%mg(level)%res(2*i,2*j  ,2*k-1)) / 4.0d0
+        p%of(id)%loc%mg(level+1)%src(i,j) = &
+        &( p%of(id)%loc%mg(level)%res(2*i-1,2*j-1)+p%of(id)%loc%mg(level)%res(2*i,2*j-1)+ &
+        &  p%of(id)%loc%mg(level)%res(2*i-1,2*j  )+p%of(id)%loc%mg(level)%res(2*i,2*j  )) / 4.0d0
          
-        p%of(id)%loc%mg(level+1)%sol(i,j,k) = 0.0d0
-        
-    enddo
+        p%of(id)%loc%mg(level+1)%sol(i,j) = 0.0d0
+
     enddo
     enddo
 
@@ -107,48 +89,31 @@ subroutine multigrid_prolongation(level)
 use all 
 implicit none
 integer :: id,level
-integer :: i,j,k
-real(8) :: mx,my,mz
+integer :: i,j
+real(8) :: mx,my
 
 call pt%mg%sync(level+1)
         
-!$omp parallel do private(i,j,k,mx,my,mz)
+!$omp parallel do private(i,j,mx,my)
 do id = 0, p%glb%threads-1
 
-    do k = 1, p%of(id)%loc%mg(level+1)%nz
     do j = 1, p%of(id)%loc%mg(level+1)%ny
     do i = 1, p%of(id)%loc%mg(level+1)%nx
-    
-        ! 3D
-        mx = 0.5d0*( p%of(id)%loc%mg(level+1)%sol(i+1,j,k)-p%of(id)%loc%mg(level+1)%sol(i-1,j,k) )
-        my = 0.5d0*( p%of(id)%loc%mg(level+1)%sol(i,j+1,k)-p%of(id)%loc%mg(level+1)%sol(i,j-1,k) )
-        mz = 0.5d0*( p%of(id)%loc%mg(level+1)%sol(i,j,k+1)-p%of(id)%loc%mg(level+1)%sol(i,j,k-1) )
-        p%of(id)%loc%mg(level)%pol(2*i-1,2*j-1,2*k-1) = p%of(id)%loc%mg(level+1)%sol(i,j,k) - 0.25d0*mx - 0.25d0*my - 0.25d0*mz
-        p%of(id)%loc%mg(level)%pol(2*i-1,2*j  ,2*k-1) = p%of(id)%loc%mg(level+1)%sol(i,j,k) - 0.25d0*mx + 0.25d0*my - 0.25d0*mz
-        p%of(id)%loc%mg(level)%pol(2*i  ,2*j-1,2*k-1) = p%of(id)%loc%mg(level+1)%sol(i,j,k) + 0.25d0*mx - 0.25d0*my - 0.25d0*mz
-        p%of(id)%loc%mg(level)%pol(2*i  ,2*j  ,2*k-1) = p%of(id)%loc%mg(level+1)%sol(i,j,k) + 0.25d0*mx + 0.25d0*my - 0.25d0*mz
-        p%of(id)%loc%mg(level)%pol(2*i-1,2*j-1,2*k)   = p%of(id)%loc%mg(level+1)%sol(i,j,k) - 0.25d0*mx - 0.25d0*my + 0.25d0*mz
-        p%of(id)%loc%mg(level)%pol(2*i-1,2*j  ,2*k)   = p%of(id)%loc%mg(level+1)%sol(i,j,k) - 0.25d0*mx + 0.25d0*my + 0.25d0*mz
-        p%of(id)%loc%mg(level)%pol(2*i  ,2*j-1,2*k)   = p%of(id)%loc%mg(level+1)%sol(i,j,k) + 0.25d0*mx - 0.25d0*my + 0.25d0*mz
-        p%of(id)%loc%mg(level)%pol(2*i  ,2*j  ,2*k)   = p%of(id)%loc%mg(level+1)%sol(i,j,k) + 0.25d0*mx + 0.25d0*my + 0.25d0*mz
 
         ! 2D
-        ! mx = 0.5d0*( p%of(id)%loc%mg(level+1)%sol(i+1,j,k)-p%of(id)%loc%mg(level+1)%sol(i-1,j,k) )
-        ! my = 0.5d0*( p%of(id)%loc%mg(level+1)%sol(i,j+1,k)-p%of(id)%loc%mg(level+1)%sol(i,j-1,k) )        
-        ! p%of(id)%loc%mg(level)%pol(2*i-1,2*j-1,2*k-1) = p%of(id)%loc%mg(level+1)%sol(i,j,k) - 0.25d0*mx - 0.25d0*my 
-        ! p%of(id)%loc%mg(level)%pol(2*i-1,2*j  ,2*k-1) = p%of(id)%loc%mg(level+1)%sol(i,j,k) - 0.25d0*mx + 0.25d0*my 
-        ! p%of(id)%loc%mg(level)%pol(2*i  ,2*j-1,2*k-1) = p%of(id)%loc%mg(level+1)%sol(i,j,k) + 0.25d0*mx - 0.25d0*my 
-        ! p%of(id)%loc%mg(level)%pol(2*i  ,2*j  ,2*k-1) = p%of(id)%loc%mg(level+1)%sol(i,j,k) + 0.25d0*mx + 0.25d0*my 
-        
-    enddo
+        mx = 0.5d0*( p%of(id)%loc%mg(level+1)%sol(i+1,j)-p%of(id)%loc%mg(level+1)%sol(i-1,j) )
+        my = 0.5d0*( p%of(id)%loc%mg(level+1)%sol(i,j+1)-p%of(id)%loc%mg(level+1)%sol(i,j-1) )        
+        p%of(id)%loc%mg(level)%pol(2*i-1,2*j-1) = p%of(id)%loc%mg(level+1)%sol(i,j) - 0.25d0*mx - 0.25d0*my 
+        p%of(id)%loc%mg(level)%pol(2*i-1,2*j  ) = p%of(id)%loc%mg(level+1)%sol(i,j) - 0.25d0*mx + 0.25d0*my 
+        p%of(id)%loc%mg(level)%pol(2*i  ,2*j-1) = p%of(id)%loc%mg(level+1)%sol(i,j) + 0.25d0*mx - 0.25d0*my 
+        p%of(id)%loc%mg(level)%pol(2*i  ,2*j  ) = p%of(id)%loc%mg(level+1)%sol(i,j) + 0.25d0*mx + 0.25d0*my 
+
     enddo
     enddo
 
-    do k = 1, p%of(id)%loc%mg(level)%nz
     do j = 1, p%of(id)%loc%mg(level)%ny
     do i = 1, p%of(id)%loc%mg(level)%nx 
-        p%of(id)%loc%mg(level)%sol(i,j,k) = p%of(id)%loc%mg(level)%sol(i,j,k) + p%of(id)%loc%mg(level)%pol(i,j,k)
-    enddo
+        p%of(id)%loc%mg(level)%sol(i,j) = p%of(id)%loc%mg(level)%sol(i,j) + p%of(id)%loc%mg(level)%pol(i,j)
     enddo
     enddo
 
@@ -162,8 +127,8 @@ end subroutine
 subroutine multigrid_residual(level,reset)
 use all
 implicit none
-integer :: level,id,i,j,k,n
-real(8) :: dx,dy,dz,l2norm
+integer :: level,id,i,j,n
+real(8) :: dx,dy,l2norm
 logical :: reset
 
 call pt%mg%sync(level)
@@ -172,29 +137,22 @@ n = p%glb%threads * p%of(0)%loc%mg(level)%n
 
 dx = p%of(0)%loc%mg(level)%dx
 dy = p%of(0)%loc%mg(level)%dy
-dz = p%of(0)%loc%mg(level)%dz
     
 l2norm = 0.0d0
 
-!$omp parallel do private(i,j,k), reduction(+:l2norm)
+!$omp parallel do private(i,j), reduction(+:l2norm)
 do id = 0, p%glb%threads-1
-    
-    do k = 1, p%of(id)%loc%mg(level)%nz
+
     do j = 1, p%of(id)%loc%mg(level)%ny
     do i = 1, p%of(id)%loc%mg(level)%nx
-        ! 3D
-        p%of(id)%loc%mg(level)%res(i,j,k) = p%of(id)%loc%mg(level)%src(i,j,k) &
-        &   - (p%of(id)%loc%mg(level)%sol(i+1,j,k)-2.0d0*p%of(id)%loc%mg(level)%sol(i,j,k)+p%of(id)%loc%mg(level)%sol(i-1,j,k))/dx**2.0d0 &
-        &   - (p%of(id)%loc%mg(level)%sol(i,j+1,k)-2.0d0*p%of(id)%loc%mg(level)%sol(i,j,k)+p%of(id)%loc%mg(level)%sol(i,j-1,k))/dy**2.0d0 &
-        &   - (p%of(id)%loc%mg(level)%sol(i,j,k+1)-2.0d0*p%of(id)%loc%mg(level)%sol(i,j,k)+p%of(id)%loc%mg(level)%sol(i,j,k-1))/dz**2.0d0
 
         ! 2D
-        ! p%of(id)%loc%mg(level)%res(i,j,k) = p%of(id)%loc%mg(level)%src(i,j,k) &
-        ! &   - (p%of(id)%loc%mg(level)%sol(i+1,j,k)-2.0d0*p%of(id)%loc%mg(level)%sol(i,j,k)+p%of(id)%loc%mg(level)%sol(i-1,j,k))/dx**2.0d0 &
-        ! &   - (p%of(id)%loc%mg(level)%sol(i,j+1,k)-2.0d0*p%of(id)%loc%mg(level)%sol(i,j,k)+p%of(id)%loc%mg(level)%sol(i,j-1,k))/dy**2.0d0
+        p%of(id)%loc%mg(level)%res(i,j) = p%of(id)%loc%mg(level)%src(i,j) &
+        &   - (p%of(id)%loc%mg(level)%sol(i+1,j)-2.0d0*p%of(id)%loc%mg(level)%sol(i,j)+p%of(id)%loc%mg(level)%sol(i-1,j))/dx**2.0d0 &
+        &   - (p%of(id)%loc%mg(level)%sol(i,j+1)-2.0d0*p%of(id)%loc%mg(level)%sol(i,j)+p%of(id)%loc%mg(level)%sol(i,j-1))/dy**2.0d0
                                     
-        L2norm = L2norm + p%of(id)%loc%mg(level)%res(i,j,k)**2.0d0
-    enddo
+        L2norm = L2norm + p%of(id)%loc%mg(level)%res(i,j)**2.0d0
+
     enddo
     enddo
 
@@ -224,21 +182,19 @@ end subroutine
 subroutine multigrid_compatibility_src(level)
 use all
 implicit none
-integer :: id,i,j,k,level
+integer :: id,i,j,level
 integer :: n
 real(8) :: s
 
 n = p%glb%threads * p%of(0)%loc%mg(level)%n
 
 s=0.0d0
-!$omp parallel do private(i,j,k), reduction(+:s)   
+!$omp parallel do private(i,j), reduction(+:s)   
 do id = 0, p%glb%threads-1
     
-    do k = 1, p%of(id)%loc%mg(level)%nz
     do j = 1, p%of(id)%loc%mg(level)%ny
     do i = 1, p%of(id)%loc%mg(level)%nx
-        s = s + p%of(id)%loc%mg(level)%src(i,j,k)
-    enddo
+        s = s + p%of(id)%loc%mg(level)%src(i,j)
     enddo
     enddo
  
@@ -246,16 +202,13 @@ enddo
 !$omp end parallel do
 
 s=s/real(n,8)
-!s=s/(nx*ny)
 
-!$omp parallel do private(i,j,k)
+!$omp parallel do private(i,j)
 do id = 0, p%glb%threads-1
             
-    do k = 1,  p%of(id)%loc%mg(level)%nz
     do j = 1,  p%of(id)%loc%mg(level)%ny
     do i = 1,  p%of(id)%loc%mg(level)%nx    
-        p%of(id)%loc%mg(level)%src(i,j,k) = p%of(id)%loc%mg(level)%src(i,j,k) - s
-    enddo
+        p%of(id)%loc%mg(level)%src(i,j) = p%of(id)%loc%mg(level)%src(i,j) - s
     enddo
     enddo
 
@@ -267,21 +220,19 @@ end subroutine
 subroutine multigrid_compatibility_sol(level)
 use all
 implicit none
-integer :: id,i,j,k,level
+integer :: id,i,j,level
 integer :: n
 real(8) :: s
 
 n = p%glb%threads * p%of(0)%loc%mg(level)%n
 
 s=0.0d0
-!$omp parallel do private(i,j,k), reduction(+:s)   
+!$omp parallel do private(i,j), reduction(+:s)   
 do id = 0, p%glb%threads-1
     
-    do k = 1, p%of(id)%loc%mg(level)%nz
     do j = 1, p%of(id)%loc%mg(level)%ny
     do i = 1, p%of(id)%loc%mg(level)%nx
-        s = s + p%of(id)%loc%mg(level)%sol(i,j,k)
-    enddo
+        s = s + p%of(id)%loc%mg(level)%sol(i,j)
     enddo
     enddo
  
@@ -291,14 +242,12 @@ enddo
 s=s/real(n,kind=8)
 !s=s/(nx*ny)
 
-!$omp parallel do private(i,j,k)
+!$omp parallel do private(i,j)
 do id = 0, p%glb%threads-1
             
-    do k = 1,  p%of(id)%loc%mg(level)%nz
     do j = 1,  p%of(id)%loc%mg(level)%ny
     do i = 1,  p%of(id)%loc%mg(level)%nx    
-        p%of(id)%loc%mg(level)%sol(i,j,k) = p%of(id)%loc%mg(level)%sol(i,j,k) - s
-    enddo
+        p%of(id)%loc%mg(level)%sol(i,j) = p%of(id)%loc%mg(level)%sol(i,j) - s
     enddo
     enddo
 
@@ -368,25 +317,21 @@ end subroutine
 subroutine multigrid_full_cycle_init()
 use all
 implicit none
-integer :: level,i,j,k,id
+integer :: level,i,j,id
 
 do level = 1, p%glb%level-1
-    !$omp parallel do private(i,j,k)
+    !$omp parallel do private(i,j)
     do id = 0, p%glb%threads-1      
-        
-        do k = 1, p%of(id)%loc%mg(level+1)%nz
+
         do j = 1, p%of(id)%loc%mg(level+1)%ny
         do i = 1, p%of(id)%loc%mg(level+1)%nx
         
-            p%of(id)%loc%mg(level+1)%src(i,j,k) = &
-            &( p%of(id)%loc%mg(level)%src(2*i-1,2*j-1,2*k-1)+p%of(id)%loc%mg(level)%src(2*i,2*j-1,2*k-1)+ &
-            &  p%of(id)%loc%mg(level)%src(2*i-1,2*j  ,2*k-1)+p%of(id)%loc%mg(level)%src(2*i,2*j  ,2*k-1)+ &
-            &  p%of(id)%loc%mg(level)%src(2*i-1,2*j-1,2*k)  +p%of(id)%loc%mg(level)%src(2*i,2*j-1,2*k  )+ &
-            &  p%of(id)%loc%mg(level)%src(2*i-1,2*j  ,2*k)  +p%of(id)%loc%mg(level)%src(2*i,2*j  ,2*k  )) / 8.0d0
+            p%of(id)%loc%mg(level+1)%src(i,j) = &
+            &( p%of(id)%loc%mg(level)%src(2*i-1,2*j-1)+p%of(id)%loc%mg(level)%src(2*i,2*j-1)+ &
+            &  p%of(id)%loc%mg(level)%src(2*i-1,2*j  )+p%of(id)%loc%mg(level)%src(2*i,2*j  )) / 4.0d0
              
-            p%of(id)%loc%mg(level+1)%sol(i,j,k) = 0.0d0
-            
-        enddo
+            p%of(id)%loc%mg(level+1)%sol(i,j) = 0.0d0
+
         enddo
         enddo
 
@@ -394,13 +339,11 @@ do level = 1, p%glb%level-1
     !$omp end parallel do
 enddo
 
-!$omp parallel do private(i,j,k)
+!$omp parallel do private(i,j)
 do id = 0, p%glb%threads-1
-    do k = 1, p%of(id)%loc%mg(1)%nz
     do j = 1, p%of(id)%loc%mg(1)%ny
     do i = 1, p%of(id)%loc%mg(1)%nx
-        p%of(id)%loc%mg(1)%sol(i,j,k)=0.0d0
-    enddo
+        p%of(id)%loc%mg(1)%sol(i,j)=0.0d0
     enddo
     enddo
 enddo

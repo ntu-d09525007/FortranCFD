@@ -14,13 +14,13 @@ integer :: id
 !$omp parallel do 
 do id = 0, p%glb%threads-1
 
-    call ns_ab_diff_job_sec(p%of(id),p%of(id)%loc%velsrc%x%tmp,p%of(id)%loc%velsrc%y%tmp,p%of(id)%loc%velsrc%z%tmp,&
-                                     p%of(id)%loc%vel%x%old,p%of(id)%loc%vel%y%old,p%of(id)%loc%vel%z%old, &
+    call ns_ab_diff_job_sec(p%of(id),p%of(id)%loc%velsrc%x%tmp,p%of(id)%loc%velsrc%y%tmp,&
+                                     p%of(id)%loc%vel%x%old,p%of(id)%loc%vel%y%old, &
                                      p%of(id)%loc%phi%old,p%of(id)%loc%normals%curv%old,p%of(id)%loc%delta%old,&
                                      p%of(id)%loc%rho%old,p%of(id)%loc%mu%old,.true.,0.5d0)
 
-    call ns_ab_diff_job_sec(p%of(id),p%of(id)%loc%velsrc%x%tmp,p%of(id)%loc%velsrc%y%tmp,p%of(id)%loc%velsrc%z%tmp,&
-                                     p%of(id)%loc%vel%x%tmp,p%of(id)%loc%vel%y%tmp,p%of(id)%loc%vel%z%tmp, &
+    call ns_ab_diff_job_sec(p%of(id),p%of(id)%loc%velsrc%x%tmp,p%of(id)%loc%velsrc%y%tmp,&
+                                     p%of(id)%loc%vel%x%tmp,p%of(id)%loc%vel%y%tmp, &
                                      p%of(id)%loc%phi%now,p%of(id)%loc%normals%curv%now,p%of(id)%loc%delta%now,&
                                      p%of(id)%loc%rho%now,p%of(id)%loc%mu%now,.false.,0.5d0)
 enddo
@@ -28,121 +28,81 @@ enddo
     
 end subroutine
 
-subroutine ns_ab_diff_job_sec(q,sx,sy,sz,u,v,w,phi,curv,delta,rho,mu,reset,alpha)
+subroutine ns_ab_diff_job_sec(q,sx,sy,u,v,phi,curv,delta,rho,mu,reset,alpha)
 use all
 implicit none
 type(job) :: q
 real(8), dimension(q%loc%is-q%glb%ghc:q%loc%ie+q%glb%ghc,&
-                  &q%loc%js-q%glb%ghc:q%loc%je+q%glb%ghc,&
-                  &q%loc%ks-q%glb%ghc:q%loc%ke+q%glb%ghc) :: sx,sy,sz,u,v,w,phi,curv,delta,rho,mu
-integer :: i,j,k
+                  &q%loc%js-q%glb%ghc:q%loc%je+q%glb%ghc) :: sx,sy,u,v,phi,curv,delta,rho,mu
+integer :: i,j
 logical :: reset
 real(8) :: alpha
 real(8) :: rho_, mu_, delta_, curv_
-real(8) :: xx,yy,zz
-real(8) :: ux,uy,uz,vx,vy,vz,wx,wy,wz
-real(8) :: phix,phiy,phiz
-real(8) :: dif_x, dif_y, dif_z
+real(8) :: xx,yy
+real(8) :: ux,uy,vx,vy
+real(8) :: phix,phiy
+real(8) :: dif_x, dif_y
 
 if(reset)then
 
-    do k = q%loc%ks, q%loc%ke
     do j = q%loc%js, q%loc%je
     do i = q%loc%is, q%loc%ie
-        sx(i,j,k) = 0.0d0
-        sy(i,j,k) = 0.0d0
-        sz(i,j,k) = 0.0d0
-    enddo
+        sx(i,j) = 0.0d0
+        sy(i,j) = 0.0d0
     enddo
     enddo
 
 endif
 
-do k = q%loc%ks, q%loc%ke
 do j = q%loc%js, q%loc%je
 do i = q%loc%is, q%loc%ie
 
-    rho_   = 0.5d0*(  rho(i,j,k)+  rho(i+1,j,k))
-    mu_    = 0.5d0*(   mu(i,j,k)+   mu(i+1,j,k))
-    delta_ = 0.5d0*(delta(i,j,k)+delta(i+1,j,k))
-    curv_  = 0.5d0*( curv(i,j,k)+ curv(i+1,j,k))
+    rho_   = 0.5d0*(  rho(i,j)+  rho(i+1,j))
+    mu_    = 0.5d0*(   mu(i,j)+   mu(i+1,j))
+    delta_ = 0.5d0*(delta(i,j)+delta(i+1,j))
+    curv_  = 0.5d0*( curv(i,j)+ curv(i+1,j))
 
-    xx = (u(i+1,j,k)-2.0d0*u(i,j,k)+u(i-1,j,k))/q%glb%dx**2.0d0
-    yy = (u(i,j+1,k)-2.0d0*u(i,j,k)+u(i,j-1,k))/q%glb%dy**2.0d0
-    zz = (u(i,j,k+1)-2.0d0*u(i,j,k)+u(i,j,k-1))/q%glb%dz**2.0d0
+    xx = (u(i+1,j)-2.0d0*u(i,j)+u(i-1,j))/q%glb%dx**2.0d0
+    yy = (u(i,j+1)-2.0d0*u(i,j)+u(i,j-1))/q%glb%dy**2.0d0
 
-    ux = 0.5d0*(u(i+1,j,k)-u(i-1,j,k))/q%glb%dx
-    uy = 0.5d0*(u(i,j+1,k)-u(i,j-1,k))/q%glb%dy
-    uz = 0.5d0*(u(i,j,k+1)-u(i,j,k-1))/q%glb%dz
+    ux = 0.5d0*(u(i+1,j)-u(i-1,j))/q%glb%dx
+    uy = 0.5d0*(u(i,j+1)-u(i,j-1))/q%glb%dy
 
-    vx = 0.5d0*( v(i+1,j,k)-v(i,j,k)+v(i+1,j-1,k)-v(i,j-1,k) )/q%glb%dx
-    wx = 0.5d0*( w(i+1,j,k)-w(i,j,k)+w(i+1,j,k-1)-w(i,j,k-1) )/q%glb%dx
+    vx = 0.5d0*( v(i+1,j)-v(i,j)+v(i+1,j-1)-v(i,j-1) )/q%glb%dx
 
-    phix = (phi(i+1,j,k)-phi(i,j,k))/q%glb%dx
-    phiy = 0.25d0*(phi(i+1,j+1,k)-phi(i+1,j-1,k)+phi(i,j+1,k)-phi(i,j-1,k))/q%glb%dy
-    phiz = 0.25d0*(phi(i+1,j,k+1)-phi(i+1,j,k-1)+phi(i,j,k+1)-phi(i,j,k-1))/q%glb%dz 
+    phix = (phi(i+1,j)-phi(i,j))/q%glb%dx
+    phiy = 0.25d0*(phi(i+1,j+1)-phi(i+1,j-1)+phi(i,j+1)-phi(i,j-1))/q%glb%dy
 
     dif_x = mu_ / rho_ * xx / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phix * 2.0d0*ux / ( rho_ * q%glb%re)
     dif_y = mu_ / rho_ * yy / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phiy * (uy+vx)  / ( rho_ * q%glb%re)
-    dif_z = mu_ / rho_ * zz / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phiz * (uz+wx)  / ( rho_ * q%glb%re)
 
-    sx(i,j,k) = sx(i,j,k) + alpha * ( dif_x+dif_y+dif_z + q%glb%gx*q%glb%btn_g / q%glb%fr &
+    sx(i,j) = sx(i,j) + alpha * ( dif_x+dif_y + q%glb%gx*q%glb%btn_g / q%glb%fr &
             & - q%glb%btn_sf*curv_*delta_*phix / (q%glb%we*rho_)  )
 
     ! ==========================================================================================
 
-    rho_   = 0.5d0*(  rho(i,j,k)+  rho(i,j+1,k))
-    mu_    = 0.5d0*(   mu(i,j,k)+   mu(i,j+1,k))
-    delta_ = 0.5d0*(delta(i,j,k)+delta(i,j+1,k))
-    curv_  = 0.5d0*( curv(i,j,k)+ curv(i,j+1,k))
+    rho_   = 0.5d0*(  rho(i,j)+  rho(i,j+1))
+    mu_    = 0.5d0*(   mu(i,j)+   mu(i,j+1))
+    delta_ = 0.5d0*(delta(i,j)+delta(i,j+1))
+    curv_  = 0.5d0*( curv(i,j)+ curv(i,j+1))
 
-    xx = (v(i+1,j,k)-2.0d0*v(i,j,k)+v(i-1,j,k))/q%glb%dx**2.0d0
-    yy = (v(i,j+1,k)-2.0d0*v(i,j,k)+v(i,j-1,k))/q%glb%dy**2.0d0
-    zz = (v(i,j,k+1)-2.0d0*v(i,j,k)+v(i,j,k-1))/q%glb%dz**2.0d0
+    xx = (v(i+1,j)-2.0d0*v(i,j)+v(i-1,j))/q%glb%dx**2.0d0
+    yy = (v(i,j+1)-2.0d0*v(i,j)+v(i,j-1))/q%glb%dy**2.0d0
 
-    vx = 0.5d0*(v(i+1,j,k)-v(i-1,j,k))/q%glb%dx
-    vy = 0.5d0*(v(i,j+1,k)-v(i,j-1,k))/q%glb%dy
-    vz = 0.5d0*(v(i,j,k+1)-v(i,j,k-1))/q%glb%dz
+    vx = 0.5d0*(v(i+1,j)-v(i-1,j))/q%glb%dx
+    vy = 0.5d0*(v(i,j+1)-v(i,j-1))/q%glb%dy
 
-    uy = 0.5d0*( u(i,j+1,k)-u(i,j,k)+u(i-1,j+1,k)-u(i-1,j,k) )/q%glb%dy
-    wy = 0.5d0*( w(i,j+1,k)-w(i,j,k)+w(i,j+1,k-1)-w(i,j,k-1) )/q%glb%dy
+    uy = 0.5d0*( u(i,j+1)-u(i,j)+u(i-1,j+1)-u(i-1,j) )/q%glb%dy
 
-    phix = 0.25d0*(phi(i+1,j,k)-phi(i-1,j,k)+phi(i+1,j+1,k)-phi(i-1,j+1,k))/q%glb%dx
-    phiy = ( phi(i,j+1,k)-phi(i,j,k) )/q%glb%dy
-    phiz = 0.25d0*(phi(i,j+1,k+1)-phi(i,j+1,k-1)+phi(i,j,k+1)-phi(i,j,k-1))/q%glb%dz
+    phix = 0.25d0*(phi(i+1,j)-phi(i-1,j)+phi(i+1,j+1)-phi(i-1,j+1))/q%glb%dx
+    phiy = ( phi(i,j+1)-phi(i,j) )/q%glb%dy
 
     dif_x = mu_ / rho_ * xx / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phix*(uy+vx) / ( rho_ * q%glb%re)
     dif_y = mu_ / rho_ * yy / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phiy*2.0d0*vy/ ( rho_ * q%glb%re)
-    dif_z = mu_ / rho_ * zz / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phiz*(wy+vz) / ( rho_ * q%glb%re)
 
-    sy(i,j,k) = sy(i,j,k) + alpha * ( dif_x+dif_y+dif_z + q%glb%gy * q%glb%btn_g / q%glb%fr &
+    sy(i,j) = sy(i,j) + alpha * ( dif_x+dif_y + q%glb%gy * q%glb%btn_g / q%glb%fr &
             & - q%glb%btn_sf * curv_*delta_ * phiy / (q%glb%we*rho_)  )
 
-    ! ==========================================================================================
-
-    rho_   = 0.5d0*(  rho(i,j,k)+  rho(i,j,k+1))
-    mu_    = 0.5d0*(   mu(i,j,k)+   mu(i,j,k+1))
-    delta_ = 0.5d0*(delta(i,j,k)+delta(i,j,k+1))
-    curv_  = 0.5d0*( curv(i,j,k)+ curv(i,j,k+1))
-
-    wx = 0.5d0*( w(i+1,j,k)-w(i-1,j,k) )/q%glb%dx
-    wy = 0.5d0*( w(i,j+1,k)-w(i,j-1,k) )/q%glb%dy
-    wz = 0.5d0*( w(i,j,k+1)-w(i,j,k-1) )/q%glb%dz
-
-    uz = 0.5d0*( u(i,j,k+1)-u(i,j,k)+u(i-1,j,k+1)-u(i-1,j,k) )/q%glb%dz
-    vz = 0.5d0*( v(i,j,k+1)-v(i,j,k)+v(i,j-1,k+1)-v(i,j-1,k) )/q%glb%dz
-
-    phix = 0.25d0*( phi(i+1,j,k+1) - phi(i-1,j,k+1) + phi(i+1,j,k) - phi(i-1,j,k) )/q%glb%dx
-    phiy = 0.25d0*( phi(i,j+1,k+1) - phi(i,j-1,k+1) + phi(i,j+1,k) - phi(i,j-1,k) )/q%glb%dy
-    phiz = ( phi(i,j,k+1) - phi(i,j,k) ) / q%glb%dz
-    
-    dif_x = mu_ / rho_ * xx / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phix * (uz+wx)  / ( rho_ * q%glb%re )
-    dif_y = mu_ / rho_ * yy / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phiy * (vz+wy)  / ( rho_ * q%glb%re )
-    dif_z = mu_ / rho_ * zz / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phiz * 2.0d0*wz / ( rho_ * q%glb%re )
-
-    sz(i,j,k) = sz(i,j,k) + alpha * ( dif_x+dif_y+dif_z + q%glb%gz * q%glb%btn_g / q%glb%fr &
-            & - q%glb%btn_sf * curv_ * delta_ * phiz / (q%glb%we*rho_)  )
-enddo
 enddo
 enddo
 
