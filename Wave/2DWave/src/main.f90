@@ -10,8 +10,6 @@ end module all
 program main
 use all
 implicit none
-integer :: iter,id,i,j,k
-real(8) :: norm, norm2
 
 call problem_init
 
@@ -37,6 +35,7 @@ do
         call print_LS_info
         call print_CPU_info
         call find_momentum
+        call Stokes_wave_error
         write(*,*)"========================================="
     endif
     call output
