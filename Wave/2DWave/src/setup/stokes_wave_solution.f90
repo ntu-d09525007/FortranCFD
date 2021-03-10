@@ -26,7 +26,7 @@ do id = 0, p%glb%threads-1
         u = p%wa%U * dexp(ky) * dcos(kx-wt+p%wa%k*p%glb%dx*0.5d0)
         v = p%wa%U * dexp(ky) * dsin(kx-wt)
 
-        if( p%of(id)%loc%phi%now(i,j) > 0.0d0 )then
+        if( p%of(id)%loc%phi%now(i,j) > 0.0d0 .and. y<0.0d0 )then
             xnorm2 = xnorm2 + (p%of(id)%loc%vel%x%now(i,j)-u)**2.0d0
             ynorm2 = ynorm2 + (p%of(id)%loc%vel%y%now(i,j)-v)**2.0d0
 

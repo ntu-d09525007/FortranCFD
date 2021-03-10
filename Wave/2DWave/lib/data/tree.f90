@@ -4,7 +4,7 @@ use branches
 implicit none
 
 type wave
-real(8) :: phase_speed, wavelength, amplitude
+real(8) :: phase_speed, wavelength, steepness
 real(8) :: k, w
 real(8) :: L, U
 end type wave
@@ -79,7 +79,7 @@ integer :: id, level
     write(*,*)" --- Wave Property --- "
     write(*,'(A20,F15.8)')"Wavenumber:",p%wa%k
     write(*,'(A20,F15.8)')"Wave frequency:",p%wa%w
-    write(*,'(A20,F15.8)')"Wave amplitude:",p%wa%L
+    write(*,'(A20,F15.8)')"Wave steepness:",p%wa%steepness
     write(*,'(A20,F15.8)')"Wave ref. velocity:",p%wa%U
     
     ! write(*,*)" --- SubDomain Information  --- "
@@ -163,7 +163,7 @@ integer :: x,y
  read(526,*)
  read(526,*)x,y
  read(526,*)
- read(526,*)p%wa%phase_speed, p%wa%wavelength, p%wa%amplitude
+ read(526,*)p%wa%phase_speed, p%wa%wavelength, p%wa%steepness
  close(unit=526)
 
  if( x==1 )then
@@ -224,6 +224,13 @@ real(8) :: mag
     
     write(*,*)"finish allocating private grids"
     
+    if(p%glb%how_to_paras==6)then
+        p%glb%xend   = p%glb%xend   * 2.0d0 * dacos(-1.0d0)
+        p%glb%xstart = p%glb%xstart * 2.0d0 * dacos(-1.0d0)
+        p%glb%yend   = p%glb%yend   * 2.0d0 * dacos(-1.0d0)
+        p%glb%ystart = p%glb%ystart * 2.0d0 * dacos(-1.0d0)
+    endif
+
     p%glb%dx = ( p%glb%xend - p%glb%xstart ) / p%glb%node_x
     p%glb%dy = ( p%glb%yend - p%glb%ystart ) / p%glb%node_y
   
@@ -269,6 +276,15 @@ real(8) :: mag
             p%glb%U = p%glb%L / p%glb%T
         case (5) ! U+T
             p%glb%L = p%glb%U * p%glb%T
+        case (6) ! Wave study
+            p%glb%L = p%wa%wavelength / (2.0d0*dacos(-1.0d0))
+            p%glb%U = dsqrt( p%glb%L * p%glb%g )
+            p%glb%T = p%glb%L / p%glb%U
+            !-------------------------------
+            p%wa%k = 1.0d0
+            p%wa%w = p%wa%phase_speed / p%glb%U * p%wa%k
+            p%wa%L = p%wa%steepness
+            p%wa%U = p%wa%L * p%wa%w
         case default
             write(*,*)"Error >> Wrong parameter selector "
             stop
@@ -324,12 +340,6 @@ real(8) :: mag
         call p%mg_setup
         write(*,*)"finish initializing multigrid exact solver"
     endif
-
-    ! ----- Wave papmeters setup --------
-    p%wa%k = 2.0d0 * dacos(-1.0d0) * p%glb%L / p%wa%wavelength
-    p%wa%w = p%wa%phase_speed / p%glb%U * p%wa%k
-    p%wa%L = p%wa%amplitude / p%glb%L 
-    p%wa%U = p%wa%L * p%wa%w
     
 end subroutine
 

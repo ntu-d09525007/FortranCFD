@@ -3,7 +3,7 @@ ooo	Method to capture interface ( LS / MPLS / CLSVOF )
 ooo	Name of the problem 
 64_Wave
 ooo	Dimension of threads grid in X, Y direction
-16	13
+2	2
 ooo	Multigrid level
 6
 ooo	Cells per unit length 
@@ -11,21 +11,21 @@ ooo	Cells per unit length
 ooo	Number of ghost cell
 3
 ooo	Range of domain in X direction
--8.0	8.0
+-1.0	1.0
 ooo	Range of domain in Y direction
--5.0	8.0
+-1.0	1.0
 ooo	Time to stop / plot
-5.0	0.1
+10.0	0.1
 ooo	Crount number ( advection / redistance )
-0.01	0.5
+0.002	0.5
 ooo	PPE iteration ( tolerance / w1 / w2 / valve )
 8.0	0.5	0.5	4.0
 ooo	SRK6 iteration ( tolerance / w )
 10.0	0.5	
 ooo	Level set interface width 
 1.5
-ooo	Problem parameters ( Prescribed / L / L+U / L+T / U+T )
-3
+ooo	Problem parameters ( Prescribed / L / L+U / L+T / U+T / Wave-Study )
+6
 ooo	Density / Viscosity of fluid 1 ( phi > 0 )
 998.0		0.00114
 ooo	Density / Viscosity of fluid 2 ( phi < 0 )
@@ -48,5 +48,5 @@ ooo	Velocity boundary condition in Y direction ( no-slip / slip / non-reflective
 1	1
 ooo	Periodic ( X, Y )
 1	0	
-ooo	Phase speed  / Wave length / Wave Amplitude
-2.0	4.0	0.02
+ooo	Phase speed  / Wave length / Wave Steepness
+0.395	0.1	0.3

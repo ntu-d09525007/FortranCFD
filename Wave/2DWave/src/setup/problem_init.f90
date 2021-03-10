@@ -77,8 +77,13 @@ CHARACTER(100) :: NAME_OF_FILE
             ky = p%wa%k * y
 
             if( p%of(id)%loc%phi%now(i,j) > 0.0d0 )then
-                p%of(id)%loc%vel%x%now(i,j) = p%wa%U * dexp(ky) * dcos(kx)
-                p%of(id)%loc%vel%y%now(i,j) = p%wa%U * dexp(ky) * dsin(kx)
+                if (y<=0.0d0)then
+                    p%of(id)%loc%vel%x%now(i,j) = p%wa%U * dexp(ky) * dcos(kx)
+                    p%of(id)%loc%vel%y%now(i,j) = p%wa%U * dexp(ky) * dsin(kx)
+                else
+                    p%of(id)%loc%vel%x%now(i,j) = p%wa%U *  dcos(kx)
+                    p%of(id)%loc%vel%y%now(i,j) = p%wa%U *  dsin(kx)
+                endif
             endif
 
         enddo
