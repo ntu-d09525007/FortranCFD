@@ -23,8 +23,8 @@ do id = 0, p%glb%threads-1
         ky = p%wa%k * y
         wt = p%wa%w * p%glb%time
 
-        u = p%wa%U * dexp(kz) * dcos(kx-wt+p%wa%k*p%glb%dx*0.5d0)
-        v = p%wa%U * dexp(kz) * dsin(kx-wt)
+        u = p%wa%U * dexp(ky) * dcos(kx-wt+p%wa%k*p%glb%dx*0.5d0)
+        v = p%wa%U * dexp(ky) * dsin(kx-wt)
 
         if( p%of(id)%loc%phi%now(i,j) > 0.0d0 )then
             xnorm2 = xnorm2 + (p%of(id)%loc%vel%x%now(i,j)-u)**2.0d0
