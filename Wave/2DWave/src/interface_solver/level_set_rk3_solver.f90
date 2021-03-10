@@ -30,7 +30,7 @@ real(8) :: src
     call pt%phi%sync
     call level_set_rk3_source_setup
     
-    !$omp parallel do private(i,j,k,src)
+    !$omp parallel do private(i,j,src)
     do id = 0, p%glb%threads-1
         
         call level_set_rk3_source(p%of(id),p%of(id)%loc%tdata%x%l2)
@@ -50,7 +50,7 @@ real(8) :: src
     call pt%phi%sync
     call level_set_rk3_source_setup
     
-    !$omp parallel do private(i,j,k,src)
+    !$omp parallel do private(i,j,src)
     do id = 0, p%glb%threads-1
         
         call level_set_rk3_source(p%of(id),p%of(id)%loc%tdata%x%l3)
