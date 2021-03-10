@@ -59,7 +59,7 @@ do
     
     call pt%phi%sync
     
-    if( time>timestop .or.  error.le.1.0d-8) exit
+    if( time>timestop .or.  error.le.1.0d-6) exit
     
     if( mod(iter,100) .eq. 0 )then
         write(*,'("LS Init:",I8,F8.5,ES15.4)')iter,time,error
