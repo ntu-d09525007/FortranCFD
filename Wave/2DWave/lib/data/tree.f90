@@ -76,7 +76,12 @@ integer :: id, level
     write(*,'(A20,I8)')"Overlap layer",p%of(id)%glb%ghc
     write(*,'(A20,L5)')"X Periodic:",p%glb%xper
     write(*,'(A20,L5)')"Y Periodic:",p%glb%yper
-
+    write(*,*)" --- Wave Property --- "
+    write(*,'(A20,F15.8)')"Wavenumber:",p%wa%k
+    write(*,'(A20,F15.8)')"Wave frequency:",p%wa%w
+    write(*,'(A20,F15.8)')"Wave amplitude:",p%wa%L
+    write(*,'(A20,F15.8)')"Wave ref. velocity:",p%wa%U
+    
     ! write(*,*)" --- SubDomain Information  --- "
     ! do id = 0, p%glb%threads-1
     !    write(*,'("ID ",I2,": (",I2,",",I2,",",I2,")")')ID,p%of(id)%loc%idx,p%of(id)%loc%idy,p%of(id)%loc%idz
