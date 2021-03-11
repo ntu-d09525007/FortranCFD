@@ -21,11 +21,11 @@ real(8) :: err,perr
     do 
     
         iter = iter + 1
-        
-        call level_set_source(.false.)
+
+        call level_set_source()
         
         err=0.0_8
-        
+
         !$omp parallel do reduction(max:err)
         do id = 0, p%glb%threads-1
     
@@ -67,12 +67,11 @@ real(8) :: err,perr
 end subroutine
 
 
-subroutine level_set_source(btn)
+subroutine level_set_source()
 use all 
 !$ use omp_lib
 implicit none
 integer :: i,j,id
-logical :: btn
 
     !$omp parallel do private(i,j)
     do id = 0, p%glb%threads-1
@@ -92,13 +91,13 @@ logical :: btn
         ! calculate x derivatives
         do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
         
-            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%x%solve("uccd",&
                 &p%of(id)%loc%tdata%x%s1(:,j),p%of(id)%loc%tdata%x%ss1(:,j),p%of(id)%loc%nvel%x%tmp(:,j),p%of(id)%loc%nvel%x%old(:,j))
                                         
-            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%x%solve("uccd",&
                 &p%of(id)%loc%tdata%x%s2(:,j),p%of(id)%loc%tdata%x%ss2(:,j),p%of(id)%loc%nvel%x%tmp(:,j),p%of(id)%loc%nvel%x%old(:,j))
                                         
-            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%x%solve("uccd",&
                &p%of(id)%loc%tdata%x%s3(:,j),p%of(id)%loc%tdata%x%ss3(:,j),p%of(id)%loc%nvel%x%tmp(:,j),p%of(id)%loc%nvel%x%old(:,j))
             
         end do
@@ -116,13 +115,13 @@ logical :: btn
         ! calculate y derivatives
         do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
             
-            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%y%solve("uccd",&
                 &p%of(id)%loc%tdata%x%s1(i,:),p%of(id)%loc%tdata%x%ss1(i,:),p%of(id)%loc%nvel%y%tmp(i,:),p%of(id)%loc%nvel%y%old(i,:))
                                         
-            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%y%solve("uccd",&
                 &p%of(id)%loc%tdata%x%s2(i,:),p%of(id)%loc%tdata%x%ss2(i,:),p%of(id)%loc%nvel%y%tmp(i,:),p%of(id)%loc%nvel%y%old(i,:))
                                         
-            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%y%solve("uccd",&
                &p%of(id)%loc%tdata%x%s3(i,:),p%of(id)%loc%tdata%x%ss3(i,:),p%of(id)%loc%nvel%y%tmp(i,:),p%of(id)%loc%nvel%y%old(i,:))
         end do
         

@@ -14,11 +14,6 @@ implicit none
 call problem_init
 
 do 
-    if(p%glb%time < 2.0d0*dacos(-1.0d0)/p%wa%w )then
-        p%glb%dt = 0.0002*p%glb%dx
-    else
-        p%glb%dt = 0.01*p%glb%dx
-    endif
     
     p%glb%time = p%glb%time + p%glb%dt 
     p%glb%iter = p%glb%iter + 1 
