@@ -7,6 +7,7 @@ type wave
 real(8) :: phase_speed, wavelength, steepness
 real(8) :: k, w
 real(8) :: L, U
+real(8) :: width, theta
 end type wave
 
 type filemanager
@@ -163,7 +164,7 @@ integer :: x,y
  read(526,*)
  read(526,*)x,y
  read(526,*)
- read(526,*)p%wa%phase_speed, p%wa%wavelength, p%wa%steepness
+ read(526,*)p%wa%phase_speed, p%wa%wavelength, p%wa%steepness, p%wa%width, p%wa%theta
  close(unit=526)
 
  if( x==1 )then

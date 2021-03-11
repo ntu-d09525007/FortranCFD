@@ -56,19 +56,20 @@ subroutine ns_check_convergence_div
 use all
 !$ use omp_lib
 implicit none
-integer :: id,i,j
+integer :: id,i,j,n
 real(8) :: div, sumdiv
 real(8) :: ux,vy
 
 div=0.0d0
 sumdiv=0.0d0
-
-!$omp parallel do private(i,j,ux,vy), reduction(max:div), reduction(+:sumdiv)
+n=0
+!$omp parallel do private(i,j,ux,vy), reduction(max:div), reduction(+:sumdiv,n)
 do id = 0, p%glb%threads-1
     
     do j = p%of(id)%loc%js, p%of(id)%loc%je
     do i = p%of(id)%loc%is, p%of(id)%loc%ie
-    
+
+        n=n+1
         ux = (p%of(id)%loc%vel%x%now(i,j)-p%of(id)%loc%vel%x%now(i-1,j))/p%glb%dx
         vy = (p%of(id)%loc%vel%y%now(i,j)-p%of(id)%loc%vel%y%now(i,j-1))/p%glb%dy
    
@@ -81,7 +82,7 @@ do id = 0, p%glb%threads-1
 enddo   
 !$omp end parallel do
   
-p%glb%vel_sdiv = sumdiv / (p%glb%node_x*p%glb%node_y)
+p%glb%vel_sdiv = sumdiv / (n)
 p%glb%vel_div = div
     
 end subroutine

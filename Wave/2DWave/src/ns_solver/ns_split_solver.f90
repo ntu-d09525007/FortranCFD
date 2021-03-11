@@ -361,8 +361,8 @@ do i = q%loc%is, q%loc%ie
     dif_x = mu/rho*xx/q%glb%re + (1.0d0-q%glb%mu_12)*delta*phix*2.0d0*ux/(rho*q%glb%re)
     dif_y = mu/rho*yy/q%glb%re + (1.0d0-q%glb%mu_12)*delta*phiy*(uy+vx)/(rho*q%glb%re)
 
-    sx(i,j) = dif_x + dif_y + q%glb%gx*q%glb%btn_g/q%glb%fr - q%glb%btn_sf*curv*delta*phix / (q%glb%we*rho)
-    
+    sx(i,j) = sx(i,j) +  w * ( dif_x + dif_y + q%glb%gx*q%glb%btn_g/q%glb%fr - q%glb%btn_sf*curv*delta*phix / (q%glb%we*rho) )
+
 end do
 end do
 
@@ -384,10 +384,12 @@ do i = q%loc%is, q%loc%ie
     dif_x = mu/rho*xx/q%glb%re + (1.0d0-q%glb%mu_12)*delta*phix*(uy+vx)/(rho*q%glb%re)
     dif_y = mu/rho*yy/q%glb%re + (1.0d0-q%glb%mu_12)*delta*phiy*2.0d0*vy/(rho*q%glb%re)
 
-    sy(i,j) = dif_x + dif_y + q%glb%gy*q%glb%btn_g/q%glb%fr - q%glb%btn_sf*curv*delta*phiy / (q%glb%we*rho)
+    sy(i,j) = sy(i,j) + w * ( dif_x + dif_y + q%glb%gy*q%glb%btn_g/q%glb%fr - q%glb%btn_sf*curv*delta*phiy / (q%glb%we*rho) )
     
 end do
 end do
+
+call wave_generator(q,sx,sy,w)
     
 end subroutine
 

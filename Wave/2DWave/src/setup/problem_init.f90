@@ -37,11 +37,13 @@ CHARACTER(100) :: NAME_OF_FILE
 
             kx = p%wa%k * x
             
-            if( y < p%wa%L * dcos(kx) )then
-                p%of(id)%loc%phi%now(i,j) = 1.0d0
-            else
-                p%of(id)%loc%phi%now(i,j) = -1.0d0
-            endif
+            ! if( y < p%wa%L * dcos(kx) )then
+            !     p%of(id)%loc%phi%now(i,j) = 1.0d0
+            ! else
+            !     p%of(id)%loc%phi%now(i,j) = -1.0d0
+            ! endif
+
+            p%of(id)%loc%phi%now(i,j) = -y
 
             p%of(id)%loc%vel%x%now(i,j) = 0.0_8
             p%of(id)%loc%vel%y%now(i,j) = 0.0_8
@@ -62,36 +64,36 @@ CHARACTER(100) :: NAME_OF_FILE
     call pt%phi%sync
     call pt%vof%sync
 
-    call level_set_rk3_redis(0)
+    ! call level_set_rk3_redis(0)
 
-    !$omp parallel do private(i,j,x,y,kx,ky)
-    do id = 0, p%glb%threads-1
+    ! !$omp parallel do private(i,j,x,y,kx,ky)
+    ! do id = 0, p%glb%threads-1
 
-        do j = p%of(id)%loc%js, p%of(id)%loc%je
-        do i = p%of(id)%loc%is, p%of(id)%loc%ie 
+    !     do j = p%of(id)%loc%js, p%of(id)%loc%je
+    !     do i = p%of(id)%loc%is, p%of(id)%loc%ie 
 
-            x = p%glb%x(i,j)
-            y = p%glb%y(i,j)
+    !         x = p%glb%x(i,j)
+    !         y = p%glb%y(i,j)
 
-            kx = p%wa%k * x
-            ky = p%wa%k * y
+    !         kx = p%wa%k * x
+    !         ky = p%wa%k * y
 
-            if( p%of(id)%loc%phi%now(i,j) > 0.0d0 )then
-                if (y<=0.0d0)then
-                    p%of(id)%loc%vel%x%now(i,j) = p%wa%U * dexp(ky) * dcos(kx)
-                    p%of(id)%loc%vel%y%now(i,j) = p%wa%U * dexp(ky) * dsin(kx)
-                else
-                    p%of(id)%loc%vel%x%now(i,j) = p%wa%U *  dcos(kx)
-                    p%of(id)%loc%vel%y%now(i,j) = p%wa%U *  dsin(kx)
-                endif
-            endif
+    !         if( p%of(id)%loc%phi%now(i,j) > 0.0d0 )then
+    !             if (y<=0.0d0)then
+    !                 p%of(id)%loc%vel%x%now(i,j) = p%wa%U * dexp(ky) * dcos(kx)
+    !                 p%of(id)%loc%vel%y%now(i,j) = p%wa%U * dexp(ky) * dsin(kx)
+    !             else
+    !                 p%of(id)%loc%vel%x%now(i,j) = p%wa%U *  dcos(kx)
+    !                 p%of(id)%loc%vel%y%now(i,j) = p%wa%U *  dsin(kx)
+    !             endif
+    !         endif
 
-        enddo
-        enddo
+    !     enddo
+    !     enddo
 
-    enddo
-    !$omp end parallel do
-    call pt%vel%sync
+    ! enddo
+    ! !$omp end parallel do
+    ! call pt%vel%sync
 
     call p%node_vel
     call pt%nvel%sync

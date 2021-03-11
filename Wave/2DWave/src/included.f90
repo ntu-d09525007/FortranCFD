@@ -17,6 +17,7 @@ include './ns_solver/ns_ppe_solver.f90'
 include './ns_solver/ns_ppe_mg_solver.f90'
 include './ns_solver/ns_velbc.f90'
 include './ns_solver/ns_split_solver.f90'
+include './ns_solver/wave_generator.f90'
 
 include './others/TDMA.f90'
 include './others/output.f90'
