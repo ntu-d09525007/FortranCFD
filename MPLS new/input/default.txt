@@ -1,0 +1,52 @@
+ooo	Method to capture interface ( LS / MPLS / CLSVOF ) 
+2
+ooo	Name of the problem 
+64_Wave
+ooo	Dimension of threads grid in X, Y direction
+2	2
+ooo	Multigrid level
+5
+ooo	Cells per unit length 
+32
+ooo	Number of ghost cell
+3
+ooo	Range of domain in X direction
+-1.0	1.0
+ooo	Range of domain in Y direction
+-1.0	1.0
+ooo	Time to stop / plot
+30.0	0.1
+ooo	Crount number ( advection / redistance )
+0.01	0.5
+ooo	PPE iteration ( tolerance / w1 / w2 / valve )
+8.0	0.5	0.5	4.0
+ooo	SRK6 iteration ( tolerance / w )
+14.0	0.5	
+ooo	Level set interface width 
+1.5
+ooo	Problem parameters ( Prescribed / L / L+U / L+T / U+T / Wave-Study )
+6
+ooo	Density / Viscosity of fluid 1 ( phi > 0 )
+998.0		0.00114
+ooo	Density / Viscosity of fluid 2 ( phi < 0 )
+1.205		0.0000175
+ooo	Surface tension of fluid 1, 2 / Using ?
+0.078		0
+ooo	Gravity / Using ?
+9.81		1
+ooo	Gravity direction ( no need normalize)
+0.0	-1.0
+ooo	Characteristic Length, Velocity, Time
+1.0		0.5		0.0
+ooo	Dimensionless parameters ( Re, Fr, We )  !!! We should not be zero
+1000.0		0.4096		1.0
+ooo	Density / Viscosity ratio of fluid 1, 2
+0.001		0.01
+ooo	Velocity boundary condition in X direction ( no-slip / slip / non-reflective )
+3	3
+ooo	Velocity boundary condition in Y direction ( no-slip / slip / non-reflective )
+1	1
+ooo	Periodic ( X, Y )
+0	0	
+ooo	Phase speed  / Wave length / Wave Steepness / Source width / Angle of propagation
+0.395	0.1	0.3	0.5	0.0
