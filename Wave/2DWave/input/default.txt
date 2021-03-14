@@ -1,7 +1,7 @@
-ooo	Method to capture interface ( LS / MPLS / CLSVOF ) 
-2
+ooo	( LS / MPLS / CLSVOF ) / MPLS curvature dependent?
+2	0
 ooo	Name of the problem 
-64_Wave
+Wave_64
 ooo	Dimension of threads grid in X, Y direction
 2	2
 ooo	Multigrid level
@@ -15,7 +15,7 @@ ooo	Range of domain in X direction
 ooo	Range of domain in Y direction
 -1.0	1.0
 ooo	Time to stop / plot
-30.0	0.1
+20.0	0.5
 ooo	Crount number ( advection / redistance )
 0.01	0.5
 ooo	PPE iteration ( tolerance / w1 / w2 / valve )
@@ -35,7 +35,7 @@ ooo	Surface tension of fluid 1, 2 / Using ?
 ooo	Gravity / Using ?
 9.81		1
 ooo	Gravity direction ( no need normalize)
-0.0	-1.0
+0.0		-1.0
 ooo	Characteristic Length, Velocity, Time
 1.0		0.5		0.0
 ooo	Dimensionless parameters ( Re, Fr, We )  !!! We should not be zero

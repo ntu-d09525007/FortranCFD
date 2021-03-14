@@ -114,7 +114,7 @@ integer :: x,y
  open(unit=526,file=trim(path),status='old')
  
  read(526,*)
- read(526,*)p%glb%method
+ read(526,*)p%glb%method, p%glb%mpls
  read(526,*)
  read(526,*)p%glb%name
  read(526,*)
@@ -230,6 +230,8 @@ real(8) :: mag
         p%glb%xstart = p%glb%xstart * 2.0d0 * dacos(-1.0d0)
         p%glb%yend   = p%glb%yend   * 2.0d0 * dacos(-1.0d0)
         p%glb%ystart = p%glb%ystart * 2.0d0 * dacos(-1.0d0)
+        p%glb%t2s    = p%glb%t2s    * 2.0d0 * dacos(-1.0d0)
+        p%glb%t2p    = p%glb%t2p    * 2.0d0 * dacos(-1.0d0)
     endif
 
     p%glb%dx = ( p%glb%xend - p%glb%xstart ) / p%glb%node_x
@@ -343,7 +345,6 @@ real(8) :: mag
     endif
     
 end subroutine
-
 
 subroutine manager_sync(p)
 implicit none

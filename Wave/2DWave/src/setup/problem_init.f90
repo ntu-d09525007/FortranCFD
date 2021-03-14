@@ -43,7 +43,7 @@ CHARACTER(100) :: NAME_OF_FILE
             !     p%of(id)%loc%phi%now(i,j) = -1.0d0
             ! endif
 
-            p%of(id)%loc%phi%now(i,j) = -y
+            p%of(id)%loc%phi%now(i,j) = - y
 
             p%of(id)%loc%vel%x%now(i,j) = 0.0_8
             p%of(id)%loc%vel%y%now(i,j) = 0.0_8
