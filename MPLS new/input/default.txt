@@ -1,4 +1,4 @@
-ooo	( LS / MPLS / CLSVOF ) / MPLS kappa dependent?
+ooo	( LS / MPLS / CLSVOF ) / MPLS curvature dependent?
 2	0
 ooo	Name of the problem 
 CRWENO
