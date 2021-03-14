@@ -1,9 +1,9 @@
 ooo	( LS / MPLS / CLSVOF ) / MPLS curvature dependent?
 2	0
 ooo	Name of the problem 
-CRWENO
+MPLS
 ooo	Dimension of threads grid in X, Y direction
-2	2
+1	1
 ooo	Multigrid level
 -1
 ooo	Cells per unit length 
@@ -15,7 +15,7 @@ ooo	Range of domain in X direction
 ooo	Range of domain in Y direction
 0.0	1.0
 ooo	Time to stop / plot
-6.0	0.5
+3.0	0.5
 ooo	Crount number ( advection / redistance )
 0.01	0.5
 ooo	PPE iteration ( tolerance / w1 / w2 / valve )

@@ -121,18 +121,20 @@ do id = 0, p%glb%threads-1
         call wenojs_flux_split(p%of(id)%loc%tdata%x%s2(:,j),p%of(id)%loc%tdata%x%s1(:,j),&
                                p%of(id)%loc%tdata%x%ss2(:,j),p%of(id)%loc%tdata%x%ss1(:,j),&
                                p%of(id)%loc%is,p%of(id)%loc%ie,p%of(id)%glb%ghc)
-        !call crweno_flux_split(p%of(id)%loc%tdata%x%s2(:,j),p%of(id)%loc%tdata%x%s1(:,j),&
-        !                       p%of(id)%loc%tdata%x%ss2(:,j),p%of(id)%loc%tdata%x%ss1(:,j),&
-        !                       p%of(id)%loc%is,p%of(id)%loc%ie,p%of(id)%glb%ghc)
+
+        ! call crweno_flux_split(p%of(id)%loc%tdata%x%s2(:,j),p%of(id)%loc%tdata%x%s1(:,j),&
+        !                        p%of(id)%loc%tdata%x%ss2(:,j),p%of(id)%loc%tdata%x%ss1(:,j),&
+        !                        p%of(id)%loc%is,p%of(id)%loc%ie,p%of(id)%glb%ghc)
     end do 
 
     do i = p%of(id)%loc%is, p%of(id)%loc%ie
         call wenojs_flux_split(p%of(id)%loc%tdata%y%s2(i,:),p%of(id)%loc%tdata%y%s1(i,:),&
                                p%of(id)%loc%tdata%y%ss2(i,:),p%of(id)%loc%tdata%y%ss1(i,:),&
                                p%of(id)%loc%js,p%of(id)%loc%je,p%of(id)%glb%ghc)
-        !call crweno_flux_split(p%of(id)%loc%tdata%y%s2(i,:),p%of(id)%loc%tdata%y%s1(i,:),&
-        !                       p%of(id)%loc%tdata%y%ss2(i,:),p%of(id)%loc%tdata%y%ss1(i,:),&
-        !                       p%of(id)%loc%js,p%of(id)%loc%je,p%of(id)%glb%ghc)
+
+        ! call crweno_flux_split(p%of(id)%loc%tdata%y%s2(i,:),p%of(id)%loc%tdata%y%s1(i,:),&
+        !                        p%of(id)%loc%tdata%y%ss2(i,:),p%of(id)%loc%tdata%y%ss1(i,:),&
+        !                        p%of(id)%loc%js,p%of(id)%loc%je,p%of(id)%glb%ghc)
     end do
 
     do j = p%of(id)%loc%js-p%glb%ghc+2, p%of(id)%loc%je+p%glb%ghc-3
@@ -269,8 +271,6 @@ c1 = 0.2089141306d0
 c2 = 0.4999999998d0
 c3 = 0.2910858692d0
     
-call wenojs_flux_split(f,g,fp,gm,is,ie,ghc)
-
 do i = is-ghc+3, ie+ghc-4
     
     b1 = 13.0d0*(g(i-2)-2.0d0*g(i-1)+g(i))**2.0d0   + 3.0d0*(    g(i-2)-4.0d0*g(i-1)+3.0d0*g(i))**2.0d0
