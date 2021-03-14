@@ -8,7 +8,7 @@ implicit none
 type global
 character(20) :: name
 integer :: level
-integer :: method
+integer :: method, mpls
 integer :: how_to_paras
 integer :: grid_x, grid_y, threads ! numbers of CPUs 
 integer :: node_x, node_y

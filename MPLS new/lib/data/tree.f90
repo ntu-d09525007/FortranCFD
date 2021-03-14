@@ -114,7 +114,7 @@ integer :: x,y
  open(unit=526,file=trim(path),status='old')
  
  read(526,*)
- read(526,*)p%glb%method
+ read(526,*)p%glb%method, p%glb%mpls
  read(526,*)
  read(526,*)p%glb%name
  read(526,*)

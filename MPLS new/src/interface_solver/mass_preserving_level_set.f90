@@ -25,7 +25,7 @@ do iter = 1, 20
             
             plam =  p%of(id)%loc%delta%now(i,j)**2.0_8 * p%of(id)%loc%grad%now(i,j) 
             plam = plam * ( 2.0_8*(1.0_8-p%glb%rho_12)*p%of(id)%loc%heavy%now(i,j) + p%glb%rho_12 ) * p%glb%dx * p%glb%dy
-            plam = plam * p%of(id)%loc%normals%curv%now(i,j)
+            if(p%glb%mpls==1)plam = plam * p%of(id)%loc%normals%curv%now(i,j)
 
             lam = lam + plam
             
@@ -44,7 +44,7 @@ do iter = 1, 20
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
         
             src = lam * p%of(id)%loc%delta%now(i,j) * p%of(id)%loc%grad%now(i,j) 
-            src = src * p%of(id)%loc%normals%curv%now(i,j)
+            if(p%glb%mpls==1)src = src * p%of(id)%loc%normals%curv%now(i,j)
 
             p%of(id)%loc%phi%now(i,j) = p%of(id)%loc%phi%now(i,j) + src
             
