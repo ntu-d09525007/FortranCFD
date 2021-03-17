@@ -16,9 +16,9 @@ procedure final_srk4 => tsolver_roots_final_srk4
 end type tsolver_roots
 
 type tsolver_data
-integer :: is, ie, js, je
 logical :: is_vector_solver
 type(tsolver_roots) :: x, y
+real(8) :: error2, error, tol
 contains
 procedure alloc => tsolver_data_alloc
 procedure init => tsolver_data_init
@@ -43,24 +43,23 @@ p%js = js; p%je = je
 p%dt = dt; p%w = w
 p%ghc = ghc
 
- allocate( p%s1(is:ie,js:je), p%s2(is:ie,js:je), p%s3(is:ie,js:je))
- allocate( p%ss1(is:ie,js:je), p%ss2(is:ie,js:je), p%ss3(is:ie,js:je))
- allocate( p%l1(is:ie,js:je), p%l2(is:ie,js:je), p%l3(is:ie,js:je))
- allocate( p%target(is:ie,js:je) )
+allocate( p%s1(is:ie,js:je), p%s2(is:ie,js:je), p%s3(is:ie,js:je))
+allocate( p%ss1(is:ie,js:je), p%ss2(is:ie,js:je), p%ss3(is:ie,js:je))
+allocate( p%l1(is:ie,js:je), p%l2(is:ie,js:je), p%l3(is:ie,js:je))
+allocate( p%target(is:ie,js:je) )
 
 end subroutine
 
-subroutine tsolver_data_alloc(p,is,ie,js,je,dt,w,ghc)
+subroutine tsolver_data_alloc(p,is,ie,js,je,dt,w,ghc,tol)
 implicit none
 class(tsolver_data) :: p
 integer, intent(in) :: is, ie, js, je, ghc
-real(8), intent(in) :: dt, w
-
-p%is = is; p%ie = ie
-p%js = js; p%je = je
+real(8), intent(in) :: dt, w, tol
 
 call p%x%alloc(is,ie,js,je,dt,w,ghc)
 call p%y%alloc(is,ie,js,je,dt,w,ghc)
+
+p%tol = tol
 
 end subroutine
 
@@ -70,14 +69,14 @@ class(tsolver_roots) :: p
 real(8),dimension(p%is:p%ie,p%js:p%je) :: u
 integer :: i,j
 
- do j = p%js, p%je
- do i = p%is, p%ie
+do j = p%js, p%je
+do i = p%is, p%ie
     p%target(i,j) = u(i,j)
     p%s1(i,j) = u(i,j)
     p%s2(i,j) = u(i,j)
     p%s3(i,j) = u(i,j)
- enddo
- end do 
+enddo
+enddo 
 
 end subroutine
 
@@ -90,6 +89,9 @@ real(8),dimension(p%is:p%ie,p%js:p%je),optional :: y
 integer :: i,j
  
 p%is_vector_solver = btn
+
+p%error = 100.0d0
+p%error2 = 100.0d0
 
 call p%x%init(x)
 
