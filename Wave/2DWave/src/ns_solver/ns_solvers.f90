@@ -7,7 +7,7 @@ call system_clock(cpustart)
 
 call ns_init
 
-call ns_ab_solver
+!call ns_ab_solver
 call ns_split_solver
 
 call ns_check_convergence_div
@@ -115,7 +115,7 @@ do id = 0, p%glb%threads-1
 enddo   
 !$omp end parallel do
 
-l2f = dsqrt( l2f / (3.0d0*p%glb%node_x*p%glb%node_y) )
+l2f = dsqrt( l2f / (2.0d0*p%glb%node_x*p%glb%node_y) )
 
 p%glb%ns_linf = linf
 p%glb%ns_l2f = l2f

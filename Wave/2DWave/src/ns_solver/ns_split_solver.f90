@@ -5,7 +5,6 @@ implicit none
 
 p%glb%piter=0
 
-call ppe_sor_init
 call ns_split_adv
 call ns_split_diff
 call ns_check_convergence_vel

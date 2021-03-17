@@ -106,4 +106,6 @@ do i = q%loc%is, q%loc%ie
 enddo
 enddo
 
+call wave_generator(q,sx,sy,alpha)
+
 end subroutine

@@ -11,7 +11,7 @@ real(8) :: width, theta
 end type wave
 
 type filemanager
-integer :: ls_mv, damdata
+integer :: ls_mv, damdata, wave
 end type filemanager
 
 type multigrid
@@ -196,6 +196,10 @@ real(8) :: mag
     p%fil%ls_mv = 15
     open(unit=p%fil%ls_mv,file="./out/"//trim(p%glb%name)//"_MVloss.plt")
     write(p%fil%ls_mv,*)'variables = "T" "Loss of mass" "Loss of Volume" '
+
+    p%fil%wave = 16
+    open(unit=p%fil%wave,file="./out/"//trim(p%glb%name)//"_Wave.plt")
+    write(p%fil%ls_mv,*)'variables = "T" "Numerical" "Exact" '
 
     p%glb%threads = p%glb%grid_x * p%glb%grid_y 
     
