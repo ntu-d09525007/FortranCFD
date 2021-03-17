@@ -4,7 +4,7 @@ use all
 implicit none
 integer :: i,j,id,iter
 integer(8) :: cpustart, cpuend
-real(8) :: err,perr
+logical :: check
 
     call system_clock(cpustart)
 
@@ -24,21 +24,16 @@ real(8) :: err,perr
 
         call level_set_source()
         
-        err=0.0_8
-
-        !$omp parallel do reduction(max:err)
-        do id = 0, p%glb%threads-1
-    
-            call p%of(id)%loc%tdata%solve_srk6(err)
-            !call p%of(id)%loc%tdata%solve_srk4(err)
-            
+        !$omp parallel do reduction(.and.:check)
+        do id = 0, p%glb%threads-1   
+            call p%of(id)%loc%tdata%solve_srk6(check)
         enddo
         !$omp end parallel do
         
     
-        if( err < p%glb%t_tol )exit
+        if( check )exit
         
-        if( mod(iter,500) == 0)write(*,*)"LS solver,",iter,err
+        if( mod(iter,1000) == 0)write(*,*)"LS solver,",iter,err
         
     end do
     
@@ -46,8 +41,7 @@ real(8) :: err,perr
     do id = 0, p%glb%threads-1
         
         call p%of(id)%loc%tdata%final_srk6()
-        !call p%of(id)%loc%tdata%final_srk4()
-        
+
         do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
         do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
             p%of(id)%loc%phi%now(i,j) = p%of(id)%loc%tdata%x%target(i,j)

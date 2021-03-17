@@ -119,7 +119,7 @@ CALL P%LOC%NVEL%ALLOC(IS,IE,JS,JE)
 CALL P%LOC%VELSRC%ALLOC(IS,IE,JS,JE)
 
 ! solvers
-CALL P%LOC%tdata%ALLOC(IS,IE,JS,JE,P%GLB%DT,P%GLB%t_w,P%GLB%GHC)
+CALL P%LOC%tdata%ALLOC(IS,IE,JS,JE,P%GLB%DT,P%GLB%t_w,P%GLB%GHC,p%glb%t_tol)
 CALL P%LOC%ccdsolvers%init(IS,IE,JS,JE,P%GLB%DX,P%GLB%DY,P%GLB%DT)
 
 if( p%glb%level>0 )then

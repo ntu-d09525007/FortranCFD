@@ -36,7 +36,6 @@ class(tsolver_roots) :: p
 integer, intent(in) :: is, ie, js, je, ghc
 real(8), intent(in) :: dt, w
 
-
 p%is = is; p%ie = ie
 p%js = js; p%je = je
 

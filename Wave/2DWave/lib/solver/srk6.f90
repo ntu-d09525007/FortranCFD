@@ -43,24 +43,34 @@ coef3_1 = 5.0_8/36.0_8 - cc/3.0_8; coef3_2 = 2.0_8/9.0_8 - 2.0_8*cc/3.0_8; coef3
  enddo
  
  
-end subroutine 
+end subroutine
 
-subroutine tsolver_data_solve_srk6(p,err)
+subroutine tsolver_data_solve_srk6(p,check)
 implicit none
 class(tsolver_data) :: p
-real(8), intent(out) :: err
+logical, intent(out) :: check
 real(8) :: err1, err2
 
- call p%x%solve_srk6(err1)
+p%error2 = p%error
 
- if( p%is_vector_solver )then
+call p%x%solve_srk6(err1)
+
+if( p%is_vector_solver )then
     call p%y%solve_srk6(err2)
-    err = max( err1, err2 )
- else
-    err = err1
- endif
+    p%error = max( err1, err2 )
+else
+    p%error = err1
+endif
 
-end subroutine 
+check = .false.
+
+if( p%error / p%error2 < 0.9 )then
+    if(p%error < 1.0d-14) check = .true.
+else
+    if(p%error < p%tol) check = .true.
+endif
+
+end subroutine
 
 subroutine tsolver_roots_final_srk6(p)
 implicit none
