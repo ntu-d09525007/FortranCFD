@@ -18,7 +18,7 @@ use all
 implicit none
 integer :: i,j,id,iter
 integer(8) :: cpustart, cpuend
-logical :: check
+real(8) :: err
 
 
     !$omp parallel do private(i,j)
@@ -42,16 +42,18 @@ logical :: check
         
         call ns_split_adv_source()
         
-        !$omp parallel do reduction(.and.:check)
+        err=0.0_8  
+        !$omp parallel do reduction(max:err)
         do id = 0, p%glb%threads-1
-            call p%of(id)%loc%tdata%solve_srk6(check)
+            call p%of(id)%loc%tdata%solve_srk6(err)
         enddo
         !$omp end parallel do
     
-        if( check )exit
+        if( err < p%glb%t_tol )exit
         
-        if( mod(iter,1000) == 0)write(*,*)"NS adv solver,",iter,err
+        if( mod(iter,500) == 0)write(*,*)"NS adv solver,",iter,err
         
+        if( iter>5000)stop "NS adv SRK6 can not converge"
     end do
     
     !$omp parallel do private(i,j)

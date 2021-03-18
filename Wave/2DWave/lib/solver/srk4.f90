@@ -39,43 +39,33 @@ enddo
 
 end subroutine 
 
-subroutine tsolver_data_solve_srk4(p,check)
+subroutine tsolver_data_solve_srk4(p,err)
 implicit none
 class(tsolver_data) :: p
-logical, intent(out) :: check
+real(8), intent(out) :: err
 real(8) :: err1, err2
 
-p%error2 = p%error
+ call p%x%solve_srk4(err1)
 
-call p%x%solve_srk4(err1)
-
-if( p%is_vector_solver )then
+ if( p%is_vector_solver )then
     call p%y%solve_srk4(err2)
-    p%error = max( err1, err2 )
-else
-    p%error = err1
-endif
+    err = max( err1, err2 )
+ else
+    err = err1
+ endif
 
-check = .false.
-
-if( p%error / p%error2 < 0.9 )then
-    if(p%error < 1.0d-14) check = .true.
-else
-    if(p%error < p%tol) check = .true.
-endif
-
-end subroutine
+end subroutine 
 
 subroutine tsolver_roots_final_srk4(p)
 implicit none
 class(tsolver_roots) :: p
 integer :: i,j,k
 
-do j = p%js, p%je
-do i = p%is, p%ie
-    p%target(i,j) = p%target(i,j) + p%dt/2.0d0 * ( p%l1(i,j) + p%l2(i,j) )
-enddo
-enddo
+ do j = p%js, p%je
+ do i = p%is, p%ie
+     p%target(i,j) = p%target(i,j) + p%dt/2.0d0 * ( p%l1(i,j) + p%l2(i,j) )
+ enddo
+ enddo
 
 end subroutine
 
@@ -84,12 +74,12 @@ implicit none
 class(tsolver_data) :: p
 integer :: i,j
 
-call p%x%final_srk4
+ call p%x%final_srk4
 
-if( p%is_vector_solver )then
-    call p%y%final_srk4
-endif
-
-p%is_vector_solver = .false.
+ if( p%is_vector_solver )then
+     call p%y%final_srk4
+ endif
+ 
+ p%is_vector_solver = .false.
  
  end subroutine

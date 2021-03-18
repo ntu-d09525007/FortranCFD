@@ -4,15 +4,13 @@ use all
 implicit none
 integer :: i,j,id,iter
 integer(8) :: cpustart, cpuend
-logical :: check
+real(8) :: err,perr
 
     call system_clock(cpustart)
 
     !$omp parallel do
     do id = 0, p%glb%threads-1  
-        
         call p%of(id)%loc%tdata%init(.false.,p%of(id)%loc%phi%old)
-        
     enddo
     !$omp end parallel do
     
@@ -24,16 +22,21 @@ logical :: check
 
         call level_set_source()
         
-        !$omp parallel do reduction(.and.:check)
-        do id = 0, p%glb%threads-1   
-            call p%of(id)%loc%tdata%solve_srk6(check)
+        err=0.0_8
+
+        !$omp parallel do reduction(max:err)
+        do id = 0, p%glb%threads-1
+            call p%of(id)%loc%tdata%solve_srk6(err)
+            !call p%of(id)%loc%tdata%solve_srk4(err)
         enddo
         !$omp end parallel do
         
     
-        if( check )exit
+        if( err < p%glb%t_tol )exit
         
-        if( mod(iter,1000) == 0)write(*,*)"LS solver,",iter,err
+        if( mod(iter,500) == 0)write(*,*)"LS solver,",iter,err
+        
+        if( iter > 5000 ) stop "LS SRK6 can not converge."
         
     end do
     
@@ -41,7 +44,8 @@ logical :: check
     do id = 0, p%glb%threads-1
         
         call p%of(id)%loc%tdata%final_srk6()
-
+        !call p%of(id)%loc%tdata%final_srk4()
+        
         do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
         do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
             p%of(id)%loc%phi%now(i,j) = p%of(id)%loc%tdata%x%target(i,j)

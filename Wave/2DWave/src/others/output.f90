@@ -14,7 +14,7 @@ eta=0.0d0
 do id = 0, p%glb%threads-1
 
     do i = p%of(id)%loc%is, p%of(id)%loc%ie
-        if( abs(p%glb%x(i,j)-1.5d0*2.0d0*pi)<p%glb%dx*0.5d0)then
+        if( abs(p%glb%x(i,j)-2.5d0*2.0d0*pi)<p%glb%dx*0.5d0)then
             do j = p%of(id)%loc%js, p%of(id)%loc%je
                 if(p%of(id)%loc%phi%now(i,j)*p%of(id)%loc%phi%now(i,j+1)<0.0d0)then
                     x = p%glb%x(i,j)
