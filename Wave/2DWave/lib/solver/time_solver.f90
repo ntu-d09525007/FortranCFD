@@ -16,6 +16,7 @@ procedure final_srk4 => tsolver_roots_final_srk4
 end type tsolver_roots
 
 type tsolver_data
+integer :: is, ie, js, je
 logical :: is_vector_solver
 type(tsolver_roots) :: x, y
 real(8) :: error2, error, tol
@@ -54,6 +55,9 @@ implicit none
 class(tsolver_data) :: p
 integer, intent(in) :: is, ie, js, je, ghc
 real(8), intent(in) :: dt, w, tol
+
+p%is = is; p%ie = ie
+p%js = js; p%je = je
 
 call p%x%alloc(is,ie,js,je,dt,w,ghc)
 call p%y%alloc(is,ie,js,je,dt,w,ghc)
