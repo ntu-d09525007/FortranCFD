@@ -8,6 +8,8 @@ real(8) :: w
 real(8) :: width,alpha,beta,I1,kh0,D0,D1,D2,x,theta
 integer :: i,j
 
+if(p%wa%width<1.0d-5) return
+
 ! ------ Wave source input ------ 
 width = 2.0d0*dacos(-1.0d0)*p%wa%width
 theta = p%wa%theta / 180.0d0 * dacos(-1.0d0)
