@@ -9,28 +9,28 @@ pi=dacos(-1.0d0)
 ! level set method, loss of volume/mass in percentage
 write(p%fil%ls_mv,*)p%glb%time,100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass,100.0d0*(p%glb%ivol-p%glb%vol)/p%glb%ivol
 
-! eta=0.0d0
-! !$omp parallel do private(i,j)
-! do id = 0, p%glb%threads-1
+eta=0.0d0
+!$omp parallel do private(i,j)
+do id = 0, p%glb%threads-1
 
-!     do i = p%of(id)%loc%is, p%of(id)%loc%ie
-!         if( abs(p%glb%x(i,j)-2.5d0*2.0d0*pi)<p%glb%dx*0.5d0)then
-!             do j = p%of(id)%loc%js, p%of(id)%loc%je
-!                 if(p%of(id)%loc%phi%now(i,j)*p%of(id)%loc%phi%now(i,j+1)<0.0d0)then
-!                     x = p%glb%x(i,j)
-!                     r = abs(p%of(id)%loc%phi%now(i,j))/(abs(p%of(id)%loc%phi%now(i,j))+abs(p%of(id)%loc%phi%now(i,j+1)))
-!                     eta = p%glb%y(i,j) + p%glb%dy * r
-!                 endif
-!             enddo
-!         endif
-!     enddo
+    do i = p%of(id)%loc%is, p%of(id)%loc%ie
+        if( abs(p%glb%x(i,j))<p%glb%dx*0.5d0)then
+            do j = p%of(id)%loc%js, p%of(id)%loc%je
+                if(p%of(id)%loc%phi%now(i,j)*p%of(id)%loc%phi%now(i,j+1)<0.0d0)then
+                    x = p%glb%x(i,j)
+                    r = abs(p%of(id)%loc%phi%now(i,j))/(abs(p%of(id)%loc%phi%now(i,j))+abs(p%of(id)%loc%phi%now(i,j+1)))
+                    eta = p%glb%y(i,j) + p%glb%dy * r
+                endif
+            enddo
+        endif
+    enddo
 
-! enddo
-! !$omp end parallel do
+enddo
+!$omp end parallel do
 
-! write(p%fil%wave,*)p%glb%time,eta,p%wa%L*dcos(p%wa%k*x-p%wa%w*p%glb%time)
+write(p%fil%wave,*)p%glb%time/(2.0d0*pi),eta,p%wa%L*dcos(p%wa%k*x-p%wa%w*p%glb%time)
 
-! write(*,'(2ES15.4)')eta,p%wa%L*dcos(p%wa%k*x-p%wa%w*p%glb%time)
+write(*,'(2ES15.4)')eta,p%wa%L*dcos(p%wa%k*x-p%wa%w*p%glb%time)
 
 end subroutine
 

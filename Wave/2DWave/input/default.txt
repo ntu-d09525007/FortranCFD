@@ -5,9 +5,9 @@ Wave_64
 ooo	Dimension of threads grid in X, Y direction
 2	3
 ooo	Multigrid level
-5
+7
 ooo	Cells per unit length 
-32
+128
 ooo	Number of ghost cell
 3
 ooo	Range of domain in X direction
@@ -17,7 +17,7 @@ ooo	Range of domain in Y direction
 ooo	Time to stop / plot
 20.0	0.2
 ooo	Crount number ( advection / redistance )
-0.005	0.5
+0.01	0.5
 ooo	PPE iteration ( tolerance / w1 / w2 / valve )
 8.0	0.5	0.5	4.0
 ooo	SRK6 iteration ( tolerance / w )
@@ -27,9 +27,9 @@ ooo	Level set interface width
 ooo	Problem parameters ( Prescribed / L / L+U / L+T / U+T / Wave-Study )
 6
 ooo	Density / Viscosity of fluid 1 ( phi > 0 )
-1000.0		0.00089
+1000.0		0.00001
 ooo	Density / Viscosity of fluid 2 ( phi < 0 )
-1.0		0.0000175
+1.0		0.0000001
 ooo	Surface tension of fluid 1, 2 / Using ?
 0.078		0
 ooo	Gravity / Using ?
