@@ -25,6 +25,8 @@ CHARACTER(100) :: NAME_OF_FILE
         
     call p%show
     
+    kh = p%wa%k * abs(p%glb%ystart)
+
     ug=30
     !$omp parallel do private(i,j,ii,jj,x,y)
     do id = 0, p%glb%threads-1
@@ -37,16 +39,11 @@ CHARACTER(100) :: NAME_OF_FILE
 
             kx = p%wa%k * x
             
-            if( y < p%wa%L * dcos(kx) )then
+            if( y <=  Stokes_wave_interface(kx,p%wa%steepness,kh,p%wa%L) )then
                 p%of(id)%loc%phi%now(i,j) = 1.0d0
             else
                 p%of(id)%loc%phi%now(i,j) = -1.0d0
             endif
-
-            !p%of(id)%loc%phi%now(i,j) = - y
-
-            p%of(id)%loc%vel%x%now(i,j) = 0.0_8
-            p%of(id)%loc%vel%y%now(i,j) = 0.0_8
 
         end do
         end do
@@ -65,31 +62,6 @@ CHARACTER(100) :: NAME_OF_FILE
     call pt%vof%sync
 
     call level_set_rk3_redis(0)
-
-    !$omp parallel do private(i,j,x,y,kx,ky,kh)
-    do id = 0, p%glb%threads-1
-
-        do j = p%of(id)%loc%js, p%of(id)%loc%je
-        do i = p%of(id)%loc%is, p%of(id)%loc%ie 
-
-            x = p%glb%x(i,j)
-            y = p%glb%y(i,j)
-
-            kx = p%wa%k * x
-            ky = p%wa%k * y
-            kh = p%wa%k * abs(p%glb%ystart)
-
-            if( p%of(id)%loc%phi%now(i,j) > 0.0d0 )then
-                p%of(id)%loc%vel%x%now(i,j) = p%wa%U * dcosh(ky+kh) / dcosh(kh) * dcos(kx)
-                p%of(id)%loc%vel%y%now(i,j) = p%wa%U * dsinh(ky+kh) / dcosh(kh) * dsin(kx)
-            endif
-
-        enddo
-        enddo
-
-    enddo
-    !$omp end parallel do
-    call pt%vel%sync
 
     call p%node_vel
     call pt%nvel%sync
@@ -114,6 +86,8 @@ CHARACTER(100) :: NAME_OF_FILE
     write(*,*) "plotting"
     call plot
     call p%plot
+
+    stop
     
     p%glb%ls_adv = 0.0d0
     p%glb%ls_red = 0.0d0

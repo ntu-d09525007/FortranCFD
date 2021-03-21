@@ -48,3 +48,21 @@ write(*,'("X error:",2ES15.4)')xnorm2,xnormax
 write(*,'("Y error:",2ES15.4)')ynorm2,ynormax
 
 end subroutine
+
+function Stokes_wave_interface(theta,eps,kh,a) result(eta)
+implicit none
+real(8), intent(in) :: theta,eps,kh,a
+real(8) :: eta
+real(8) :: c1,s1
+real(8) :: eta1,eta2,eta3
+
+c1=dsinh(kh)
+s1=dcosh(kh)
+
+eta3=eps**2.0d0*(3.0d0*(8.0d0*s1**6.0d0+24.0d0*s1**4.0d0+24.0d0*s1**2.0d0+9))/(64.0d0*s1**6.0d0)
+eta2=eps*c1/s1*(2.0d0*s1**2.0d0+3.0)/(4.0d0*s1**2.0d0)
+eta1=1.0d0-eta3
+
+eta = a * ( eta1*dcos(theta) + eta2*dcos(2.0d0*theta) + eta3*dcos(3.0d0*theta) )
+
+end  function
