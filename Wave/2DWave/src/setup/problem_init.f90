@@ -28,7 +28,7 @@ CHARACTER(100) :: NAME_OF_FILE
     kh = p%wa%k * abs(p%glb%ystart)
 
     ug=30
-    !$omp parallel do private(i,j,ii,jj,x,y)
+    !$omp parallel do private(i,j,ii,jj,x,y,kx,ky)
     do id = 0, p%glb%threads-1
         
         do j = p%of(id)%loc%js, p%of(id)%loc%je
@@ -38,9 +38,12 @@ CHARACTER(100) :: NAME_OF_FILE
             y = p%glb%y(i,j)
 
             kx = p%wa%k * x
+            ky = p%wa%k * y
             
-            if( y <=  Stokes_wave_interface(kx,p%wa%steepness,kh,p%wa%L) )then
+            if( y <= p%wa%L * ( dcos(kx) + 0.5d0*p%wa%steepness*dcos(kx) + 3.0d0/8.0d0*p%wa%steepness**2.0d0*dcos(3.0d0*kx) ) )then
                 p%of(id)%loc%phi%now(i,j) = 1.0d0
+                p%of(id)%loc%vel%x%now(i,j) = p%wa%U*dcosh(ky+kh)/dcosh(kh)*dcos(kx)
+                p%of(id)%loc%vel%y%now(i,j) = p%wa%U*dsinh(ky+kh)/dcosh(kh)*dsin(kx)
             else
                 p%of(id)%loc%phi%now(i,j) = -1.0d0
             endif

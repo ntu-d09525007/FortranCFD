@@ -284,7 +284,7 @@ real(8) :: mag
         case (6) ! Wave study -- finite depth
             p%wa%k = 1.0d0
             p%glb%L = p%wa%wavelength / (2.0d0*dacos(-1.0d0))
-            p%glb%U = dsqrt( p%glb%L * p%glb%g ) * dsqrt( dtanh(p%wa%k * abs(p%glb%ystart)) )
+            p%glb%U = dsqrt( p%glb%L * p%glb%g ) !* dsqrt( dtanh(p%wa%k * abs(p%glb%ystart)) )
             p%glb%T = p%glb%L / p%glb%U
             p%glb%fr = p%glb%u**2.0d0 / ( p%glb%g * p%glb%L ) 
             !-------------------------------
