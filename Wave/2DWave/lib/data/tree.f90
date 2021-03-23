@@ -281,20 +281,20 @@ real(8) :: mag
             p%glb%U = p%glb%L / p%glb%T
         case (5) ! U+T
             p%glb%L = p%glb%U * p%glb%T
-        case (6) ! Wave study -- finite depth
+        case (6) ! Wave study -- infinite depth
             p%wa%k = 1.0d0
             p%glb%L = p%wa%wavelength / (2.0d0*dacos(-1.0d0))
             p%glb%U = dsqrt( p%glb%L * p%glb%g ) !* dsqrt( dtanh(p%wa%k * abs(p%glb%ystart)) )
             p%glb%T = p%glb%L / p%glb%U
             p%glb%fr = p%glb%u**2.0d0 / ( p%glb%g * p%glb%L ) 
             !-------------------------------
-            p%wa%phase_speed = 1.0d0
-            p%wa%w = p%wa%k
+            p%wa%phase_speed = p%glb%U * ( 1.0d0 + 0.5d0*p%wa%steepness )
+            p%wa%w = p%wa%k * p%wa%phase_speed
             p%wa%L = p%wa%steepness / p%wa%k
             p%wa%U = p%wa%steepness / p%glb%fr
             !-------------------------------
-            p%glb%t2s  = p%glb%t2s  * 2.0d0 * dacos(-1.0d0) 
-            p%glb%t2p  = p%glb%t2p  * 2.0d0 * dacos(-1.0d0)
+            p%glb%t2s  = p%glb%t2s * 2.0d0 * dacos(-1.0d0) / p%wa%w
+            p%glb%t2p  = p%glb%t2p * 2.0d0 * dacos(-1.0d0) / p%wa%w
         case default
             write(*,*)"Error >> Wrong parameter selector "
             stop

@@ -40,10 +40,15 @@ CHARACTER(100) :: NAME_OF_FILE
             kx = p%wa%k * x
             ky = p%wa%k * y
             
-            if( y <= p%wa%L * ( dcos(kx) + 0.5d0*p%wa%steepness*dcos(kx) + 3.0d0/8.0d0*p%wa%steepness**2.0d0*dcos(3.0d0*kx) ) )then
+            if( y <= p%wa%L * ( (1.0d0-p%wa%steepness**2.0d0/16.0d0)*dcos(kx) + 0.5d0*p%wa%steepness*dcos(kx) + 3.0d0/8.0d0*p%wa%steepness**2.0d0*dcos(3.0d0*kx) ) )then
                 p%of(id)%loc%phi%now(i,j) = 1.0d0
-                p%of(id)%loc%vel%x%now(i,j) = p%wa%U*dcosh(ky+kh)/dcosh(kh)*dcos(kx)
-                p%of(id)%loc%vel%y%now(i,j) = p%wa%U*dsinh(ky+kh)/dcosh(kh)*dsin(kx)
+                if( y<=0.0d0 )then      
+                        p%of(id)%loc%vel%x%now(i,j) = p%wa%U*dexp(ky)*dcos(kx)
+                        p%of(id)%loc%vel%y%now(i,j) = p%wa%U*dexp(ky)*dsin(kx)
+                else
+                        p%of(id)%loc%vel%x%now(i,j) = p%wa%U*dcos(kx)
+                        p%of(id)%loc%vel%y%now(i,j) = p%wa%U*dsin(kx)
+                endif
             else
                 p%of(id)%loc%phi%now(i,j) = -1.0d0
             endif
@@ -90,7 +95,6 @@ CHARACTER(100) :: NAME_OF_FILE
     call plot
     call p%plot
 
-    stop
     
     p%glb%ls_adv = 0.0d0
     p%glb%ls_red = 0.0d0

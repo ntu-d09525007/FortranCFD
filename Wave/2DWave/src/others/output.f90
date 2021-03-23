@@ -2,7 +2,7 @@ subroutine output()
 use all
 implicit none
 integer :: id,i,j
-real(8) :: pi, eta, r, x
+real(8) :: pi, eta, r, x, exact
 
 pi=dacos(-1.0d0)
 
@@ -27,6 +27,8 @@ do id = 0, p%glb%threads-1
 
 enddo
 !$omp end parallel do
+
+exact = 
 
 write(p%fil%wave,*)p%glb%time/(2.0d0*pi),eta,p%wa%L*dcos(p%wa%k*x-p%wa%w*p%glb%time)
 
