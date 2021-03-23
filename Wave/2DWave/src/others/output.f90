@@ -2,7 +2,7 @@ subroutine output()
 use all
 implicit none
 integer :: id,i,j
-real(8) :: pi, eta, r, x, exact
+real(8) :: pi, eta, r, x, exact, theta, kh
 
 pi=dacos(-1.0d0)
 
@@ -28,11 +28,13 @@ do id = 0, p%glb%threads-1
 enddo
 !$omp end parallel do
 
-exact = 
+kh = p%wa%k * abs(p%glb%ystart)
+theta = p%wa%k*x-p%wa%w*p%glb%time
+exact = p%wa%L * Stokes_wave_interface(theta,p%wa%steepness,kh) 
 
-write(p%fil%wave,*)p%glb%time/(2.0d0*pi),eta,p%wa%L*dcos(p%wa%k*x-p%wa%w*p%glb%time)
+write(p%fil%wave,*)p%glb%time/(2.0d0*pi),eta,exact
 
-write(*,'(2ES15.4)')eta,p%wa%L*dcos(p%wa%k*x-p%wa%w*p%glb%time)
+write(*,'(2ES15.4)')eta,exact
 
 end subroutine
 

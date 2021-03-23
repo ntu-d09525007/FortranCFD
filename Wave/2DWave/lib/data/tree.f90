@@ -187,7 +187,7 @@ class(manager) :: p
 character(*) :: path
 integer :: max_threads
 integer :: i, j, id
-real(8) :: mag
+real(8) :: mag, kh, ap
 
     call p%read(path)
 
@@ -281,20 +281,23 @@ real(8) :: mag
             p%glb%U = p%glb%L / p%glb%T
         case (5) ! U+T
             p%glb%L = p%glb%U * p%glb%T
-        case (6) ! Wave study -- infinite depth
+        case (6) ! Wave study -- finite depth, benchmark
             p%wa%k = 1.0d0
-            p%glb%L = p%wa%wavelength / (2.0d0*dacos(-1.0d0))
-            p%glb%U = dsqrt( p%glb%L * p%glb%g ) !* dsqrt( dtanh(p%wa%k * abs(p%glb%ystart)) )
-            p%glb%T = p%glb%L / p%glb%U
-            p%glb%fr = p%glb%u**2.0d0 / ( p%glb%g * p%glb%L ) 
+            p%wa%w = 1.0d0
             !-------------------------------
-            p%wa%phase_speed = p%glb%U * ( 1.0d0 + 0.5d0*p%wa%steepness )
-            p%wa%w = p%wa%k * p%wa%phase_speed
-            p%wa%L = p%wa%steepness / p%wa%k
+            kh = abs(p%wa%k*p%glb%ystart)
+            ap = 1.0d0 / dtanh(kh)
+            !-------------------------------
+            p%glb%L = p%wa%wavelength / (2.0d0*dacos(-1.0d0))
+            p%glb%U = dsqrt( p%glb%L * p%glb%g * dtanh(kh)*(1.0+p%wa%steepness**2*(9.0/8.0*(ap**2-1.0)**2+ap**2)) )
+            p%glb%T = p%glb%L / p%glb%U
+            p%glb%fr = p%glb%u**2.0d0 / ( p%glb%g * p%glb%L )          
+            !-------------------------------
+            p%wa%L = p%wa%steepness
             p%wa%U = p%wa%steepness / p%glb%fr
             !-------------------------------
-            p%glb%t2s  = p%glb%t2s * 2.0d0 * dacos(-1.0d0) / p%wa%w
-            p%glb%t2p  = p%glb%t2p * 2.0d0 * dacos(-1.0d0) / p%wa%w
+            p%glb%t2s  = p%glb%t2s * 2.0d0 * dacos(-1.0d0)
+            p%glb%t2p  = p%glb%t2p * 2.0d0 * dacos(-1.0d0)
         case default
             write(*,*)"Error >> Wrong parameter selector "
             stop
