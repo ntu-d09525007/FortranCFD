@@ -3,7 +3,7 @@ ooo	( LS / MPLS / CLSVOF ) / MPLS curvature dependent?
 ooo	Name of the problem 
 Wave_64
 ooo	Dimension of threads grid in X, Y direction
-2	3
+4	6
 ooo	Multigrid level
 7
 ooo	Cells per unit length 
