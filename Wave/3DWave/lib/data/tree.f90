@@ -306,7 +306,7 @@ real(8) :: kh,ap
             p%wa%k = 1.0d0
             p%wa%w = 1.0d0
             !-------------------------------
-            kh = abs(p%wa%k*p%glb%zstart)
+            kh = abs(p%wa%k * p%glb%zstart)
             ap = 1.0d0 / dtanh(kh)
             !-------------------------------
             p%glb%L = p%wa%wavelength / (2.0d0*dacos(-1.0d0))

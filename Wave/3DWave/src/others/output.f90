@@ -2,23 +2,28 @@ subroutine output()
 use all
 implicit none
 integer :: i,j,k,id
-real(8) :: eta
+real(8) :: eta,num,x
 
 ! level set method, loss of volume/mass in percentage
 write(p%fil%ls_mv,*)p%glb%time,100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass,100.0d0*(p%glb%ivol-p%glb%vol)/p%glb%ivol
 
 eta=0.0d0
-!$omp parallel do private(i,j,k)
+num=0.0d0
+x=0.0d0
+!$omp parallel do private(i,j,k,r), reduction(+:eta,num,x)
 do id = 0, p%glb%threads-1
 
     do i = p%of(id)%loc%is, p%of(id)%loc%ie
-        if( abs(p%glb%x(i,j))<p%glb%dx*0.5d0)then
+        if( abs(p%glb%x(i,j,k))<p%glb%dx*0.5d0 )then
+            do k = p%of(id)%loc%ks, p%of(id)%loc%ke
             do j = p%of(id)%loc%js, p%of(id)%loc%je
-                if(p%of(id)%loc%phi%now(i,j)*p%of(id)%loc%phi%now(i,j+1)<0.0d0)then
-                    x = p%glb%x(i,j)
-                    r = abs(p%of(id)%loc%phi%now(i,j))/(abs(p%of(id)%loc%phi%now(i,j))+abs(p%of(id)%loc%phi%now(i,j+1)))
-                    eta = p%glb%y(i,j) + p%glb%dy * r
+                if(p%of(id)%loc%phi%now(i,j,k)*p%of(id)%loc%phi%now(i,j,k+1)<0.0d0)then
+                    x = x + p%glb%x(i,j,k)
+                    num =  num + 1.0d0
+                    r = abs(p%of(id)%loc%phi%now(i,j,k))/(abs(p%of(id)%loc%phi%now(i,j,k))+abs(p%of(id)%loc%phi%now(i,j,k+1)))
+                    eta = eta + p%glb%k(i,j,k) + p%glb%dz * r
                 endif
+            enddo
             enddo
         endif
     enddo
@@ -26,7 +31,10 @@ do id = 0, p%glb%threads-1
 enddo
 !$omp end parallel do
 
-kh = p%wa%k * abs(p%glb%ystart)
+x=x/num
+eta=eta/num
+
+kh = p%wa%k * abs(p%glb%zstart)
 theta = p%wa%k*x-p%wa%w*p%glb%time
 exact = p%wa%L * Stokes_wave_interface(theta,p%wa%steepness,kh) 
 
