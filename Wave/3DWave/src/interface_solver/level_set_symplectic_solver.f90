@@ -94,13 +94,13 @@ logical :: btn
         do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
         do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
         
-            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%x%solve("uccd",&
                 &p%of(id)%loc%tdata%x%s1(:,j,k),p%of(id)%loc%tdata%x%ss1(:,j,k),p%of(id)%loc%nvel%x%tmp(:,j,k),p%of(id)%loc%nvel%x%old(:,j,k))
                                         
-            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%x%solve("uccd",&
                 &p%of(id)%loc%tdata%x%s2(:,j,k),p%of(id)%loc%tdata%x%ss2(:,j,k),p%of(id)%loc%nvel%x%tmp(:,j,k),p%of(id)%loc%nvel%x%old(:,j,k))
                                         
-            call p%of(id)%loc%ccdsolvers%x%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%x%solve("uccd",&
                &p%of(id)%loc%tdata%x%s3(:,j,k),p%of(id)%loc%tdata%x%ss3(:,j,k),p%of(id)%loc%nvel%x%tmp(:,j,k),p%of(id)%loc%nvel%x%old(:,j,k))
             
         end do
@@ -122,13 +122,13 @@ logical :: btn
         do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
         do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
             
-            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%y%solve("uccd",&
                 &p%of(id)%loc%tdata%x%s1(i,:,k),p%of(id)%loc%tdata%x%ss1(i,:,k),p%of(id)%loc%nvel%y%tmp(i,:,k),p%of(id)%loc%nvel%y%old(i,:,k))
                                         
-            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%y%solve("uccd",&
                 &p%of(id)%loc%tdata%x%s2(i,:,k),p%of(id)%loc%tdata%x%ss2(i,:,k),p%of(id)%loc%nvel%y%tmp(i,:,k),p%of(id)%loc%nvel%y%old(i,:,k))
                                         
-            call p%of(id)%loc%ccdsolvers%y%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%y%solve("uccd",&
                &p%of(id)%loc%tdata%x%s3(i,:,k),p%of(id)%loc%tdata%x%ss3(i,:,k),p%of(id)%loc%nvel%y%tmp(i,:,k),p%of(id)%loc%nvel%y%old(i,:,k))
         end do
         end do
@@ -149,13 +149,13 @@ logical :: btn
         do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
         do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
             
-            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%z%solve("uccd",&
                     &p%of(id)%loc%tdata%x%s1(i,j,:),p%of(id)%loc%tdata%x%ss1(i,j,:),p%of(id)%loc%nvel%z%tmp(i,j,:),p%of(id)%loc%nvel%z%old(i,j,:))
 
-            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%z%solve("uccd",&
                     &p%of(id)%loc%tdata%x%s2(i,j,:),p%of(id)%loc%tdata%x%ss2(i,j,:),p%of(id)%loc%nvel%z%tmp(i,j,:),p%of(id)%loc%nvel%z%old(i,j,:))
 
-            call p%of(id)%loc%ccdsolvers%z%solve("srkccd",&
+            call p%of(id)%loc%ccdsolvers%z%solve("uccd",&
                    &p%of(id)%loc%tdata%x%s3(i,j,:),p%of(id)%loc%tdata%x%ss3(i,j,:),p%of(id)%loc%nvel%z%tmp(i,j,:),p%of(id)%loc%nvel%z%old(i,j,:))
         end do
         end do

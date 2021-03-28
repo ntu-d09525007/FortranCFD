@@ -38,8 +38,9 @@ do
         call print_CPU_info
         call find_momentum
         write(*,*)"========================================="
+        call output
     endif
-    call output
+    
 
     if( p%glb%time > p%glb%t2s ) exit
     
