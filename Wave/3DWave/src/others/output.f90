@@ -2,7 +2,7 @@ subroutine output()
 use all
 implicit none
 integer :: i,j,k,id
-real(8) :: eta,num,x
+real(8) :: eta,num,x,r,kh,exact,theta
 
 ! level set method, loss of volume/mass in percentage
 write(p%fil%ls_mv,*)p%glb%time,100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass,100.0d0*(p%glb%ivol-p%glb%vol)/p%glb%ivol
@@ -21,7 +21,7 @@ do id = 0, p%glb%threads-1
                     x = x + p%glb%x(i,j,k)
                     num =  num + 1.0d0
                     r = abs(p%of(id)%loc%phi%now(i,j,k))/(abs(p%of(id)%loc%phi%now(i,j,k))+abs(p%of(id)%loc%phi%now(i,j,k+1)))
-                    eta = eta + p%glb%k(i,j,k) + p%glb%dz * r
+                    eta = eta + p%glb%z(i,j,k) + p%glb%dz * r
                 endif
             enddo
             enddo

@@ -152,9 +152,9 @@ if( p%loc%idy==0 .and. .not. p%glb%yper )then
         do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
         do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
 
-            src = p%loc%vel%y%old(i,p%loc%js-1,k)*(v(i,p%loc%js+1)-v(i,p%loc%js,k))/p%glb%dy*p%glb%dt
+            src = p%loc%vel%y%old(i,p%loc%js-1,k)*(v(i,p%loc%js+1,k)-v(i,p%loc%js,k))/p%glb%dy*p%glb%dt
 
-            v(i,p%loc%js-1) = p%loc%vel%y%old(i,p%loc%js-1,k) - src
+            v(i,p%loc%js-1,k) = p%loc%vel%y%old(i,p%loc%js-1,k) - src
 
             do j = 2, p%glb%ghc
                 v(i,p%loc%js-j,k) = 2.0d0*v(i,p%loc%js-j+1,k) - v(i,p%loc%js-j+2,k)
