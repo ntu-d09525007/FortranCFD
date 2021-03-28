@@ -5,7 +5,7 @@ implicit none
 integer :: id, i, j, k, ug, ii,jj,kk
 real(8) :: x, y, z, err
 CHARACTER(100) :: NAME_OF_FILE
-real(8) :: kx, kz
+real(8) :: kx, kz, kh
     
     NAME_OF_FILE="default.txt"
     
@@ -25,8 +25,10 @@ real(8) :: kx, kz
         
     call p%show
     
+    kh = p%wa%k * abs(p%glb%zstart)
+
     ug=30
-    !$omp parallel do private(i,j,k,ii,jj,kk,x,y,z,kx)
+    !$omp parallel do private(i,j,k,ii,jj,kk,x,y,z,kx,kz)
     do id = 0, p%glb%threads-1
         
         do k = p%of(id)%loc%ks, p%of(id)%loc%ke
@@ -38,16 +40,19 @@ real(8) :: kx, kz
             z = p%glb%z(i,j,k)
 
             kx = p%wa%k * x
-            
-            if( z < p%wa%L * dcos(kx) )then
-                p%of(id)%loc%phi%now(i,j,k) = 1.0d0
+            kz = p%wa%k * z
+
+            if( y <= p%wa%L * Stokes_wave_interface(kx,p%wa%steepness,kh)  )then
+                p%of(id)%loc%phi%now(i,j) = 1.0d0
+                p%of(id)%loc%vel%x%now(i,j) = p%wa%U * Stokes_wave_u(kx,p%wa%steepness,kh,kz)
+                p%of(id)%loc%vel%z%now(i,j) = p%wa%U * Stokes_wave_v(kx,p%wa%steepness,kh,kz)
             else
-                p%of(id)%loc%phi%now(i,j,k) = -1.0d0
+                p%of(id)%loc%phi%now(i,j) = -1.0d0
+                p%of(id)%loc%vel%x%now(i,j) = 0.0d0
+                p%of(id)%loc%vel%z%now(i,j) = 0.0d0
             endif
             
-            p%of(id)%loc%vel%x%now(i,j,k) = 0.0_8
             p%of(id)%loc%vel%y%now(i,j,k) = 0.0_8
-            p%of(id)%loc%vel%z%now(i,j,k) = 0.0_8
             
         end do
         end do
@@ -67,34 +72,6 @@ real(8) :: kx, kz
     call pt%vof%sync
 
     call level_set_rk3_redis(0)
-
-    !$omp parallel do private(i,j,k,x,y,z,kx,kz)
-    do id = 0, p%glb%threads-1
-
-        do k = p%of(id)%loc%ks, p%of(id)%loc%ke
-        do j = p%of(id)%loc%js, p%of(id)%loc%je
-        do i = p%of(id)%loc%is, p%of(id)%loc%ie 
-
-            x = p%glb%x(i,j,k)
-            y = p%glb%y(i,j,k)
-            z = p%glb%z(i,j,k)
-
-            kx = p%wa%k * x
-            kz = p%wa%k * z
-
-            if( p%of(id)%loc%phi%now(i,j,k) > 0.0d0 )then
-                p%of(id)%loc%vel%x%now(i,j,k) = p%wa%U * dexp(kz) * dcos(kx)
-                p%of(id)%loc%vel%y%now(i,j,k) = 0.0d0
-                p%of(id)%loc%vel%z%now(i,j,k) = p%wa%U * dexp(kz) * dsin(kx)
-            endif
-
-        enddo
-        enddo
-        enddo
-
-    enddo
-    !$omp end parallel do
-    call pt%vel%sync
 
     call p%node_vel
     call pt%nvel%sync
