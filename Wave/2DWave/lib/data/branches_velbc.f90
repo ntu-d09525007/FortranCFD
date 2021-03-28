@@ -175,7 +175,7 @@ if (p%loc%idy==p%glb%grid_y-1 .and. .not. p%glb%yper )then
 
             do j = 1, p%glb%ghc
                 u(i,p%loc%je+j) = - u(i,p%loc%je+1-j)
-                v(i,p%loc%je+j) = 2.0d0*v(i,p%loc%je-1) - v(i,p%loc%je-2)
+                v(i,p%loc%je+j) = 2.0d0*v(i,p%loc%je+j-1) - v(i,p%loc%je+j-2)
             enddo
 
         enddo

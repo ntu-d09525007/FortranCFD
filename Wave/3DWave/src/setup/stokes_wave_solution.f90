@@ -1,57 +1,25 @@
-subroutine Stokes_wave_error()
-use all 
-!$ use omp_lib
+function Stokes_wave_u(t,e,kh,ky) result(u)
 implicit none
-integer :: i,j,k,id
-real(8) :: x,y,z
-real(8) :: xnorm2,xnormax,ynorm2,ynormax,znorm2,znormax
-real(8) :: u,w,kx,kz,wt,kdx
+real(8), intent(in) :: t,e,kh,ky
+real(8) :: u,s,c
 
-xnorm2=0.0d0;ynorm2=0.0d0;znorm2=0.0d0;
-xnormax=0.0d0;ynormax=0.0d0;znormax=0.0d0;
+s = dsinh(kh)
+c = dcosh(kh)
 
-!$omp parallel do private(i,j,k,x,y,z,u,w,kx,kz,wt), reduction(+:xnorm2,ynorm2,znorm2), reduction(max:xnormax,ynormax,znormax)
-do id = 0, p%glb%threads-1
+u = dcosh(kh+ky)*dcos(t) / c
+u = u + 0.75d0 * e * dcosh(2.0d0*(kh+ky)) * dcos(2.0*t) /  (s**3.0d0*c)
 
-    do k = p%of(id)%loc%ks, p%of(id)%loc%ke
-    do j = p%of(id)%loc%js, p%of(id)%loc%je
-    do i = p%of(id)%loc%is, p%of(id)%loc%ie 
+end  function
 
-        x = p%glb%x(i,j,k)
-        y = p%glb%y(i,j,k)
-        z = p%glb%z(i,j,k)
+function Stokes_wave_v(t,e,kh,ky) result(v)
+implicit none
+real(8), intent(in) :: t,e,kh,ky
+real(8) :: v,s,c
 
-        kx = p%wa%k * x
-        kz = p%wa%k * z
-        wt = p%wa%w * p%glb%time
+s = dsinh(kh)
+c = dcosh(kh)
 
-        u = p%wa%U * dexp(kz) * dcos(kx-wt+p%wa%k*p%glb%dx*0.5d0)
-        w = p%wa%U * dexp(kz) * dsin(kx-wt)
+v = dsinh(kh+ky)*dsin(t) / c
+v = v + 0.75d0 * e * dsinh(2.0d0*(kh+ky)) * dsin(2.0*t) /  (s**3.0d0*c)
 
-        if( p%of(id)%loc%phi%now(i,j,k) > 0.0d0 )then
-            xnorm2 = xnorm2 + (p%of(id)%loc%vel%x%now(i,j,k)-u)**2.0d0
-            ynorm2 = ynorm2 + (p%of(id)%loc%vel%y%now(i,j,k)  )**2.0d0
-            znorm2 = znorm2 + (p%of(id)%loc%vel%z%now(i,j,k)-w)**2.0d0
-
-            xnormax = max( xnormax, abs(p%of(id)%loc%vel%x%now(i,j,k)-u))
-            ynormax = max( ynormax, abs(p%of(id)%loc%vel%y%now(i,j,k)  )) 
-            znormax = max( znormax, abs(p%of(id)%loc%vel%z%now(i,j,k)-w))
-        endif
-
-    enddo
-    enddo
-    enddo
-
-enddo
-!$omp end parallel do
-
-xnorm2=dsqrt(xnorm2/real(p%glb%node_x*p%glb%node_y*p%glb%node_z,kind=8))
-ynorm2=dsqrt(ynorm2/real(p%glb%node_x*p%glb%node_y*p%glb%node_z,kind=8))
-znorm2=dsqrt(znorm2/real(p%glb%node_x*p%glb%node_y*p%glb%node_z,kind=8))
-
-write(*,*)""
-write(*,'("X error:",2ES15.4)')xnorm2,xnormax
-write(*,'("Y error:",2ES15.4)')ynorm2,ynormax
-write(*,'("Z error:",2ES15.4)')znorm2,znormax
-
-end subroutine
+end  function

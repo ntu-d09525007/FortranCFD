@@ -198,6 +198,7 @@ character(*) :: path
 integer :: max_threads
 integer :: i, j, k, id
 real(8) :: mag
+real(8) :: kh,ap
 
     call p%read(path)
 
@@ -245,6 +246,8 @@ real(8) :: mag
         p%glb%xstart = p%glb%xstart * 2.0d0 * dacos(-1.0d0)
         p%glb%yend   = p%glb%yend   * 2.0d0 * dacos(-1.0d0)
         p%glb%ystart = p%glb%ystart * 2.0d0 * dacos(-1.0d0)
+        p%glb%zend   = p%glb%zend   * 2.0d0 * dacos(-1.0d0)
+        p%glb%zstart = p%glb%zstart * 2.0d0 * dacos(-1.0d0)
     endif
 
     p%glb%dx = ( p%glb%xend - p%glb%xstart ) / p%glb%node_x
@@ -299,15 +302,23 @@ real(8) :: mag
             p%glb%U = p%glb%L / p%glb%T
         case (5) ! U+T
             p%glb%L = p%glb%U * p%glb%T
-        case (6) ! Wave study
-            p%glb%L = p%wa%wavelength / (2.0d0*dacos(-1.0d0))
-            p%glb%U = dsqrt( p%glb%L * p%glb%g )
-            p%glb%T = p%glb%L / p%glb%U
-            !-------------------------------
+        case (6) ! Wave study -- finite depth, benchmark
             p%wa%k = 1.0d0
-            p%wa%w = p%wa%phase_speed / p%glb%U * p%wa%k
+            p%wa%w = 1.0d0
+            !-------------------------------
+            kh = abs(p%wa%k*p%glb%zstart)
+            ap = 1.0d0 / dtanh(kh)
+            !-------------------------------
+            p%glb%L = p%wa%wavelength / (2.0d0*dacos(-1.0d0))
+            p%glb%U = dsqrt( p%glb%L * p%glb%g * dtanh(kh)*(1.0+p%wa%steepness**2*(9.0/8.0*(ap**2-1.0)**2+ap**2)) )
+            p%glb%T = p%glb%L / p%glb%U
+            p%glb%fr = p%glb%u**2.0d0 / ( p%glb%g * p%glb%L )          
+            !-------------------------------
             p%wa%L = p%wa%steepness
-            p%wa%U = p%wa%L * p%wa%w
+            p%wa%U = p%wa%steepness / p%glb%fr
+            !-------------------------------
+            p%glb%t2s  = p%glb%t2s * 2.0d0 * dacos(-1.0d0)
+            p%glb%t2p  = p%glb%t2p * 2.0d0 * dacos(-1.0d0)
         case default
             write(*,*)"Error >> Wrong parameter selector "
             stop
@@ -436,7 +447,5 @@ enddo
 !$omp end parallel do
 
 end subroutine
-
-
 
 end module tree

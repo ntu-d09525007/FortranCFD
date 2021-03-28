@@ -6,6 +6,7 @@ integer :: i,j,k
 real(8), dimension(p%loc%is-p%glb%ghc:p%loc%ie+p%glb%ghc,&
                   &p%loc%js-p%glb%ghc:p%loc%je+p%glb%ghc,&
                   &p%loc%ks-p%glb%ghc:p%loc%ke+p%glb%ghc) :: u,v,w
+real(8) :: src
 
 !==========================================
 !  X-direction velocity boundary condition
@@ -43,11 +44,20 @@ if( p%loc%idx == 0 .and. .not. p%glb%xper )then
 
         do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
         do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
-        do i = 1, p%glb%ghc
-            u(p%loc%is-i,j,k) = u(p%loc%is,j,k)
-            v(p%loc%is-i,j,k) = v(p%loc%is,j,k)
-            w(p%loc%is-i,j,k) = w(p%loc%is,j,k)
-        end do  
+
+            src = p%loc%vel%x%old(p%loc%is-1,j,k)*(u(p%loc%is+1,j,k)-u(p%loc%is,j,k))/p%glb%dx*p%glb%dt
+
+            u(p%loc%is-1,j,k) = p%loc%vel%x%old(p%loc%is-1,j,k) - src
+
+            do i = 2, p%glb%ghc
+                u(p%loc%is-i,j,k) = 2.0d0*u(p%loc%is-i+1,j,k)-u(p%loc%is-i+2,j,k)
+            end do
+
+            do i = 1, p%glb%ghc
+                v(p%loc%is-i,j,k) = - v(p%loc%is-1+i,j,k)
+                w(p%loc%is-i,j,k) = - w(p%loc%is-1+i,j,k)
+            end do
+
         end do
         end do
                 
@@ -62,7 +72,7 @@ if ( p%loc%idx == p%glb%grid_x-1 .and. .not. p%glb%xper )then
         do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
         do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
         do i = 1, p%glb%ghc
-            u(p%loc%ie+i,j,k) = - u(p%loc%ie-i,j,k)
+            u(p%loc%ie+i,j,k) = - u(p%loc%ie  -i,j,k)
             v(p%loc%ie+i,j,k) = - v(p%loc%ie+1-i,j,k)
             w(p%loc%ie+i,j,k) = - w(p%loc%ie+1-i,j,k)
         end do  
@@ -75,7 +85,7 @@ if ( p%loc%idx == p%glb%grid_x-1 .and. .not. p%glb%xper )then
         do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
         do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
         do i = 1, p%glb%ghc
-            u(p%loc%ie+i,j,k) = u(p%loc%ie-i,j,k)
+            u(p%loc%ie+i,j,k) = u(p%loc%ie  -i,j,k)
             v(p%loc%ie+i,j,k) = v(p%loc%ie+1-i,j,k)
             w(p%loc%ie+i,j,k) = w(p%loc%ie+1-i,j,k)
         end do  
@@ -87,12 +97,18 @@ if ( p%loc%idx == p%glb%grid_x-1 .and. .not. p%glb%xper )then
 
         do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
         do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
-        do i = 1, p%glb%ghc
-            u(p%loc%ie+i,j,k) = u(p%loc%ie,j,k)
-            v(p%loc%ie+i,j,k) = v(p%loc%ie,j,k)
-            w(p%loc%ie+i,j,k) = w(p%loc%ie,j,k)
-        end do  
-        end do
+            
+            src = p%loc%vel%x%old(p%loc%ie,j,k)*(u(p%loc%ie-1,j,k)-u(p%loc%ie-2,j,k))/p%glb%dx*p%glb%dt
+
+            u(p%loc%ie,j,k) = p%loc%vel%x%old(p%loc%ie,j,k) - src
+
+            do i = 1, p%glb%ghc
+                u(p%loc%ie+i,j,k) = 2.0d0*u(p%loc%ie+i-1,j,k)-u(p%loc%ie+i-2,j,k)
+                v(p%loc%ie+i,j,k) = - v(p%loc%ie+1-i,j,k)
+                w(p%loc%ie+i,j,k) = - w(p%loc%ie+1-i,j,k)
+            end do
+
+        end do 
         end do 
                 
     endif
@@ -135,11 +151,20 @@ if( p%loc%idy==0 .and. .not. p%glb%yper )then
 
         do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
         do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
-        do j = 1, p%glb%ghc
-            u(i,p%loc%js-j,k) = u(i,p%loc%js,k)
-            v(i,p%loc%js-j,k) = v(i,p%loc%js,k)
-            w(i,p%loc%js-j,k) = w(i,p%loc%js,k)
-        enddo
+
+            src = p%loc%vel%y%old(i,p%loc%js-1,k)*(v(i,p%loc%js+1)-v(i,p%loc%js,k))/p%glb%dy*p%glb%dt
+
+            v(i,p%loc%js-1) = p%loc%vel%y%old(i,p%loc%js-1,k) - src
+
+            do j = 2, p%glb%ghc
+                v(i,p%loc%js-j,k) = 2.0d0*v(i,p%loc%js-j+1,k) - v(i,p%loc%js-j+2,k)
+            enddo
+
+            do j = 1, p%glb%ghc
+                u(i,p%loc%js-j,k) = - u(i,p%loc%js-1+j,k)
+                w(i,p%loc%js-j,k) = - w(i,p%loc%js-1+j,k)
+            enddo
+
         enddo
         enddo
 
@@ -179,11 +204,17 @@ if (p%loc%idy==p%glb%grid_y-1 .and. .not. p%glb%yper )then
 
         do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
         do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
-        do j = 1, p%glb%ghc
-            u(i,p%loc%je+j,k) = u(i,p%loc%je,k)
-            v(i,p%loc%je+j,k) = v(i,p%loc%je,k)
-            w(i,p%loc%je+j,k) = w(i,p%loc%je,k)
-        enddo
+
+            src = p%loc%vel%y%old(i,p%loc%je,k)*(v(i,p%loc%je-1,k)-v(i,p%loc%je-2,k))/p%glb%dy*p%glb%dt
+
+            v(i,p%loc%je,k) = p%loc%vel%y%old(i,p%loc%je,k) - src
+
+            do j = 1, p%glb%ghc
+                u(i,p%loc%je+j,k) = - u(i,p%loc%je+1-j,k)
+                v(i,p%loc%je+j,k) = 2.0d0*v(i,p%loc%je+j-1,k) - v(i,p%loc%je+k-2,k)
+                w(i,p%loc%je+j,k) = - w(i,p%loc%je+1-j,k)
+            enddo
+
         enddo
         enddo
 
@@ -227,11 +258,20 @@ if( p%loc%idz==0 .and. .not. p%glb%zper )then
 
         do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
         do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
-        do k = 1, p%glb%ghc
-            u(i,j,p%loc%ks-k) = u(i,j,p%loc%ks)
-            v(i,j,p%loc%ks-k) = v(i,j,p%loc%ks)
-            w(i,j,p%loc%ks-k) = w(i,j,p%loc%ks)
-        enddo
+
+            src = p%loc%vel%z%old(i,j,p%loc%ks-1)*(w(i,j,p%loc%ks+1)-w(i,j,p%loc%ks))/p%glb%dz*p%glb%dt
+
+            w(i,j,p%loc%ks-1) = p%loc%vel%z%old(i,j,p%loc%ks-1) - src
+
+            do k = 2, p%glb%ghc
+                w(i,j,p%loc%ks-k) = 2.0d0*w(i,j,p%loc%ks-k+1) - w(i,j,p%loc%ks-k+2)
+            enddo
+
+            do k = 1, p%glb%ghc
+                u(i,j,p%loc%ks-k) = - u(i,j,p%loc%ks-1+k)
+                v(i,j,p%loc%ks-k) = - v(i,j,p%loc%ks-1+k)
+            enddo
+
         enddo
         enddo
                                 
@@ -271,11 +311,17 @@ if (p%loc%idz==p%glb%grid_z-1 .and. .not. p%glb%zper )then
 
         do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
         do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
-        do k = 1, p%glb%ghc
-            u(i,j,p%loc%ke+k) = u(i,j,p%loc%ke)
-            v(i,j,p%loc%ke+k) = v(i,j,p%loc%ke)
-            w(i,j,p%loc%ke+k) = w(i,j,p%loc%ke)
-        enddo
+
+            src = p%loc%vel%z%old(i,j,p%loc%ke)*(w(i,j,p%loc%ke-1)-w(i,j,p%loc%ke-2))/p%glb%dz*p%glb%dt
+
+            w(i,j,p%loc%ke) = p%loc%vel%z%old(i,j,p%loc%ke) - src
+
+            do k = 1, p%glb%ghc
+                u(i,j,p%loc%ke+k) = - u(i,j,p%loc%ke+1-k)
+                v(i,j,p%loc%ke+k) = - v(i,j,p%loc%ke+1-k)
+                w(i,j,p%loc%ke+k) = 2.0d0*w(i,j,p%loc%ke+k-1) - w(i,j,p%loc%ke+k-2)
+            enddo
+
         enddo
         enddo
 
@@ -329,8 +375,8 @@ if( p%loc%idx == 0 .and. .not. p%glb%xper )then
         do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
         do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc       
         do i = 1, p%glb%ghc
-            u(p%loc%is-i,j,k) = u(p%loc%is,j,k)
-            v(p%loc%is-i,j,k) = v(p%loc%is,j,k)
+            u(p%loc%is-i,j,k) = - u(p%loc%is-1+i,j,k)
+            v(p%loc%is-i,j,k) = - v(p%loc%is-1+i,j,k)
             w(p%loc%is-i,j,k) = w(p%loc%is,j,k)
         end do
         end do
@@ -371,8 +417,8 @@ if ( p%loc%idx == p%glb%grid_x-1 .and. .not. p%glb%xper )then
         do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
         do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc       
         do i = 1, p%glb%ghc
-            u(p%loc%ie+i,j,k) = u(p%loc%ie,j,k)
-            v(p%loc%ie+i,j,k) = v(p%loc%ie,j,k)
+            u(p%loc%ie+i,j,k) = - u(p%loc%ie+1-i,j,k)
+            v(p%loc%ie+i,j,k) = - v(p%loc%ie+1-i,j,k)
             w(p%loc%ie+i,j,k) = w(p%loc%ie,j,k)
         end do  
         end do
@@ -417,8 +463,8 @@ if( p%loc%idy==0 .and. .not. p%glb%yper )then
         do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
         do j = 1, p%glb%ghc
         do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
-            u(i,p%loc%js-j,k) = u(i,p%loc%js,k)
-            v(i,p%loc%js-j,k) = v(i,p%loc%js,k)
+            u(i,p%loc%js-j,k) = - u(i,p%loc%js-1+j,k)
+            v(i,p%loc%js-j,k) = - v(i,p%loc%js-1+j,k)
             w(i,p%loc%js-j,k) = w(i,p%loc%js,k)
         enddo
         enddo
@@ -459,8 +505,8 @@ if (p%loc%idy==p%glb%grid_y-1 .and. .not. p%glb%yper )then
         do k = p%loc%ks-p%glb%ghc, p%loc%ke+p%glb%ghc
         do j = 1, p%glb%ghc
         do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
-            u(i,p%loc%je+j,k) = u(i,p%loc%je,k)
-            v(i,p%loc%je+j,k) = v(i,p%loc%je,k)
+            u(i,p%loc%je+j,k) = - u(i,p%loc%je+1-j,k)
+            v(i,p%loc%je+j,k) = - v(i,p%loc%je+1-j,k)
             w(i,p%loc%je+j,k) = w(i,p%loc%je,k)
         enddo
         enddo
@@ -505,8 +551,8 @@ if( p%loc%idz==0 .and. .not. p%glb%zper )then
         do k = 1, p%glb%ghc
         do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
         do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
-            u(i,j,p%loc%ks-k) =  u(i,j,p%loc%ks)
-            v(i,j,p%loc%ks-k) =  v(i,j,p%loc%ks)
+            u(i,j,p%loc%ks-k) = - u(i,j,p%loc%ks-1+k)
+            v(i,j,p%loc%ks-k) = - v(i,j,p%loc%ks-1+k)
             w(i,j,p%loc%ks-k) =  w(i,j,p%loc%ks)
         enddo
         enddo
@@ -547,8 +593,8 @@ if (p%loc%idz==p%glb%grid_z-1 .and. .not. p%glb%zper )then
         do k = 1, p%glb%ghc
         do j = p%loc%js-p%glb%ghc, p%loc%je+p%glb%ghc
         do i = p%loc%is-p%glb%ghc, p%loc%ie+p%glb%ghc
-            u(i,j,p%loc%ke+k) =  u(i,j,p%loc%ke)
-            v(i,j,p%loc%ke+k) =  v(i,j,p%loc%ke)
+            u(i,j,p%loc%ke+k) = - u(i,j,p%loc%ke+1-k)
+            v(i,j,p%loc%ke+k) = - v(i,j,p%loc%ke+1-k)
             w(i,j,p%loc%ke+k) =  w(i,j,p%loc%ke)
         enddo
         enddo

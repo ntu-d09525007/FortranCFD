@@ -2,42 +2,37 @@ subroutine output()
 use all
 implicit none
 integer :: i,j,k,id
-real(8) :: damfront, damh
-    ! level set method, loss of volume/mass in percentage
-    write(p%fil%ls_mv,*)p%glb%time,100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass,100.0d0*(p%glb%ivol-p%glb%vol)/p%glb%ivol
+real(8) :: eta
 
-    damfront = 0.0d0; damh=0.0d0
-    !$omp parallel do private(i,j,k), reduction(max:damfront,damh)
-    do id = 0, p%glb%threads-1
-        
-        if( p%of(id)%loc%idz==0 )then
-            k=1
+! level set method, loss of volume/mass in percentage
+write(p%fil%ls_mv,*)p%glb%time,100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass,100.0d0*(p%glb%ivol-p%glb%vol)/p%glb%ivol
+
+eta=0.0d0
+!$omp parallel do private(i,j,k)
+do id = 0, p%glb%threads-1
+
+    do i = p%of(id)%loc%is, p%of(id)%loc%ie
+        if( abs(p%glb%x(i,j))<p%glb%dx*0.5d0)then
             do j = p%of(id)%loc%js, p%of(id)%loc%je
-            do i = p%of(id)%loc%is, p%of(id)%loc%ie
-                if( p%of(id)%loc%phi%now(i,j,k)*p%of(id)%loc%phi%now(i+1,j,k) < 0.0d0 )then
-                    damfront = max( damfront, p%glb%x(i,j,k) + &
-                        p%glb%dx*abs(p%of(id)%loc%phi%now(i,j,k))/( abs(p%of(id)%loc%phi%now(i,j,k))+abs(p%of(id)%loc%phi%now(i+1,j,k))) )
+                if(p%of(id)%loc%phi%now(i,j)*p%of(id)%loc%phi%now(i,j+1)<0.0d0)then
+                    x = p%glb%x(i,j)
+                    r = abs(p%of(id)%loc%phi%now(i,j))/(abs(p%of(id)%loc%phi%now(i,j))+abs(p%of(id)%loc%phi%now(i,j+1)))
+                    eta = p%glb%y(i,j) + p%glb%dy * r
                 endif
             enddo
-            enddo   
         endif
-
-        if( p%of(id)%loc%idx==0 )then
-            i=1
-            do k = p%of(id)%loc%ks, p%of(id)%loc%ke
-            do j = p%of(id)%loc%js, p%of(id)%loc%je
-                if( p%of(id)%loc%phi%now(i,j,k)*p%of(id)%loc%phi%now(i,j,k+1) < 0.0d0 )then
-                    damh = max( damh, p%glb%z(i,j,k) + &
-                        p%glb%dz*abs(p%of(id)%loc%phi%now(i,j,k))/( abs(p%of(id)%loc%phi%now(i,j,k))+abs(p%of(id)%loc%phi%now(i,j,k+1))) )
-                endif
-            enddo
-            enddo
-        endif
-
     enddo
-    !$omp end parallel do 
 
-    write(p%fil%damdata, *)p%glb%time, damfront, damh
+enddo
+!$omp end parallel do
+
+kh = p%wa%k * abs(p%glb%ystart)
+theta = p%wa%k*x-p%wa%w*p%glb%time
+exact = p%wa%L * Stokes_wave_interface(theta,p%wa%steepness,kh) 
+
+write(p%fil%wave,*)p%glb%time/(2.0d0*pi),eta,exact
+
+write(*,'(2ES15.4)')eta,exact
 
 end subroutine
 
