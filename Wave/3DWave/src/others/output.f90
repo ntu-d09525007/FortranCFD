@@ -16,14 +16,14 @@ x=0.0d0
 do id = 0, p%glb%threads-1
 
     do i = p%of(id)%loc%is, p%of(id)%loc%ie
-        if( abs(p%glb%x(i,j,k))<p%glb%dx*0.5d0 )then
+        if( abs(p%of(id)%glb%x(i,j,k))<p%glb%dx*0.5d0 )then
             do k = p%of(id)%loc%ks, p%of(id)%loc%ke
             do j = p%of(id)%loc%js, p%of(id)%loc%je
                 if(p%of(id)%loc%phi%now(i,j,k)*p%of(id)%loc%phi%now(i,j,k+1)<0.0d0)then
-                    x = x + p%glb%x(i,j,k)
+                    x = x + p%of(id)%glb%x(i,j,k)
                     num =  num + 1.0d0
                     r = abs(p%of(id)%loc%phi%now(i,j,k))/(abs(p%of(id)%loc%phi%now(i,j,k))+abs(p%of(id)%loc%phi%now(i,j,k+1)))
-                    eta = eta + p%glb%z(i,j,k) + p%glb%dz * r
+                    eta = eta + p%of(id)%glb%z(i,j,k) + p%glb%dz * r
                 endif
             enddo
             enddo

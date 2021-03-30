@@ -42,14 +42,14 @@ real(8) :: kx, kz, kh
             kx = p%wa%k * x
             kz = p%wa%k * z
 
-            if( y <= p%wa%L * Stokes_wave_interface(kx,p%wa%steepness,kh)  )then
-                p%of(id)%loc%phi%now(i,j) = 1.0d0
-                p%of(id)%loc%vel%x%now(i,j) = p%wa%U * Stokes_wave_u(kx,p%wa%steepness,kh,kz)
-                p%of(id)%loc%vel%z%now(i,j) = p%wa%U * Stokes_wave_v(kx,p%wa%steepness,kh,kz)
+            if( z <= p%wa%L * Stokes_wave_interface(kx,p%wa%steepness,kh)  )then
+                p%of(id)%loc%phi%now(i,j,k) = 1.0d0
+                p%of(id)%loc%vel%x%now(i,j,k) = p%wa%U * Stokes_wave_u(kx,p%wa%steepness,kh,kz)
+                p%of(id)%loc%vel%z%now(i,j,k) = p%wa%U * Stokes_wave_v(kx,p%wa%steepness,kh,kz)
             else
-                p%of(id)%loc%phi%now(i,j) = -1.0d0
-                p%of(id)%loc%vel%x%now(i,j) = 0.0d0
-                p%of(id)%loc%vel%z%now(i,j) = 0.0d0
+                p%of(id)%loc%phi%now(i,j,k) = -1.0d0
+                p%of(id)%loc%vel%x%now(i,j,k) = 0.0d0
+                p%of(id)%loc%vel%z%now(i,j,k) = 0.0d0
             endif
             
             p%of(id)%loc%vel%y%now(i,j,k) = 0.0_8
@@ -106,5 +106,4 @@ real(8) :: kx, kz, kh
     p%glb%iter = 0
     p%glb%time = 0.0d0
 
-        
 end subroutine
