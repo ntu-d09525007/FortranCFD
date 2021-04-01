@@ -1,9 +1,9 @@
 subroutine ns_ab_adv_source
 implicit none
 
-call ns_ab_adv_source_sec
+!call ns_ab_adv_source_sec
 !call ns_ab_adv_source_quick
-!call ns_ab_adv_source_uccd
+call ns_ab_adv_source_uccd
     
 end subroutine
 
@@ -232,7 +232,7 @@ implicit none
 integer :: id,i,j,k
 real(8) :: u,v,w
 
-!$omp parallel do private(i,j,k)
+!$omp parallel do 
 do id = 0, p%glb%threads-1
         
     call p%of(id)%find_stag_vel( p%of(id)%loc%tdata%x%s1, p%of(id)%loc%tdata%y%s1, p%of(id)%loc%tdata%z%s1, &
@@ -246,7 +246,7 @@ call pt%tdatay%sync
 call pt%tdataz%sync
 
 
-!$omp parallel do private(u,v,w,i,j,k)
+!$omp parallel do private(i,j,k)
 do id = 0, p%glb%threads-1
 
     do k = p%of(id)%loc%ks, p%of(id)%loc%ke
@@ -273,7 +273,7 @@ do id = 0, p%glb%threads-1
 enddo
 !$omp end parallel do
 
-!$omp parallel do private(u,v,w,i,j,k)
+!$omp parallel do private(i,j,k)
 do id = 0, p%glb%threads-1
 
     do k = p%of(id)%loc%ks, p%of(id)%loc%ke
@@ -301,7 +301,7 @@ enddo
 !$omp end parallel do
 
 
-!$omp parallel do private(u,v,w,i,j,k)
+!$omp parallel do private(i,j,k)
 do id = 0, p%glb%threads-1
 
     do j = p%of(id)%loc%js, p%of(id)%loc%je

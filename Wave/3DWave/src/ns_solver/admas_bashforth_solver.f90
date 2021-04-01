@@ -23,7 +23,7 @@ do iter = 1, 5
 end do
 
 call ns_check_convergence_vel
-call ppe_mg_solver(p%glb%piter)
+call ppe_mg_solver(p%glb%iter)
 !call ppe_sor_solver(1.0d-6)
     
 end subroutine

@@ -7,7 +7,6 @@ call system_clock(cpustart)
 
 call ns_init
 
-!call ns_ab_solver_SOR
 call ns_ab_solver
 
 call ns_check_convergence_div
