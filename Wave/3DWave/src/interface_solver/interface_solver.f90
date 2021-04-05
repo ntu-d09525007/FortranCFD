@@ -26,8 +26,8 @@ subroutine mpls()
 use all
 implicit none
 
-call level_set_symplectic_solver 
-!call level_set_rk3_solver
+!call level_set_symplectic_solver 
+call level_set_rk3_solver
 call mass_preserving_level_set
 if(mod(p%glb%iter,5).eq.0)call level_set_rk3_redis(1)
 
