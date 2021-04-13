@@ -3,7 +3,7 @@ ooo	Method to capture interface ( LS / MPLS / CLSVOF )
 ooo	Name of the problem 
 64_Wave
 ooo	Dimension of threads grid in X, Y, Z direction
-2	2	4
+4	2	3
 ooo	Multigrid level
 6
 ooo	Cells per unit length 
@@ -11,17 +11,17 @@ ooo	Cells per unit length
 ooo	Number of ghost cell
 3
 ooo	Range of domain in X direction
--0.5	0.5
+-1.0	1.0
 ooo	Range of domain in Y direction
 0.0	1.0
 ooo	Range of domain in Z direction
--1.0	1.0
+-1.0	0.5
 ooo	Time to stop / plot
 10.0	0.2
 ooo	Crount number ( advection / redistance )
 0.01	0.5
 ooo	PPE iteration ( tolerance / w1 / w2 / valve )
-8.0	    0.5	        0.5    	    4.0
+10.0	0.5	0.5	4.0
 ooo	SRK6 iteration ( tolerance / w )
 10.0	0.5	
 ooo	Level set interface width 
@@ -37,9 +37,9 @@ ooo	Surface tension of fluid 1, 2 / Using ?
 ooo	Gravity / Using ?
 9.81		1
 ooo	Gravity direction ( no need normalize)
-0.0	   	 0.0	    	-1.0
+0.0	0.0	-1.0
 ooo	Characteristic Length, Velocity, Time
-5.0		3.19		0
+5.0	3.19	0
 ooo	Dimensionless parameters ( Re, Fr, We )  !!! We should not be zero
 1000.0		0.4096		1.0
 ooo	Density / Viscosity ratio of fluid 1, 2
@@ -53,4 +53,4 @@ ooo	Velocity boundary condition in Z direction ( no-slip / slip / non-reflective
 ooo	Periodic ( X, Y, Z )
 1	1	0
 ooo	Phase speed  / Wave length / Wave steepness
-3.19		0.1		0.3
+3.19	0.1	0.3

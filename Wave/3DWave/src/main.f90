@@ -38,7 +38,7 @@ do
         call print_CPU_info
         call find_momentum
         write(*,*)"========================================="
-        !call output
+        call output
     endif
     
 

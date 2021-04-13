@@ -5,11 +5,12 @@ implicit none
 integer :: i,j,k,id,iter
 real(8) :: lam, plam
 
-do iter = 1, 3
+call p%curv()
+call pt%normals%sync
+
+do iter = 1, 20
     
     call p%ls_mv()
-    call p%surface_norms2()
-    call pt%normals%sync
     
     lam = 0.0_8
     
@@ -57,6 +58,8 @@ do iter = 1, 3
     !$omp end parallel do
     
     call pt%phi%sync
+
+    if( abs(p%glb%imass - p%glb%mass)/p%glb%imass < 1.0d-10 )exit
     
 end do  
 
