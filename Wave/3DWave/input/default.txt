@@ -1,7 +1,7 @@
 ooo	Method to capture interface ( LS / MPLS / CLSVOF ) 
 2
 ooo	Name of the problem 
-64_Wave
+128_WENO_Wave
 ooo	Dimension of threads grid in X, Y, Z direction
 4	2	3
 ooo	Multigrid level
