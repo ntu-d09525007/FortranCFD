@@ -158,10 +158,10 @@ enddo
 !$omp parallel do private(a1,a2,a3,z)
 do i = 1, n
 
-    z = -alpha*h(i)
+    z = -alpha*h%now(i)
 
     a1 = (z*h(i-1)+0.5*z**2) / dx**2
-    a2 = 1.0 - (2.0*z*h(i)+z**2) / dx**2
+    a2 = 1.0 - (2.0*z*h%now(i)+z**2) / dx**2
     a3 = (z*h(i+1)+0.5*z**2) / dx**2
 
     A(i,i) = a2
@@ -199,7 +199,7 @@ call find_u()
 
 !$omp parallel do
 do i = 1, n
-    hu%now(i) = u%now(i) * h(i)
+    hu%now(i) = u%now(i) * h%now(i)
 enddo
 !$omp end parallel do
 
@@ -208,9 +208,9 @@ call u%get_fxx(dx)
 
 !$omp parallel do private(z,u1)
 do i = 1, n
-    z =  - alpha * h(i)
-    u1 = (z+0.5)*hu%xx(i)+(z**2/2.0-h(I)**2/6.0)*u%xx(i)
-    psi%now(i) = h(i)*(u%now(i)+u1)
+    z =  - alpha * h%now(i)
+    u1 = (z+0.5)*hu%xx(i)+(z**2/2.0-h%now(I)**2/6.0)*u%xx(i)
+    psi%now(i) = h%now(i)*(u%now(i)+u1)
 enddo
 !$omp end parallel do
 
