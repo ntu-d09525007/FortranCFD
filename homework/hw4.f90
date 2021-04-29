@@ -11,10 +11,10 @@ type :: work_data
     procedure get_fxx => find_second_dervaitve
     procedure bc => boundary_condition
 end type work_data
-integer :: n
+integer :: n, pltid
 real(8),dimension(:,:),allocatable :: A
-real(8),dimension(:),allocatable :: x,h
-type(work_data) :: u,phi,eta,psi,hu
+real(8),dimension(:),allocatable :: x
+type(work_data) :: h,u,phi,eta,psi,hu
 real(8) :: g,alpha
 real(8) :: xstart, xend, dx
 real(8) :: dt,t,t2s,t2p
@@ -91,8 +91,52 @@ end subroutine
 end module data
 
 program main
+use data
 implicit none
+integer :: i
 
+xstart=-6
+xend=6
+dx=0.06
+g=9.81
+alpha=-0.531
+n=(xend-xstart)/dx + 1
+
+allocate(A(n,n),x(n))
+call h%init(n)
+call u%init(n)
+call phi%init(n)
+call eta%init(n)
+call psi%init(n)
+call hu%init(n)
+
+!$omp parallel do 
+do i =  1, n
+    x(i) = xstart + (i-1)*dx
+    h(i) = 0.3
+    eta(i) = 0.1*dexp(-18.0*x(i)**2)
+    phi(i) = 0.0
+enddo
+!$omp end parallel do 
+call h%bc
+call eta%bc
+call phi%bc
+
+pltid=0
+dt=0.9*dx/dsqrt(g*0.4)
+t=0.0
+t2s=2.0
+t2p=0.5
+
+call plot
+
+do 
+    t=t+dt
+    call ssp_rk3_solve
+    call plot
+    if(t>t2s)exit
+
+enddo
 
 contains
 
@@ -207,6 +251,25 @@ do i = 1, n
 enddo
 !$omp end parallel do
 call eta%bc; call phi%bc
+
+end subroutine
+
+subroutine plot()
+use data
+implicit none
+integer :: i
+character(2) :: name
+
+if(abs(t-pltid*t2p)>dt)return
+
+write(name,'(i2.2)')pltid
+open(unit=66,file='hw4_'//name//'.dat')
+
+do i = 1, n
+    write(66,*)x(i),eta(i)
+enddo
+close(unit=66)
+pltid=pltid+1
 
 end subroutine
 
