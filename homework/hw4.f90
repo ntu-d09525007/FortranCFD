@@ -12,8 +12,7 @@ type :: work_data
     procedure bc => boundary_condition
 end type work_data
 integer :: n, pltid
-real(8),dimension(:,:),allocatable :: A
-real(8),dimension(:),allocatable :: x
+real(8),dimension(:),allocatable :: x,A,B,C,S
 type(work_data) :: h,u,phi,eta,psi,hu
 real(8) :: g,alpha
 real(8) :: xstart, xend, dx
@@ -102,7 +101,7 @@ g=9.81
 alpha=-0.531
 n=(xend-xstart)/dx + 1
 
-allocate(A(n,n),x(n))
+allocate(A(n),B(n),C(n),S(n),x(n))
 call h%init(n)
 call u%init(n)
 call phi%init(n)
@@ -141,19 +140,11 @@ enddo
 contains
 
 subroutine find_u()
-use data, only : h, alpha, dx, n, A, phi, u
+use data
 implicit none
 integer :: i,j,info
 real(8) :: a1,a2,a3,z
 real(8),dimension(n) :: ipiv, work
-
-!$omp parallel do
-do i = 1, n
-do j = 1, n
-    A(i,j) = 0.0
-enddo
-enddo
-!$omp end parallel do
 
 !$omp parallel do private(a1,a2,a3,z)
 do i = 1, n
@@ -164,25 +155,23 @@ do i = 1, n
     a2 = 1.0 - (2.0*z*h%now(i)+z**2) / dx**2
     a3 = (z*h%now(i+1)+0.5*z**2) / dx**2
 
-    A(i,i) = a2
+    B(i) = a2
 
     if (i>1 .and. i<N) then
-        A(i,i-1) = a1
-        A(i,i+1) = a3
+        A(i) = a1
+        C(i) = a3
     else if (i==1)then
-        A(i,i+1) = a1+a3
+        C(i) = a1+a3
     else 
-        A(i,i-1) = a1+a3
+        A(i) = a1+a3
     endif
+
+    S(i) = phi%now(i)
 
 enddo
 !$omp end parallel do
 
-call SGETRF(n,n,A,n,ipiv,info)
-call SGETRI(n,A,n,ipiv,work,n,info)
-if (info.ne.0) stop 'Matrix inversion failed!'
-
-u%now(1:n) = matmul(A,phi%now(1:n))
+call solve_tridiagonal(A,B,C,S,u%now(1:n),1,n)
 
 call u%bc()
 
@@ -269,6 +258,42 @@ do i = 1, n
 enddo
 close(unit=66)
 pltid=pltid+1
+
+end subroutine
+
+ subroutine solve_tridiagonal(A,B,C,S,X,M,N)
+!cccccccccccccccccccccccccccccccccc
+!
+! A, first  coefficient matrix
+! B, second coefficient matrix
+! C, third  coefficient matrix
+! S, sorce matrix
+! X, solution
+! [M,N], index domain
+!
+!cccccccccccccccccccccccccccccccccc
+implicit none
+integer :: M, N, i
+real(kind=8),dimension(m:n) :: A,B,C,S,X
+ 
+ C(M) = C(M)/ B(M)
+ S(M) = S(M)/ B(M)
+ 
+ do i = M+1, N, 1
+     
+     C(i) = C(i) / ( B(I)-A(I)*C(I-1) )
+     S(I) = (S(I) - A(i)*S(I-1))/(B(i)-A(I)*C(i-1))
+
+ end do
+ 
+ X(N) = S(N)
+ 
+ do i = N-1, M, -1
+     
+     X(i) = S(i) - C(i)*X(i+1)   
+     
+ end do
+
 
 end subroutine
 
