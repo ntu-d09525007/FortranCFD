@@ -160,9 +160,9 @@ do i = 1, n
 
     z = -alpha*h%now(i)
 
-    a1 = (z*h(i-1)+0.5*z**2) / dx**2
+    a1 = (z*h%now(i-1)+0.5*z**2) / dx**2
     a2 = 1.0 - (2.0*z*h%now(i)+z**2) / dx**2
-    a3 = (z*h(i+1)+0.5*z**2) / dx**2
+    a3 = (z*h%now(i+1)+0.5*z**2) / dx**2
 
     A(i,i) = a2
 
