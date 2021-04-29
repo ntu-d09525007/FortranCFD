@@ -113,9 +113,9 @@ call hu%init(n)
 !$omp parallel do 
 do i =  1, n
     x(i) = xstart + (i-1)*dx
-    h(i) = 0.3
-    eta(i) = 0.1*dexp(-18.0*x(i)**2)
-    phi(i) = 0.0
+    h%now(i) = 0.3
+    eta%now(i) = 0.1*dexp(-18.0*x(i)**2)
+    phi%now(i) = 0.0
 enddo
 !$omp end parallel do 
 call h%bc
@@ -266,7 +266,7 @@ write(name,'(i2.2)')pltid
 open(unit=66,file='hw4_'//name//'.dat')
 
 do i = 1, n
-    write(66,*)x(i),eta(i)
+    write(66,*)x(i),eta%now(i)
 enddo
 close(unit=66)
 pltid=pltid+1
