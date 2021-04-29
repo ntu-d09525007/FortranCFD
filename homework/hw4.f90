@@ -170,11 +170,9 @@ do i = 1, n
         A(i,i-1) = a1
         A(i,i+1) = a3
     else if (i==1)then
-        A(i,i) = a2+a3
-        A(i,i+1) = a3
+        A(i,i+1) = a1+a3
     else 
-        A(i,i) = a1+a2
-        A(i,i-1) = a1
+        A(i,i-1) = a1+a3
     endif
 
 enddo
@@ -182,6 +180,7 @@ enddo
 
 call SGETRF(n,n,A,n,ipiv,info)
 call SGETRI(n,A,n,ipiv,work,n,info)
+if (info.ne.0) stop 'Matrix inversion failed!'
 
 u%now(1:n) = matmul(A,phi%now(1:n))
 
