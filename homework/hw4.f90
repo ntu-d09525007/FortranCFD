@@ -125,7 +125,7 @@ pltid=0
 dt=0.9*dx/dsqrt(g*0.4)
 t=0.0
 t2s=2.0
-t2p=0.5
+t2p=0.1
 
 call plot
 
@@ -161,9 +161,11 @@ do i = 1, n
         A(i) = a1
         C(i) = a3
     else if (i==1)then
-        C(i) = a1+a3
+        B(i) = a2+a1
+        C(i) = a3
     else 
-        A(i) = a1+a3
+        B(i) = a2+a3
+        A(i) = a1
     endif
 
     S(i) = phi%now(i)
@@ -254,7 +256,7 @@ write(name,'(i2.2)')pltid
 open(unit=66,file='hw4_'//name//'.dat')
 
 do i = 1, n
-    write(66,*)x(i),eta%now(i)
+    write(66,*)x(i),u%now(i)
 enddo
 close(unit=66)
 pltid=pltid+1
