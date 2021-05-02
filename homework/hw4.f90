@@ -12,24 +12,36 @@ num=5
 
 call pr%run(0.001d0,"ref")
 
-allocate(p(num))
+allocate(p(num+2))
 
 do id = 1, num
     write(name,'(i1.1)')id
     call p(id)%run(0.06d0/2.0d0**(id-1),name)
-    write(*,'(2ES15.4)')p(id)%dx,l2_error(pr,p(id)) 
+    call l2_error(pr,p(id)) 
 enddo
+
+do id = 1, num
+    if (id==1)then
+        write(*,*)p(id)%dx,p(id)%error
+    else
+         write(*,*)p(id)%dx,p(id)%error, dlog(p(id)%error/p(id-1)%error) / dlog(p(id)%dx/p(id-1)%dx)
+    endif
+enddo
+
+call p(num+1)%run(0.03d0,"With_Sponge",.true.)
+call p(num+2)%run(0.03d0,"Without_Sponge",.false.)
 
 contains
 
-function l2_error(pr,p)  result(l2)
+subroutine l2_error(pr,p) 
 use data
 implicit none
 type(task) :: pr, p
 integer :: i,j
 real(8) :: int, l2
 
-!!$omp parallel do private(j,int), reduction(+:l2)
+l2=0.0
+!$omp parallel do private(j,int), reduction(+:l2)
 do i = 2, p%n-1
     do j = 1, pr%n
         if( pr%x(j)>p%x(i) .and. pr%x(j-1)<p%x(i) )then
@@ -39,11 +51,12 @@ do i = 2, p%n-1
         endif
     enddo
 enddo
-!!$omp end parallel do
+!$omp end parallel do
 
 l2 = dsqrt(l2/p%n)
 
+p%error = l2
 
-end function
+end subroutine
 
 end program

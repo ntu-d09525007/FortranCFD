@@ -3,6 +3,9 @@ implicit none
 save
 
 type :: work_data
+! ==============================
+! Define structure for physical properties
+! ==============================
     integer :: n
     real(8),dimension(:),allocatable :: now, old, x, xx
     contains
@@ -14,13 +17,18 @@ type :: work_data
 end type work_data
 
 type :: task
+! ==============================
+! Define all data needed to accomplish a simulation
+! ==============================
     integer :: n, pltid
-    real(8),dimension(:),allocatable :: x,A,B,C,S
+    real(8),dimension(:),allocatable :: x,A,B,C,S,diff
     type(work_data) :: h,u,phi,eta,psi,hu
     real(8) :: g,alpha
     real(8) :: xstart, xend, dx
     real(8) :: dt,t,t2s,t2p
-    character(10) :: name
+    real(8) :: error
+    character(20) :: name
+    logical :: sponge
     contains
     procedure run => task_run
     procedure solve => ssp_rk3_solve
@@ -32,6 +40,9 @@ end type task
 contains
 
 subroutine data_init(p,n)
+! ==============================
+! Allocate the data
+! ==============================
 implicit none
 class(work_data) :: p
 integer :: n
@@ -56,6 +67,9 @@ enddo
 end subroutine
 
 subroutine find_first_dervaitve(p,dx)
+! ==============================
+! Get first derivative with fourth-order central difference scheme
+! ==============================
 implicit none
 class(work_data) :: p
 real(8) :: dx
@@ -66,13 +80,15 @@ call p%bc()
 !$omp parallel do
 do i = 1, p%n
     p%x(i) = (-p%now(i-2)+8.0*p%now(i-1)-8.0*p%now(i+1)+p%now(i+2))/(12.0*dx)
-    !p%x(i) = 0.5*(p%now(i+1)-p%now(i-1))/dx
 enddo
 !$omp end parallel do
 
 end subroutine
 
 subroutine find_second_dervaitve(p,dx)
+! ==============================
+! Get first derivative with fourth-order central difference scheme
+! ==============================
 implicit none
 class(work_data) :: p
 real(8) :: dx
@@ -83,39 +99,57 @@ call p%bc()
 !$omp parallel do
 do i = 1, p%n
     p%xx(i) = (-p%now(i-2)+16.0*p%now(i-1)-30.0*p%now(i)+16.0*p%now(i+1)-p%now(i+2))/(12.0*dx**2)
-    !p%xx(i) = (p%now(i+1)-2.0*p%now(i)+p%now(i-1))/dx**2
 enddo
 !$omp end parallel do
 
 end subroutine
 
 subroutine boundary_condition(p)
+! ==============================
+! Open boundary condition, ( d{\phi}/dx = 0 at boundary )
+! ==============================
 implicit none
 class(work_data) :: p
 
-p%now(0)  = p%now(2)
-p%now(-1) = p%now(3)
-p%now(p%n+1) = p%now(p%n-1)
-p%now(p%n+2) = p%now(p%n-2)
+p%now(0)  = p%now(1)
+p%now(-1) = p%now(1)
+p%now(p%n+1) = p%now(p%n)
+p%now(p%n+2) = p%now(p%n)
 
 end subroutine
 
-subroutine task_run(p,dx,name)
+subroutine task_run(p,dx,name,sponge)
 implicit none
 class(task) :: p
 real(8) :: dx
 character(*) :: name
 integer :: i
+logical,optional :: sponge
+
+
+p%sponge = .false.
+if(present(sponge)) p%sponge = sponge
 
 p%xstart=-6
 p%xend=6
+
+! ==============================
+! Create virutal doamin for sponge layer
+! ==============================
+if(p%sponge)then
+    p%xstart = -8
+    p%xend = 8
+endif
+
 p%dx=dx
 p%g=9.81
 p%alpha=0.531
 p%n=(p%xend-p%xstart)/p%dx + 1
 p%name = trim(name)
 
-allocate(p%A(p%n),p%B(p%n),p%C(p%n),p%S(p%n),p%x(p%n))
+
+allocate(p%A(p%n),p%B(p%n),p%C(p%n),p%S(p%n),p%x(p%n),p%diff(p%n))
+
 call p%h%init(p%n)
 call p%u%init(p%n)
 call p%phi%init(p%n)
@@ -137,11 +171,44 @@ call p%eta%bc
 call p%phi%bc
 call p%u%bc
 
+! ==============================
+! Define dacay coefficient for sponge layer
+! ==============================
+if(.not. p%sponge)then
+    !$omp parallel do
+    do i = 1, p%n
+        p%diff(i) = 1.0d0
+    enddo
+    !$omp end parallel do
+else
+    !$omp parallel do
+    do i = 1, p%n
+        if( p%x(i) > 6.0 )then
+            p%diff(i) = 0.5 * (1.0 - dcos(dacos(-1.0d0)*(p%x(i)-6.0)/(p%xend-6.0)) )
+        else if ( p%x(i) < -6.0 )then
+            p%diff(i) = 0.5 * (1.0 - dcos(dacos(-1.0d0)*(p%x(i)+6.0)/(p%xstart+6.0)) )
+        else
+            p%diff(i) = 1.0
+        endif
+    enddo
+    !$omp end parallel do    
+endif
+
 p%pltid=0
-p%dt=0.9*p%dx/dsqrt(p%g*0.4)
 p%t=0.0
-p%t2s=1.0
-p%t2p=0.5
+if(present(sponge))then
+    ! ==============================
+    ! Make the solutions to reach boundary to see
+    ! how sponge layer would affect the solutions.
+    ! ==============================
+    p%dt=0.9*p%dx/dsqrt(p%g*0.4)
+    p%t2s=4.0
+    p%t2p=1.0
+else
+    p%dt=0.9*0.001/dsqrt(p%g*0.4)
+    p%t2s=2.0
+    p%t2p=0.5
+endif
 
 call p%plot
 
@@ -156,6 +223,9 @@ enddo
 end subroutine
 
 subroutine ssp_rk3_solve(p)
+! ==============================
+! Solve the equations with SSP-RK3
+! ==============================
 implicit none
 class(task) :: p
 integer :: i
@@ -168,6 +238,10 @@ call p%find_src()
 do i = 1, p%n
     p%eta%now(i) = p%eta%old(i) - p%dt * p%psi%x(i)
     p%phi%now(i) = p%phi%old(i) - p%dt * p%g * p%eta%x(i)
+    ! ==============================
+    !  Sponge layer
+    ! ==============================
+    p%eta%now(i) = p%diff(i) * p%eta%now(i)
 enddo
 !$omp end parallel do
 
@@ -176,6 +250,10 @@ call p%find_src()
 do i = 1, p%n
     p%eta%now(i) = ( ( p%eta%now(i) - p%dt * p%psi%x(i) ) + 3.0 * p%eta%old(i) )/4.0
     p%phi%now(i) = ( ( p%phi%now(i) - p%dt * p%g * p%eta%x(i) ) + 3.0 * p%phi%old(i) )/4.0
+    ! ==============================
+    !  Sponge layer
+    ! ==============================
+    p%eta%now(i) = p%diff(i) * p%eta%now(i)
 enddo
 !$omp end parallel do
 
@@ -184,12 +262,20 @@ call p%find_src()
 do i = 1, p%n
     p%eta%now(i) = ( ( p%eta%now(i) - p%dt * p%psi%x(i) ) * 2.0 + p%eta%old(i) )/3.0
     p%phi%now(i) = ( ( p%phi%now(i) - p%dt * p%g * p%eta%x(i) ) * 2.0 + p%phi%old(i) )/3.0
+    ! ==============================
+    !  Sponge layer
+    ! ==============================
+    p%eta%now(i) = p%diff(i) * p%eta%now(i)
 enddo
 !$omp end parallel do
 
 end subroutine
 
 subroutine task_find_u(p)
+! ==============================
+! Get the horizontal velocit by second-order difference
+! scheme and solve the matrix with Thomas tridiagonal algorithm.
+! ==============================
 implicit none
 class(task) :: p
 integer :: i,j
@@ -209,11 +295,11 @@ do i = 1, p%n
     p%C(i) = a3
 
     if (i==1)then
-        p%B(i) = a2
-        p%C(i) = a3*2.0
+        p%B(i) = a2+a1
+        p%C(i) = a3
     else if (i==p%N)then
-        p%B(i) = a2
-        p%A(i) = a1*2.0
+        p%B(i) = a2+a3
+        p%A(i) = a1
     endif
 
     p%S(i) = p%phi%now(i)
@@ -229,6 +315,8 @@ end subroutine
 
 subroutine solve_tridiagonal(A,B,C,S,X,M,N)
 !cccccccccccccccccccccccccccccccccc
+!
+!  Solve of Thomas tridiagonal algorithm
 !
 ! A, first  coefficient matrix
 ! B, second coefficient matrix
@@ -263,6 +351,9 @@ real(kind=8),dimension(m:n) :: A,B,C,S,X
 end subroutine
 
 subroutine task_find_src(p)
+! ==============================
+! Find the source to march [eta, (u+u_2)]
+! ==============================
 implicit none
 class(task) :: p
 integer :: i
@@ -293,6 +384,9 @@ call p%eta%get_fx(p%dx)
 end subroutine
 
 subroutine task_plot(p)
+! ==============================
+! Plot the data with user-defined period
+! ==============================
 implicit none
 class(task) :: p
 integer :: i
@@ -310,6 +404,5 @@ close(unit=66)
 p%pltid=p%pltid+1
 
 end subroutine
-
 
 end module data
