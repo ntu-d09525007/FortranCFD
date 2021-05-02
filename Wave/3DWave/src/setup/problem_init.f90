@@ -102,6 +102,7 @@ real(8) :: kx, kz, kh
     p%glb%ppe    = 0.0d0
     p%glb%ns     = 0.0d0
     p%glb%syn    = 0.0d0
+    p%glb%red_error = 0.0d0
 
     p%glb%iter = 0
     p%glb%time = 0.0d0

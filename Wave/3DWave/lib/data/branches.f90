@@ -31,6 +31,7 @@ real(8) :: G, sigma ! gravity, surface tension
 real(8) :: gx,gy,gz
 real(8) :: mu_1, mu_2, rho_1, rho_2
 real(8) :: mu_12, rho_12
+real(8) :: red_error
 real(8) :: vel_div, vel_sdiv, ns_linf, ns_l2f, ppe_linf
 real(8) :: btn_sf, btn_g
 real(8) :: ls_adv, ls_red, ppe, ns, syn

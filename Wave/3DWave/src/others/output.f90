@@ -63,6 +63,7 @@ use all
 implicit none
         write(*,'("LS,  Loss of mass  (%) :",ES15.4)')100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass
         write(*,'("LS,  Loss of volume(%) :",ES15.4)')100.0d0*(p%glb%ivol-p%glb%vol)/p%glb%ivol
+        write(*,'("LS,  redistance error  :",ES15.4)')p%glb%red_error
         write(*,*)''
         if(p%glb%method==3)then
             write(*,'("VOF, Loss of mass  (%) :",ES15.4)')100.0d0*(p%glb%imassv-p%glb%massv)/p%glb%imassv

@@ -60,6 +60,8 @@ do
         
     enddo
     !$omp end parallel do
+
+    p%glb%red_error = error
     
     call pt%phi%sync
     
