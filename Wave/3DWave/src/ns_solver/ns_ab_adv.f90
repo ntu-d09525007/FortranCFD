@@ -1,9 +1,9 @@
 subroutine ns_ab_adv_source
 implicit none
 
-call ns_ab_adv_source_sec
+!call ns_ab_adv_source_sec
 !call ns_ab_adv_source_quick
-!call ns_ab_adv_source_uccd
+call ns_ab_adv_source_uccd
     
 end subroutine
 
@@ -188,6 +188,16 @@ real(8) :: uh, vh, wh
         end do
         end do
         end do
+
+    enddo
+    !$omp end parallel do 
+
+    call pt%tdatax%sync
+    call pt%tdatay%sync
+    call pt%tdataz%sync
+
+    !$omp parallel do private(i,j,k)
+    do id = 0, p%glb%threads-1
         
         do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
