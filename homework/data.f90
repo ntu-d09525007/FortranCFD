@@ -26,7 +26,7 @@ type :: task
     real(8) :: g,alpha
     real(8) :: xstart, xend, dx
     real(8) :: dt,t,t2s,t2p
-    real(8) :: error, A0
+    real(8) :: error, A0, coef
     character(20) :: name
     logical :: sponge
     contains
