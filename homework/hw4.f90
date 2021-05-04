@@ -8,28 +8,30 @@ type(task),allocatable :: p(:)
 integer :: id, num
 character(1) :: name
 
-num=5
+! num=5
 
-call pr%run(0.001d0,"ref")
+! call pr%run(0.001d0,"ref")
 
-allocate(p(num+2))
+! allocate(p(num+2))
 
-do id = 1, num
-    write(name,'(i1.1)')id
-    call p(id)%run(0.06d0/2.0d0**(id-1),name)
-    call l2_error(pr,p(id)) 
-enddo
+! do id = 1, num
+!     write(name,'(i1.1)')id
+!     call p(id)%run(0.06d0/2.0d0**(id-1),name)
+!     call l2_error(pr,p(id)) 
+! enddo
 
-do id = 1, num
-    if (id==1)then
-        write(*,*)p(id)%dx,p(id)%error
-    else
-         write(*,*)p(id)%dx,p(id)%error, dlog(p(id)%error/p(id-1)%error) / dlog(p(id)%dx/p(id-1)%dx)
-    endif
-enddo
+! do id = 1, num
+!     if (id==1)then
+!         write(*,*)p(id)%dx,p(id)%error
+!     else
+!          write(*,*)p(id)%dx,p(id)%error, dlog(p(id)%error/p(id-1)%error) / dlog(p(id)%dx/p(id-1)%dx)
+!     endif
+! enddo
 
-call p(num+1)%run(0.03d0,"With_Sponge",.true.)
-call p(num+2)%run(0.03d0,"Without_Sponge",.false.)
+! call p(num+1)%run(0.03d0,"With_Sponge",.true.)
+! call p(num+2)%run(0.03d0,"Without_Sponge",.false.)
+
+call pr%run2(0.03d0,"Test")
 
 contains
 

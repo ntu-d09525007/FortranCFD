@@ -26,15 +26,17 @@ type :: task
     real(8) :: g,alpha
     real(8) :: xstart, xend, dx
     real(8) :: dt,t,t2s,t2p
-    real(8) :: error
+    real(8) :: error, A0
     character(20) :: name
     logical :: sponge
     contains
     procedure run => task_run
+    procedure run2 => task_run2
     procedure solve => ssp_rk3_solve
     procedure find_u => task_find_u
     procedure find_src => task_find_src
     procedure plot => task_plot
+    procedure plot2 => task_plot2
 end type task
 
 contains
@@ -125,7 +127,6 @@ real(8) :: dx
 character(*) :: name
 integer :: i
 logical,optional :: sponge
-
 
 p%sponge = .false.
 if(present(sponge)) p%sponge = sponge
@@ -404,5 +405,7 @@ close(unit=66)
 p%pltid=p%pltid+1
 
 end subroutine
+
+include 'far_field.f90'
 
 end module data
