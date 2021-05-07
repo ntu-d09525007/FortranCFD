@@ -3,7 +3,7 @@ ooo	( LS / MPLS / CLSVOF ) / MPLS curvature dependent?
 ooo	Name of the problem 
 Wave_64
 ooo	Dimension of threads grid in X, Y direction
-4	6
+2	4
 ooo	Multigrid level
 7
 ooo	Cells per unit length 
@@ -11,9 +11,9 @@ ooo	Cells per unit length
 ooo	Number of ghost cell
 3
 ooo	Range of domain in X direction
-0.0	1.0
+-0.5	0.5
 ooo	Range of domain in Y direction
--2.0	1.0
+-1.0	1.0
 ooo	Time to stop / plot
 10.0	0.2
 ooo	Crount number ( advection / redistance )
