@@ -10,7 +10,6 @@ pi=dacos(-1.0d0)
 write(p%fil%ls_mv,*)p%glb%time,100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass,100.0d0*(p%glb%ivol-p%glb%vol)/p%glb%ivol
 
 eta=0.0d0
-!$omp parallel do private(i,j)
 do id = 0, p%glb%threads-1
 
     do i = p%of(id)%loc%is, p%of(id)%loc%ie
@@ -20,13 +19,14 @@ do id = 0, p%glb%threads-1
                     x = p%glb%x(i,j)
                     r = abs(p%of(id)%loc%phi%now(i,j))/(abs(p%of(id)%loc%phi%now(i,j))+abs(p%of(id)%loc%phi%now(i,j+1)))
                     eta = p%glb%y(i,j) + p%glb%dy * r
+                    exit
                 endif
             enddo
+            exit
         endif
     enddo
 
 enddo
-!$omp end parallel do
 
 kh = p%wa%k * abs(p%glb%ystart)
 theta = p%wa%k*x-p%wa%w*p%glb%time

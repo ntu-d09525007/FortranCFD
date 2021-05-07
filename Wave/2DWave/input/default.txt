@@ -1,13 +1,13 @@
 ooo	( LS / MPLS / CLSVOF ) / MPLS curvature dependent?
 2	0
 ooo	Name of the problem 
-Wave_64
+Wave_256_005
 ooo	Dimension of threads grid in X, Y direction
 2	4
 ooo	Multigrid level
 7
 ooo	Cells per unit length 
-128
+256
 ooo	Number of ghost cell
 3
 ooo	Range of domain in X direction
@@ -49,4 +49,4 @@ ooo	Velocity boundary condition in Y direction ( no-slip / slip / non-reflective
 ooo	Periodic ( X, Y )
 1	0
 ooo	Phase speed  / Wave length / Wave Steepness / Source width / Angle of propagation
-0.395	0.1   	0.3	0.0	    0.0
+0.395	0.1   	0.05	0.0	    0.0
