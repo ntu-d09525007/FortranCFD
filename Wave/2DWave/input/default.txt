@@ -11,11 +11,11 @@ ooo	Cells per unit length
 ooo	Number of ghost cell
 3
 ooo	Range of domain in X direction
--1.0	1.0
+0.0	1.0
 ooo	Range of domain in Y direction
 -2.0	1.0
 ooo	Time to stop / plot
-20.0	0.2
+10.0	0.2
 ooo	Crount number ( advection / redistance )
 0.01	0.5
 ooo	PPE iteration ( tolerance / w1 / w2 / valve )

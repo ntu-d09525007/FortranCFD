@@ -39,13 +39,13 @@ CHARACTER(100) :: NAME_OF_FILE
 
             kx = p%wa%k * x
             ky = p%wa%k * y
+
+            p%of(id)%loc%phi%now(i,j) = - y + p%wa%L * Stokes_wave_interface(kx,p%wa%steepness,kh)
             
-            if( y <= p%wa%L * Stokes_wave_interface(kx,p%wa%steepness,kh)  )then
-                p%of(id)%loc%phi%now(i,j) = 1.0d0
+            if( p%of(id)%loc%phi%now(i,j) >= 0.0d0  )then
                 p%of(id)%loc%vel%x%now(i,j) = p%wa%U * Stokes_wave_u(kx,p%wa%steepness,kh,ky)
                 p%of(id)%loc%vel%y%now(i,j) = p%wa%U * Stokes_wave_v(kx,p%wa%steepness,kh,ky)
             else
-                p%of(id)%loc%phi%now(i,j) = -1.0d0
                 p%of(id)%loc%vel%x%now(i,j) = 0.0d0
                 p%of(id)%loc%vel%y%now(i,j) = 0.0d0
             endif
@@ -66,7 +66,7 @@ CHARACTER(100) :: NAME_OF_FILE
     call pt%phi%sync
     call pt%vof%sync
 
-    call level_set_rk3_redis(0)
+    ! call level_set_rk3_redis(0)
 
     call p%node_vel
     call pt%nvel%sync

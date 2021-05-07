@@ -36,9 +36,9 @@ do
         call print_CPU_info
         call find_momentum
         !call Stokes_wave_error
-        call output
         write(*,*)"========================================="
     endif
+    call output
 
     if( p%glb%time > p%glb%t2s ) exit
     
