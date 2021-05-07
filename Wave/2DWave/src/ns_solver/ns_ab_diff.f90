@@ -73,8 +73,8 @@ do i = q%loc%is, q%loc%ie
     phix = (phi(i+1,j)-phi(i,j))/q%glb%dx
     phiy = 0.25d0*(phi(i+1,j+1)-phi(i+1,j-1)+phi(i,j+1)-phi(i,j-1))/q%glb%dy
 
-    dif_x = mu_ / rho_ * xx / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phix * 2.0d0*ux / ( rho_ * q%glb%re)
-    dif_y = mu_ / rho_ * yy / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phiy * (uy+vx)  / ( rho_ * q%glb%re)
+    dif_x = 0.0d0!mu_ / rho_ * xx / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phix * 2.0d0*ux / ( rho_ * q%glb%re)
+    dif_y = 0.0d0!mu_ / rho_ * yy / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phiy * (uy+vx)  / ( rho_ * q%glb%re)
 
     sx(i,j) = sx(i,j) + alpha * ( dif_x+dif_y + q%glb%gx*q%glb%btn_g / q%glb%fr &
             & - q%glb%btn_sf*curv_*delta_*phix / (q%glb%we*rho_)  )
@@ -97,8 +97,8 @@ do i = q%loc%is, q%loc%ie
     phix = 0.25d0*(phi(i+1,j)-phi(i-1,j)+phi(i+1,j+1)-phi(i-1,j+1))/q%glb%dx
     phiy = ( phi(i,j+1)-phi(i,j) )/q%glb%dy
 
-    dif_x = mu_ / rho_ * xx / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phix*(uy+vx) / ( rho_ * q%glb%re)
-    dif_y = mu_ / rho_ * yy / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phiy*2.0d0*vy/ ( rho_ * q%glb%re)
+    dif_x = 0.0d0!mu_ / rho_ * xx / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phix*(uy+vx) / ( rho_ * q%glb%re)
+    dif_y = 0.0d0!mu_ / rho_ * yy / q%glb%re + (1.0d0-q%glb%mu_12) * delta_ * phiy*2.0d0*vy/ ( rho_ * q%glb%re)
 
     sy(i,j) = sy(i,j) + alpha * ( dif_x+dif_y + q%glb%gy * q%glb%btn_g / q%glb%fr &
             & - q%glb%btn_sf * curv_*delta_ * phiy / (q%glb%we*rho_)  )
