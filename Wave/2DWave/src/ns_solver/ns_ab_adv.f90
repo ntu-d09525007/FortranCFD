@@ -41,7 +41,7 @@ do id = 0, p%glb%threads-1
         ym = 0.5d0*( p%of(id)%loc%vel%x%old(i,j-2)-4.0d0*p%of(id)%loc%vel%x%old(i,j-1)+3.0d0*p%of(id)%loc%vel%x%old(i,j))/p%glb%dy
             
         p%of(id)%loc%velsrc%x%now(i,j) = - ((u+abs(u))*xm+(u-abs(u))*xp)/2.0d0 &
-                                        &  - ((v+abs(v))*ym+(v-abs(v))*yp)/2.0d0 
+                                       &  - ((v+abs(v))*ym+(v-abs(v))*yp)/2.0d0 
                 
         !-----------------------------------------------------------
             

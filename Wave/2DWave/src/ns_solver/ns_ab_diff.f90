@@ -21,8 +21,8 @@ do id = 0, p%glb%threads-1
 
     call ns_ab_diff_job_sec(p%of(id),p%of(id)%loc%velsrc%x%tmp,p%of(id)%loc%velsrc%y%tmp,&
                                      p%of(id)%loc%vel%x%tmp,p%of(id)%loc%vel%y%tmp, &
-                                     p%of(id)%loc%phi%now,p%of(id)%loc%normals%curv%now,p%of(id)%loc%delta%now,&
-                                     p%of(id)%loc%rho%now,p%of(id)%loc%mu%now,.false.,0.5d0)
+                                     p%of(id)%loc%phi%old,p%of(id)%loc%normals%curv%old,p%of(id)%loc%delta%old,&
+                                     p%of(id)%loc%rho%old,p%of(id)%loc%mu%old,.false.,0.5d0)
 enddo
 !$omp end parallel do
     

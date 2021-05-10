@@ -49,4 +49,4 @@ ooo	Velocity boundary condition in Y direction ( no-slip / slip / non-reflective
 ooo	Periodic ( X, Y )
 1	0
 ooo	Phase speed  / Wave length / Wave Steepness / Source width / Angle of propagation
-0.395	0.1   	0.05	0.0	    0.0
+0.395	0.1	0.005	0.0	0.0
