@@ -1,0 +1,1 @@
+ffmpeg -r 10 -f image2 -start_number 40 -i zs_%03d.png -frames:v 61 zs.gif
