@@ -38,10 +38,10 @@ use all
 implicit none
 
 call vof_wlic_solver
-!call level_set_symplectic_solver 
-call level_set_rk3_solver
+call level_set_symplectic_solver 
+! call level_set_rk3_solver
 
-if(mod(p%glb%iter,10).eq.0)then
+if(mod(p%glb%iter,20).eq.0)then
     call clsvof_recon
 else if(mod(p%glb%iter,5).eq.0)then
    call level_set_rk3_redis(1)
