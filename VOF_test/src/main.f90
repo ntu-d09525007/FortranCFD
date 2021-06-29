@@ -25,7 +25,7 @@ do
     call p%switch
  
     call interface_solver
-    ! call ns_solver
+    call ns_solver
     call plot
 
     call p%ls_mv
@@ -33,10 +33,10 @@ do
         write(*,*)"========================================="
         write(*,'(A,",",I8,",",F15.6)')trim(p%glb%name),p%glb%iter,p%glb%time
         write(*,*)''
-        ! call print_NS_info
+        call print_NS_info
         call print_LS_info
         call print_CPU_info
-        ! call find_momentum
+        call find_momentum
         write(*,*)"========================================="
     endif
     ! call output 
