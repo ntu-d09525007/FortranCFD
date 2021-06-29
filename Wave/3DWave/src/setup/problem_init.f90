@@ -34,6 +34,24 @@ real(8) :: kx, kz, kh
         do k = p%of(id)%loc%ks, p%of(id)%loc%ke
         do j = p%of(id)%loc%js, p%of(id)%loc%je
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
+
+            do ii = 1, ug
+            do jj = 1, ug
+            do kk = 1, ug
+                
+                x = 0.5d0*( p%glb%x(i,j,k)+p%glb%x(i-1,j,k) ) + real(ii,8)*p%glb%dx/real(ug,8)
+                y = 0.5d0*( p%glb%y(i,j,k)+p%glb%y(i,j-1,k) ) + real(jj,8)*p%glb%dy/real(ug,8)
+                z = 0.5d0*( p%glb%z(i,j,k)+p%glb%z(i,j,k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
+
+                kx = p%wa%k * x
+                
+                if( z <= p%wa%L * Stokes_wave_interface(kx,p%wa%steepness,kh) )then
+                    p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) + 1.0d0/real(ug,kind=8)**3.0d0
+                end if
+                
+            end do
+            end do
+            end do
         
             x = p%glb%x(i,j,k)
             y = p%glb%y(i,j,k)

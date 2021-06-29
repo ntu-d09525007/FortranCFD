@@ -8,7 +8,7 @@ integer(8) :: cpustart, cpuend
 
     call system_clock(cpustart)
 
-    eps = 1.0d-12
+    eps = 1.0d-10
 
     call p%surface_norms2
     call pt%normals%sync
@@ -78,8 +78,6 @@ integer(8) :: cpustart, cpuend
 
             s = ( p%of(id)%loc%tdata%x%s1(i,j,k) - p%of(id)%loc%tdata%x%s1(i-1,j,k) ) / p%glb%dx
 
-            !if(i==1) s = p%of(id)%loc%tdata%x%s1(i,j,k) / p%glb%dx
-            
             p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) - s + &
                                         & p%of(id)%loc%vof%old(i,j,k) * p%glb%dt * ( p%of(id)%loc%vel%x%old(i,j,k) - p%of(id)%loc%vel%x%old(i-1,j,k) ) / p%glb%dx
             
@@ -158,8 +156,6 @@ integer(8) :: cpustart, cpuend
         do i = p%of(id)%loc%is, p%of(id)%loc%ie
 
             s = ( p%of(id)%loc%tdata%y%s1(i,j,k) - p%of(id)%loc%tdata%y%s1(i,j-1,k) ) / p%glb%dy
-
-            !if(j==1) s = p%of(id)%loc%tdata%y%s1(i,j,k) / p%glb%dy
             
             p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) - s + &
                                         & p%of(id)%loc%vof%old(i,j,k) * p%glb%dt * ( p%of(id)%loc%vel%y%old(i,j,k) - p%of(id)%loc%vel%y%old(i,j-1,k) ) / p%glb%dy
@@ -213,7 +209,7 @@ integer(8) :: cpustart, cpuend
                 a4 = dcosh( beta * ( isgn - p%of(id)%loc%vel%z%old(i,j,k)*p%glb%dt/p%glb%dz - xc ) )
                 a5 = dcosh( beta * ( isgn - xc ) )
                 
-                w  = abs(p%of(id)%loc%normals%x%now(i,j,kk)) + abs(p%of(id)%loc%normals%y%now(i,j,kk)) +abs(p%of(id)%loc%normals%z%now(i,j,kk))
+                w  = abs(p%of(id)%loc%normals%x%now(i,j,kk)) + abs(p%of(id)%loc%normals%y%now(i,j,kk)) + abs(p%of(id)%loc%normals%z%now(i,j,kk))
                 w  = abs(p%of(id)%loc%normals%z%now(i,j,kk)) / w
             
                 p%of(id)%loc%tdata%z%s1(i,j,k) = 0.5d0*( p%of(id)%loc%vel%z%old(i,j,k)*p%glb%dt - alpha*p%glb%dz/beta*dlog(a4/a5) )
@@ -240,13 +236,10 @@ integer(8) :: cpustart, cpuend
 
             s = ( p%of(id)%loc%tdata%z%s1(i,j,k) - p%of(id)%loc%tdata%z%s1(i,j,k-1) ) / p%glb%dz
 
-            !if(k==1) s = p%of(id)%loc%tdata%z%s1(i,j,k) / p%glb%dz
-            
             p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) - s + &
                                         & p%of(id)%loc%vof%old(i,j,k) * p%glb%dt * ( p%of(id)%loc%vel%z%old(i,j,k) - p%of(id)%loc%vel%z%old(i,j,k-1) ) / p%glb%dz
             
-            if(p%of(id)%loc%vof%now(i,j,k)<eps)p%of(id)%loc%vof%now(i,j,k)=0.0d0
-            if(p%of(id)%loc%vof%now(i,j,k)>1.0-eps)p%of(id)%loc%vof%now(i,j,k)=1.0d0
+            p%of(id)%loc%vof%now(i,j,k) = min(1.0d0,max(0.0d0,p%of(id)%loc%vof%now(i,j,k)))
                     
         end do
         end do 
@@ -287,7 +280,7 @@ integer(8) :: cpustart, cpuend
     enddo
     !$omp end parallel do
 
-    call level_set_rk3_redis(0,3.0d0*p%glb%ls_wid)
+    call level_set_rk3_redis(0,5.0d0*p%glb%ls_wid)
 
     !$omp parallel do private(i,j,k)
     do id = 0, p%glb%threads-1
@@ -295,7 +288,7 @@ integer(8) :: cpustart, cpuend
         do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
         do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
         do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
-            if( abs(p%of(id)%loc%vof%tmp(i,j,k)) > 1.5*p%glb%ls_wid )p%of(id)%loc%phi%now(i,j,k) = p%of(id)%loc%vof%tmp(i,j,k)
+            if( abs(p%of(id)%loc%vof%tmp(i,j,k)) > 3.0*p%glb%ls_wid )p%of(id)%loc%phi%now(i,j,k) = p%of(id)%loc%vof%tmp(i,j,k)
         end do
         end do
         end do
@@ -306,12 +299,11 @@ integer(8) :: cpustart, cpuend
     !$omp end parallel do
 
     call pt%phi%sync
+    call level_set_rk3_redis(1)
 
     call system_clock(cpuend)
     p%glb%ls_red = p%glb%ls_red + real(cpuend-cpustart,kind=8)/real(p%glb%cpurate,kind=8)   
     
-    call level_set_rk3_redis(1)
-
 end subroutine
 
 

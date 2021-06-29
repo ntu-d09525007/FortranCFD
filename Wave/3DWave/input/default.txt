@@ -1,5 +1,5 @@
 ooo	Method to capture interface ( LS / MPLS / CLSVOF ) 
-2
+3
 ooo	Name of the problem 
 128_Wave
 ooo	Dimension of threads grid in X, Y, Z direction
