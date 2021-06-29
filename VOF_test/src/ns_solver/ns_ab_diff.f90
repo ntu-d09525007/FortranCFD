@@ -1,8 +1,8 @@
 subroutine ns_ab_diff_source
 implicit none
 
-    !call ns_ab_diff_source_sec
-    call ns_ab_diff_source_uccd
+    call ns_ab_diff_source_sec
+    !call ns_ab_diff_source_uccd
 
 end subroutine
 

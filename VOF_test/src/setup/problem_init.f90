@@ -43,7 +43,7 @@ real(8) :: kx, kz, kh
                 y = 0.5d0*( p%glb%y(i,j,k)+p%glb%y(i,j-1,k) ) + real(jj,8)*p%glb%dy/real(ug,8)
                 z = 0.5d0*( p%glb%z(i,j,k)+p%glb%z(i,j,k-1) ) + real(kk,8)*p%glb%dz/real(ug,8)
                 
-                if( x<=1.0 and. z<=1.0 )then
+                if( x<=1.0 .and. z<=1.0 )then
                 ! if( (x-0.35)**2.0 + (y-0.35)**2.0 + (z-0.35)**2.0 < 0.15**2.0 )then
                     p%of(id)%loc%vof%now(i,j,k) = p%of(id)%loc%vof%now(i,j,k) + 1.0d0/real(ug,kind=8)**3.0d0
                 end if

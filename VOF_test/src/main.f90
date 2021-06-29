@@ -21,7 +21,7 @@ do
     p%glb%iter = p%glb%iter + 1 
     call p%sync 
   
-    call deforming_field_velocity
+    !call deforming_field_velocity
     call p%switch
  
     call interface_solver
