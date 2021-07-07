@@ -63,7 +63,7 @@ do id = 0, p%glb%threads-1
                     nz = p%of(id)%loc%normals%z%now(i,j,k)
                     xx = xx + p%of(id)%glb%x(i,j,k)
                     num =  num + 1.0d0
-                    eta_vof = eta_vof + p%of(id)%loc%z(i,j,k-1) + p%glb%dz * find_pos(p%of(id)%loc%vof%now(i,j,k),Nx,Ny,Nz,0.5d0,0.5d0,0.0d0)
+                    eta_vof = eta_vof + p%of(id)%glb%z(i,j,k-1) + p%glb%dz * find_pos(p%of(id)%loc%vof%now(i,j,k),Nx,Ny,Nz,0.5d0,0.5d0,0.0d0)
                 endif
             enddo
             enddo
