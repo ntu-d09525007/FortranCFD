@@ -2,7 +2,7 @@ function find_pos(iV,iM1,iM2,iM3,ix1,ix2,ix3) result(pos)
 implicit none
 real(8) :: iv,im1,im2,im3,ix1,ix2,ix3
 real(8) :: v,x1,x2,x3
-real(8) :: eps,m1,m2,m3,m,mag
+real(8) :: eps,m1,m2,m3,m,m12,mag
 real(8) :: v1,v2,v31,v32,v3
 real(8) :: alpha, pos
 logical :: reverse
@@ -11,7 +11,7 @@ m1 = min(M1,M2,M3)
 m3 = max(M1,M2,M3)
 m2 = M1+M2+M3-m1-m3
 
-mag=math.sqrt(m1*m1+m2*m2+m3*m3)
+mag=dsqrt(m1*m1+m2*m2+m3*m3)
 
 m1=m1/mag
 m2=m2/mag
@@ -64,7 +64,7 @@ V32=m12/(2.0d0*m3)
 
 if ( abs(m-m3)<eps ) then
     V3=V31
-else:
+else
     V3=V32
 endif
 
@@ -79,6 +79,7 @@ else
         alpha = cubic_root(-2.0d0, 3.0d0, -3.0d0*(m1**2.0d0+m2**2.0d0+m3**2.0d0), m1**3.0d0+m2**3.0d0+m3**3.0d0-6.0d0*m1*m2*m3*V)
     else
         alpha = m3*V + m12/2.0d0
+    endif
 endif
 
 if( x1 < eps )then

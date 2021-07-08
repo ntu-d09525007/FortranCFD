@@ -33,7 +33,7 @@ do id = 0, p%glb%threads-1
                         ny = p%of(id)%loc%normals%y%now(i,j,kk)
                         nz = p%of(id)%loc%normals%z%now(i,j,kk)
                         dz = p%of(id)%loc%phi%now(i,j,kk) * dsqrt(nx*nx+ny*ny+nz*nz) / abs(nz) 
-                        eta = eta + 0.5d0 * ( p%of(id)%loc%z(i,j,kk) + dz )
+                        eta = eta + 0.5d0 * ( p%of(id)%glb%z(i,j,kk) + dz )
                     enddo
                 endif
             enddo
