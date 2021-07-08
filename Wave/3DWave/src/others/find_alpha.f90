@@ -7,9 +7,9 @@ real(8) :: v1,v2,v31,v32,v3
 real(8) :: alpha, pos
 logical :: reverse
     
-m1 = min(M1,M2,M3)
-m3 = max(M1,M2,M3)
-m2 = M1+M2+M3-m1-m3
+m1 = min(iM1,iM2,iM3)
+m3 = max(iM1,iM2,iM3)
+m2 = iM1+iM2+iM3-m1-m3
 
 mag=dsqrt(m1*m1+m2*m2+m3*m3)
 
