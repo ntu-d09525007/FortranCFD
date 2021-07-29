@@ -46,9 +46,6 @@ endif
 if( v > 0.5 ) then
     reverse=.true.
     v=1.0d0-iv
-    x1=1.0d0-x1
-    x2=1.0d0-x2
-    x3=1.0d0-x3
 else
     reverse=.false.
     v=iv

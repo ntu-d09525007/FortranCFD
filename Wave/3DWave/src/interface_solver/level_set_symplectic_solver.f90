@@ -45,7 +45,7 @@ real(8) :: err,perr
     !$omp parallel do private(i,j,k)
     do id = 0, p%glb%threads-1
         
-        call p%of(id)%loc%tdata%final_srk4()
+        call p%of(id)%loc%tdata%final_srk6()
         
         do k = p%of(id)%loc%ks-p%glb%ghc, p%of(id)%loc%ke+p%glb%ghc
         do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
