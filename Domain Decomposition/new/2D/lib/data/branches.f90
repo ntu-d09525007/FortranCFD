@@ -43,7 +43,7 @@ integer :: id, idx, idy
 integer :: is, ie, js, je
 type(dum_matrices)  :: coe
 type(time_recorded) :: heavy, delta, grad, sign
-type(time_recorded) :: phi, p, rho, mu, vof
+type(time_recorded) :: phi, p, rho, mu, vof, phi1, phi2
 type(time_recorded_derivatives) :: normals
 type(time_recorded_vec) :: vel, nvel, velsrc
 type(tensor) :: vel_ten
@@ -106,6 +106,9 @@ CALL P%LOC%COE%ALLOC(IS,IE,JS,JE)
 
 ! level set method
 CALL P%LOC%PHI%ALLOC(IS,IE,JS,JE)
+CALL P%LOC%PHI1%ALLOC(IS,IE,JS,JE)
+CALL P%LOC%PHI2%ALLOC(IS,IE,JS,JE)
+
 CALL P%LOC%VOF%ALLOC(IS,IE,JS,JE)
 CALL P%LOC%heavy%ALLOC(IS,IE,JS,JE)
 CALL P%LOC%sign%ALLOC(IS,IE,JS,JE)

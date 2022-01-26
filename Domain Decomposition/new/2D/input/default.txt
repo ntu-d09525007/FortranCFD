@@ -1,9 +1,9 @@
 ooo	Method to capture interface ( LS / MPLS / CLSVOF ) 
 2
 ooo	Name of the problem 
-30_drybed
+vortex_two_bubble
 ooo	Dimension of threads grid in X, Y, Z direction
-5	3
+2	2
 ooo	Multigrid level
 5
 ooo	Cells per unit length 
@@ -11,13 +11,13 @@ ooo	Cells per unit length
 ooo	Number of ghost cell
 3
 ooo	Range of domain in X direction
-0.0		5.0
+0.0		1.0
 ooo	Range of domain in Y direction
-0.0		3.0
+0.0		1.0
 ooo	Time to stop / plot
-10.0		0.05
+4.0		0.25
 ooo	Crount number ( advection / redistance )
-0.02		0.25
+0.01		0.25
 ooo	PPE iteration ( tolerance / w1 / w2 / valve )
 10.0	    	0.5	    0.5    	4.0
 ooo	SRK6 iteration ( tolerance / w )

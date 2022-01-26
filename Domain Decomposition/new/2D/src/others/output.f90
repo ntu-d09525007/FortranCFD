@@ -3,8 +3,46 @@ use all
 implicit none
 integer :: i,j,id
 real(8) :: damfront, damh
-    ! level set method, loss of volume/mass in percentage
-    write(p%fil%ls_mv,*)p%glb%time,100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass,100.0d0*(p%glb%ivol-p%glb%vol)/p%glb%ivol
+real(8) :: t, t1, t2
+
+        ! level set method, loss of volume/mass in percentage
+        call p%ls_mv; t=100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass
+        !$omp parallel do private(i,j)
+        do id = 0, p%glb%threads-1
+        do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
+        do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
+            p%of(id)%loc%phi1%tmp(i,j) = p%of(id)%loc%phi%now(i,j)  ! store phi%now in phi1%tmp
+            p%of(id)%loc%phi%now(i,j) = p%of(id)%loc%phi1%now(i,j)
+        enddo
+        enddo
+        enddo
+        !$omp end parallel do
+
+        call p%ls_mv; t1=100.0d0*(p%glb%imass/2-p%glb%mass)/p%glb%imass*2
+
+        !$omp parallel do private(i,j)
+        do id = 0, p%glb%threads-1
+          do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
+          do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
+            p%of(id)%loc%phi%now(i,j) = p%of(id)%loc%phi2%now(i,j)
+          enddo
+          enddo
+        enddo
+        !$omp end parallel do 
+
+        call p%ls_mv; t2=100.0d0*(p%glb%imass/2-p%glb%mass)/p%glb%imass*2
+
+        !$omp parallel do private(i,j)
+        do id = 0, p%glb%threads-1
+          do j = p%of(id)%loc%js-p%glb%ghc, p%of(id)%loc%je+p%glb%ghc
+          do i = p%of(id)%loc%is-p%glb%ghc, p%of(id)%loc%ie+p%glb%ghc
+            p%of(id)%loc%phi%now(i,j) = p%of(id)%loc%phi1%tmp(i,j)
+          enddo
+          enddo
+        enddo
+        !$omp end parallel do 
+
+        write(p%fil%ls_mv,*)p%glb%time,t,t1,t2
 
 end subroutine
 

@@ -49,13 +49,17 @@ CHARACTER(100) :: NAME_OF_FILE
             x = p%glb%x(i,j)
             y = p%glb%y(i,j)
             
-            ! dambreak
-            !=========================================
-            if( x<=1.0d0 .and. y<=1.0d0  )then
-                p%of(id)%loc%phi%now(i,j) = 1.0_8
+            if ( dsqrt( (x-0.5)**2 + (y-0.75)**2 ) < 0.15 )then
+                p%of(id)%loc%phi%now(i,j) = - dsqrt( (x-0.5)**2 + (y-0.75)**2 ) + 0.15
+            else if ( dsqrt( (x-0.5)**2 + (y-0.25)**2 ) < 0.15 )then
+                p%of(id)%loc%phi%now(i,j) = - dsqrt( (x-0.5)**2 + (y-0.25)**2 ) + 0.15
             else
-                p%of(id)%loc%phi%now(i,j) = -1.0_8
-            end if
+                p%of(id)%loc%phi%now(i,j) = max( -dsqrt( (x-0.5)**2 + (y-0.75)**2 ) + 0.15, -dsqrt( (x-0.5)**2 + (y-0.25)**2 ) + 0.15 ) 
+            endif
+
+            p%of(id)%loc%phi1%now(i,j) = -dsqrt( (x-0.5)**2 + (y-0.75)**2 ) + 0.15
+            p%of(id)%loc%phi2%now(i,j) = -dsqrt( (x-0.5)**2 + (y-0.25)**2 ) + 0.15
+
             
             p%of(id)%loc%vel%x%now(i,j) = 0.0_8
             p%of(id)%loc%vel%y%now(i,j) = 0.0_8
@@ -64,6 +68,8 @@ CHARACTER(100) :: NAME_OF_FILE
         end do
         
         call p%of(id)%bc(0,p%of(id)%loc%phi%now)
+        call p%of(id)%bc(0,p%of(id)%loc%phi1%now)
+        call p%of(id)%bc(0,p%of(id)%loc%phi2%now)
         call p%of(id)%bc(0,p%of(id)%loc%vof%now)
         call p%of(id)%velbc(p%of(id)%loc%vel%x%now,p%of(id)%loc%vel%y%now)
 

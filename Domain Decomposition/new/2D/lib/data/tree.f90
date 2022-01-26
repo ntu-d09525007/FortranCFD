@@ -163,11 +163,11 @@ real(8) :: mag
     
     p%fil%ls_mv = 15
     open(unit=p%fil%ls_mv,file="./out/"//trim(p%glb%name)//"_MVloss.plt")
-    write(p%fil%ls_mv,*)'variables = "T" "Loss of mass" "Loss of Volume" '
+    write(p%fil%ls_mv,*)'variables = "T" "Total" "Bubble 1" "Bubble 2" '
 
-    p%fil%damdata = 16
-    open(unit=p%fil%damdata,file="./out/"//trim(p%glb%name)//"_DamData.plt")
-    write(p%fil%ls_mv,*)'variables = "T" "Damfront" "Wall" '
+    ! p%fil%damdata = 16
+    ! open(unit=p%fil%damdata,file="./out/"//trim(p%glb%name)//"_DamData.plt")
+    ! write(p%fil%ls_mv,*)'variables = "T" "Damfront" "Wall" '
     
     p%glb%threads = p%glb%grid_x * p%glb%grid_y
     

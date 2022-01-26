@@ -116,20 +116,20 @@ real(8), dimension(q%loc%is-q%glb%ghc:q%loc%ie+q%glb%ghc,&
 integer :: i,j
 
     do j = q%loc%js, q%loc%je
-        !call q%loc%uccd%x%solve(q%loc%nvel%x%old(:,j),q%loc%phi%now(:,j),q%loc%tdata%x%s1(:,j),q%loc%tdata%x%s2(:,j))
-        call wenojs_flux_split(q%loc%tdata%x%s2(:,j),q%loc%tdata%x%s1(:,j),&
-                              q%loc%tdata%x%ss2(:,j),q%loc%tdata%x%ss1(:,j),&
-                              q%loc%is,q%loc%ie,q%glb%ghc)
+        call q%loc%ccdsolvers%x%solve("uccd",q%loc%phi%now(:,j),q%loc%tdata%x%s1(:,j),q%loc%tdata%x%s2(:,j),q%loc%nvel%x%old(:,j))
+        !call wenojs_flux_split(q%loc%tdata%x%s2(:,j),q%loc%tdata%x%s1(:,j),&
+        !                       q%loc%tdata%x%ss2(:,j),q%loc%tdata%x%ss1(:,j),&
+        !                       q%loc%is,q%loc%ie,q%glb%ghc)
         !call crweno_flux_split(q%loc%tdata%x%s2(:,j),q%loc%tdata%x%s1(:,j),&
         !                      q%loc%tdata%x%ss2(:,j),q%loc%tdata%x%ss1(:,j),&
         !                      q%loc%is,q%loc%ie,q%glb%ghc)
     end do 
 
     do i = q%loc%is, q%loc%ie
-        !call q%loc%uccd%y%solve(q%loc%nvel%y%old(i,:),q%loc%phi%now(i,:),q%loc%tdata%y%s1(i,:),q%loc%tdata%y%s2(i,:))
-        call wenojs_flux_split(q%loc%tdata%y%s2(i,:),q%loc%tdata%y%s1(i,:),&
-                              q%loc%tdata%y%ss2(i,:),q%loc%tdata%y%ss1(i,:),&
-                              q%loc%js,q%loc%je,q%glb%ghc)
+        call q%loc%ccdsolvers%y%solve("uccd",q%loc%phi%now(i,:),q%loc%tdata%y%s1(i,:),q%loc%tdata%y%s2(i,:),q%loc%nvel%y%old(i,:))
+        !call wenojs_flux_split(q%loc%tdata%y%s2(i,:),q%loc%tdata%y%s1(i,:),&
+        !                       q%loc%tdata%y%ss2(i,:),q%loc%tdata%y%ss1(i,:),&
+        !                       q%loc%js,q%loc%je,q%glb%ghc)
         !call crweno_flux_split(q%loc%tdata%y%s2(i,:),q%loc%tdata%y%s1(i,:),&
         !                      q%loc%tdata%y%ss2(i,:),q%loc%tdata%y%ss1(i,:),&
         !                      q%loc%js,q%loc%je,q%glb%ghc)
@@ -137,11 +137,10 @@ integer :: i,j
 
     do j = q%loc%js, q%loc%je
     do i = q%loc%is, q%loc%ie
-        s(i,j) = - (q%loc%tdata%x%ss1(i,j)+q%loc%tdata%x%ss2(i,j)-q%loc%tdata%x%ss1(i-1,j)-q%loc%tdata%x%ss2(i-1,j)) / p%glb%dx &
-                &- (q%loc%tdata%y%ss1(i,j)+q%loc%tdata%y%ss2(i,j)-q%loc%tdata%y%ss1(i,j-1)-q%loc%tdata%y%ss2(i,j-1)) / p%glb%dy
-        ! s(i,j) = - q%loc%nvel%x%old(i,j)*q%loc%tdata%x%s1(i,j) &
-        !         &  - q%loc%nvel%y%old(i,j)*q%loc%tdata%y%s1(i,j) &
-        !         &  - q%loc%nvel%z%old(i,j)*q%loc%tdata%z%s1(i,j) 
+        ! s(i,j) = - (q%loc%tdata%x%ss1(i,j)+q%loc%tdata%x%ss2(i,j)-q%loc%tdata%x%ss1(i-1,j)-q%loc%tdata%x%ss2(i-1,j)) / p%glb%dx &
+        !         &- (q%loc%tdata%y%ss1(i,j)+q%loc%tdata%y%ss2(i,j)-q%loc%tdata%y%ss1(i,j-1)-q%loc%tdata%y%ss2(i,j-1)) / p%glb%dy
+        s(i,j) = - q%loc%nvel%x%old(i,j)*q%loc%tdata%x%s1(i,j) &
+              &  - q%loc%nvel%y%old(i,j)*q%loc%tdata%y%s1(i,j) 
     end do 
     end do
     

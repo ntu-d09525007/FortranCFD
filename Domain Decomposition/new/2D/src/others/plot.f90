@@ -30,6 +30,8 @@ E_IO = VTK_GEO_XML(nx1=nx1, nx2=nx2, ny1=ny1, ny2=ny2, nz1=nz1, nz2=nz2, NN=nn, 
                    
 E_IO = VTK_DAT_XML(var_location = 'node', var_block_action = 'open')
 E_IO = VTK_VAR_XML(NC_NN = nn, varname = 'Phi', var = reshape(p%of(id)%loc%phi%now(nx1:nx2,ny1:ny2),(/nn/)) )
+E_IO = VTK_VAR_XML(NC_NN = nn, varname = 'Phi1', var = reshape(p%of(id)%loc%phi1%now(nx1:nx2,ny1:ny2),(/nn/)) )
+E_IO = VTK_VAR_XML(NC_NN = nn, varname = 'Phi2', var = reshape(p%of(id)%loc%phi2%now(nx1:nx2,ny1:ny2),(/nn/)) )
 E_IO = VTK_VAR_XML(NC_NN = nn, varname = 'Velocity', varX = reshape(p%of(id)%loc%nvel%x%now(nx1:nx2,ny1:ny2),(/nn/)),&
                                                     &varY = reshape(p%of(id)%loc%nvel%y%now(nx1:nx2,ny1:ny2),(/nn/)),&
                                                     &varZ = reshape(p%glb%zeros(nx1:nx2,ny1:ny2),(/nn/)))

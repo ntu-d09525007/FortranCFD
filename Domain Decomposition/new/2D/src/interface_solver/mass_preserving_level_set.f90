@@ -1,9 +1,9 @@
-subroutine mass_preserving_level_set
+subroutine mass_preserving_level_set(coef)
 use all
 !$ use omp_lib
 implicit none
 integer :: i,j,id,iter
-real(8) :: lam, plam
+real(8) :: lam, plam, coef
 
 do iter = 1, 2
     
@@ -33,7 +33,7 @@ do iter = 1, 2
     enddo   
     !$omp end parallel do
     
-    lam = ( p%glb%imass - p%glb%mass ) / lam 
+    lam = ( p%glb%imass*coef - p%glb%mass ) / lam 
 
     !$omp parallel do private(i,j)
     do id = 0, p%glb%threads-1
