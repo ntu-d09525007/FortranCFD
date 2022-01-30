@@ -1,0 +1,36 @@
+SUBROUTINE FIND_MASS_VEL()
+USE PRECISION
+USE PROBLEM_DEF
+USE FLUID_PROPERTIES, ONLY : V
+USE LS_DATA, ONLY : PHI, HEAVY
+USE VOF_DATA, ONLY : VOF
+IMPLICIT NONE
+INTEGER :: I,J
+REAL(DP) :: VEL_MC,NUM
+character(3) :: name
+
+CALL HEAVY_F(PHI)
+
+NUM=0.0_DP
+VEL_MC=0.0_DP
+
+!$OMP PARALLEL DO REDUCTION(+:VEL_MC,NUM)
+DO J = 1, NODE_Y
+DO I = 1, NODE_X
+   NUM = NUM + 1.0-HEAVY(I,J)
+   VEL_MC = VEL_MC + V(I,J)*(1.0-HEAVY(I,J))
+ENDDO
+ENDDO
+!$OMP END PARALLEL DO
+
+vel_mc = vel_mc / num
+ 
+IF(ITER.EQ.1)THEN
+  WRITE(NAME,'(I3.3)')ITER_CNT
+  open(unit=19,file="vel_of_mass_"//name//".plt")
+  write(19,*)'variables ="T" "Vc" '
+ENDIF
+
+write(19,*)time,vel_mc
+
+END SUBROUTINE
