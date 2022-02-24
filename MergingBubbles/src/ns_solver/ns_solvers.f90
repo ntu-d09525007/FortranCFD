@@ -7,9 +7,9 @@ integer(8) :: cpustart, cpuend
     
     call ns_init
     
-    !call ns_ab_solver_SOR
+    call ns_ab_solver_SOR
     !call ns_split_solver
-    call ns_ab_solver_mg
+    ! call ns_ab_solver_mg
     
     call ns_check_convergence_div
     call p%node_vel
