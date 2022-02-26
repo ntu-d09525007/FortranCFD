@@ -1,9 +1,11 @@
 subroutine output()
 use all
 implicit none
-integer :: i,j,k,id, cnt
-real(8) :: damfront, damh
+integer :: i,j,k,id,cnt,num,ks,ke,kk
+real(8) :: rho, heavy, dv, x, eps, pi
+real(8),dimension(:),allocatable :: mass
 integer, dimension(1:p%glb%node_z) :: f
+logical :: switch, finish
 
     ! level set method, loss of volume/mass in percentage
     write(p%fil%ls_mv,*)p%glb%time,100.0d0*(p%glb%imass-p%glb%mass)/p%glb%imass,100.0d0*(p%glb%ivol-p%glb%vol)/p%glb%ivol
@@ -11,7 +13,7 @@ integer, dimension(1:p%glb%node_z) :: f
     do k = 1, p%glb%node_z
         f(k) = -1
         do id = 0, p%glb%threads-1
-            if( p%of(id)%loc%ks>=k .and. p%of(id)%loc%ke<=k)then
+            if( p%of(id)%loc%ks<=k .and. p%of(id)%loc%ke>=k)then
                 do j = p%of(id)%loc%js, p%of(id)%loc%je
                 do i = p%of(id)%loc%is, p%of(id)%Loc%ie
                     if( p%of(id)%loc%phi%now(i,j,k) < 0.0d0 )then
@@ -25,10 +27,73 @@ integer, dimension(1:p%glb%node_z) :: f
 
     cnt = 0
     do k = 1, p%glb%node_z-1
-        if( f(k)*f(k+1) == -1 ) cnt = cnt + 1
+        if( f(k)*f(k+1) < 0 ) cnt = cnt + 1
+    enddo
+    cnt=cnt/2
+
+    write(*,*)"Num of bubbles:",cnt
+    
+    if(cnt<2)return
+
+    allocate(mass(cnt))
+
+    dv = p%glb%dx * p%glb%dy * p%glb%dz
+    eps = 1.0d-12
+    pi = dacos(-1.0_8)
+
+    kk=1
+    do num = 1, cnt
+
+        switch=.false.
+        finish = .false.
+
+        do k = kk, p%glb%node_z
+            if(finish)exit
+
+            if( f(k)*f(k+1) < 0 )then
+                if(.not.switch)then
+                    ks=k+1
+                    switch=.true.
+                else
+                    ke=k
+                    finish=.true.
+                    kk=k+1
+                endif
+            endif
+        enddo
+
+        mass(num)=0.0d0
+        do k = ks, ke
+            do id = 0, p%glb%threads-1
+                if( p%of(id)%loc%ks<=k .and. p%of(id)%loc%ke>=k)then
+
+                    do j = p%of(id)%loc%js, p%of(id)%loc%je
+                    do i = p%of(id)%loc%is, p%of(id)%Loc%ie
+
+                        x = -p%of(id)%loc%phi%now(i,j,k) / p%glb%ls_wid
+        
+                        if( x > 1.0_8-eps )then
+                            heavy = 1.0_8
+                        else if ( x < -1.0_8+eps )then
+                            heavy = 0.0_8
+                        else
+                            heavy = 0.5_8 * (1.0_8 + x + dsin(pi*x) / pi )
+                        endif
+
+                        rho = p%glb%rho_12*heavy + (1.0_8 - heavy )
+
+                        mass(num)=mass(num)+rho*heavy*dv
+
+                    enddo
+                    enddo
+
+                endif
+            enddo
+        enddo
+
     enddo
 
-    write(*,*)"Number of bubbles: ", cnt/2
+    write(p%fil%bubble_mass,*)p%glb%time,mass(:)
 
 end subroutine
 

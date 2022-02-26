@@ -36,7 +36,7 @@ end do
 call ns_check_convergence_vel
 
 if( p%glb%iter<relax_iter )then
-    call ppe_sor_solver(1.0d-8)
+    call ppe_sor_solver(1.0d-5)
 else
     call ppe_mg_solver(iter)
 endif

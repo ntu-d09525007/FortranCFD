@@ -4,7 +4,7 @@ use branches
 implicit none
 
 type filemanager
-integer :: ls_mv, damdata
+integer :: ls_mv, bubble_mass
 end type filemanager
 
 type multigrid
@@ -170,10 +170,10 @@ real(8) :: mag
     open(unit=p%fil%ls_mv,file="./out/"//trim(p%glb%name)//"_MVloss.plt")
     write(p%fil%ls_mv,*)'variables = "T" "Loss of mass" "Loss of Volume" '
 
-    p%fil%damdata = 16
-    open(unit=p%fil%damdata,file="./out/"//trim(p%glb%name)//"_DamData.plt")
-    write(p%fil%ls_mv,*)'variables = "T" "Damfront" "Wall" '
-    
+    p%fil%bubble_mass = 16
+    open(unit=p%fil%bubble_mass,file="./out/"//trim(p%glb%name)//"_Bubble_MVloss.plt")
+    write(p%fil%ls_mv,*)'variables = "T" "B1" "B2" '
+
     p%glb%threads = p%glb%grid_x * p%glb%grid_y * p%glb%grid_z
     
     allocate( p%of(0:p%glb%threads-1))
