@@ -4,8 +4,11 @@ USE PROBLEM_DEF
 USE LS_DATA
 USE VOF_DATA
 IMPLICIT NONE
-INTEGER :: I,J,K,F(1:NODE_Z),CNT
+INTEGER :: I,J,K,F(1:NODE_Z),CNT,NUM,KK,ks,ke
+real(8) :: rho,dv
 CHARACTER(3) :: MET,GRI
+real(8),dimension(:),allocatable :: mass
+logical :: switch, finish
 
  MASS_LS = 0.0_DP
  MASS_VOF = 0.0_DP
@@ -38,12 +41,48 @@ CHARACTER(3) :: MET,GRI
  DO K = 1, NODE_Z-1
  	IF( F(K)*F(K+1) < 0 )CNT=CNT+1
  ENDDO
+ CNT=CNT/2
 
- WRITE(*,*)"NUM OF BUBBLES",CNT
+ ALLOCATE(MASS(CNT))
+
+CALL HEAVY_F(-PHI)
+
+dv = DX*DY*DZ
+kk=1
+do num = 1, cnt
+
+    switch=.false.
+    finish = .false.
+
+    do k = kk, NODE_Z-1
+        if(finish)exit
+        if( f(k)*f(k+1) < 0 )then
+            if(.not.switch)then
+                ks=k+1
+                switch=.true.
+            else
+                ke=k
+                finish=.true.
+                kk=k+1
+            endif
+        endif
+    enddo
+
+    mass(num)=0.0d0
+    do k = ks, ke
+    do j = 1, NODE_Y
+    do i = 1, NODE_X
+        rho = RATIO_RHO*heavy(I,J,K) + (1.0_8 - heavy(I,J,K) )
+        mass(num)=mass(num)+rho*heavy(I,J,K)*dv
+    enddo
+    enddo
+    enddo
+
+enddo
  
  EM_LS_A = EM_LS_A + ABS(1.0-VOL_LS/IVOL_LS)*DT/TIME_TO_STOP
  EM_VOF_A = EM_VOF_A + ABS(1.0-VOL_VOF/IVOL_vof)*DT/TIME_TO_STOP
- 
+
  
  IF( REC_MASS==0 )THEN
  	
@@ -68,6 +107,9 @@ CHARACTER(3) :: MET,GRI
  	!OPEN(UNIT=12,FILE='VOL LOSS_'//MET//'.PLT')
  	OPEN(UNIT=12,FILE='VOL LOSS.PLT')
  	WRITE(12,*)'VARIABLES = "T" "LOSS OF LS(%)" "LOSS OF VOF(%)" '
+
+    OPEN(UNIT=13,FILE='BUBBLE MASS.PLT')
+    WRITE(13,*)'VARIABLES ="T" "B1" "B2" '
 	
  	REC_MASS = 1
 
@@ -78,5 +120,7 @@ CHARACTER(3) :: MET,GRI
  
   WRITE(11,*)TIME,(1.0-MASS_LS/IMASS_LS)*100,(1.0-MASS_VOF/IMASS_VOF)*100
   WRITE(12,*)TIME,(1.0-VOL_LS/IVOL_LS)*100,(1.0-VOL_VOF/IVOL_VOF)*100 
-
+  WRITE(*,*)"NUM OF BUBBLES",CNT,MASS(:)
+  write(13,*)time,mass(:)
+  
 END SUBROUTINE

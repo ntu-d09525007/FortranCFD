@@ -39,7 +39,7 @@ INTEGER :: INITER,I,J,K
     
     CALL VELOCITY_BC()
 	
-    IF( INITER>1 )EXIT
+    IF( INITER>3 )EXIT
 	
   END DO
 
