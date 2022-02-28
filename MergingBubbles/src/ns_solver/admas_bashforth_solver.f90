@@ -5,6 +5,7 @@ implicit none
 integer :: id,i,j,k
 
     call ns_ab_adv_source
+    call ns_ab_diff_source
 
 end subroutine
 
@@ -17,28 +18,30 @@ integer :: id,i,j,k
 relax_iter = 3
 
 call ns_ab_adv_source
-    
-iter=0
-p%glb%piter=0
-    
-do 
-    
-    iter=iter+1 
-    
-    call ns_linearize
-    call ns_ab_diff_source
-    call ns_ab_predictor   
+call ns_ab_diff_source
+call ns_ab_predictor 
 
-    if(iter>5)exit
+! iter=0
+! p%glb%piter=0
+    
+! do 
+    
+!     iter=iter+1 
+    
+!     call ns_linearize
+!     call ns_ab_diff_source
+!     call ns_ab_predictor   
+
+!     if(iter>5)exit
         
-end do
+! end do
 
 call ns_check_convergence_vel
 
 if( p%glb%iter<relax_iter )then
     call ppe_sor_solver(1.0d-5)
 else
-    call ppe_mg_solver(iter)
+    call ppe_mg_solver(1)
 endif
     
 end subroutine
@@ -87,15 +90,15 @@ do id = 0, p%glb%threads-1
     do i = p%of(id)%loc%is, p%of(id)%loc%ie
             
         src = 1.50*p%of(id)%loc%velsrc%x%now(i,j,k) - 0.5d0*p%of(id)%loc%velsrc%x%old(i,j,k) 
-        src = src + p%of(id)%loc%velsrc%x%tmp(i,j,k)            
+        ! src = src + p%of(id)%loc%velsrc%x%tmp(i,j,k)            
         p%of(id)%loc%vel%x%now(i,j,k) = p%of(id)%loc%vel%x%old(i,j,k) + p%glb%dt * src
         
         src = 1.50*p%of(id)%loc%velsrc%y%now(i,j,k) - 0.5d0*p%of(id)%loc%velsrc%y%old(i,j,k) 
-        src = src + p%of(id)%loc%velsrc%y%tmp(i,j,k)    
+        ! src = src + p%of(id)%loc%velsrc%y%tmp(i,j,k)    
         p%of(id)%loc%vel%y%now(i,j,k) = p%of(id)%loc%vel%y%old(i,j,k) + p%glb%dt * src
             
         src = 1.50*p%of(id)%loc%velsrc%z%now(i,j,k) - 0.5d0*p%of(id)%loc%velsrc%z%old(i,j,k) 
-        src = src + p%of(id)%loc%velsrc%z%tmp(i,j,k)    
+        ! src = src + p%of(id)%loc%velsrc%z%tmp(i,j,k)    
         p%of(id)%loc%vel%z%now(i,j,k) = p%of(id)%loc%vel%z%old(i,j,k) + p%glb%dt * src
             
     end do

@@ -50,44 +50,46 @@ real(8) :: ux,uy,uz,vx,wx,phix,phiy,phiz,dif_x,dif_y,dif_z,curv
             phiy = 0.25d0*(p%of(id)%loc%phi%old(i+1,j+1,k)-p%of(id)%loc%phi%old(i+1,j-1,k)+p%of(id)%loc%phi%old(i,j+1,k)-p%of(id)%loc%phi%old(i,j-1,k))/p%glb%dy
             phiz = 0.25d0*(p%of(id)%loc%phi%old(i+1,j,k+1)-p%of(id)%loc%phi%old(i+1,j,k-1)+p%of(id)%loc%phi%old(i,j,k+1)-p%of(id)%loc%phi%old(i,j,k-1))/p%glb%dz
             
-            dif_x = mu/rho*xx/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phix*2.0d0*ux/(rho*p%glb%re)
-            dif_y = mu/rho*yy/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiy*(uy+vx)/(rho*p%glb%re)
-            dif_z = mu/rho*zz/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiz*(uz+wx)/(rho*p%glb%re)
+            dif_x = mu/rho*xx/p%glb%re + (1.0d0-p%glb%mu_12)*delta*phix*2.0d0*ux/(rho*p%glb%re)
+            dif_y = mu/rho*yy/p%glb%re + (1.0d0-p%glb%mu_12)*delta*phiy*(uy+vx)/(rho*p%glb%re)
+            dif_z = mu/rho*zz/p%glb%re + (1.0d0-p%glb%mu_12)*delta*phiz*(uz+wx)/(rho*p%glb%re)
             
             p%of(id)%loc%velsrc%x%tmp(i,j,k) = dif_x + dif_y + dif_z &
             & + p%glb%gx*p%glb%btn_g / p%glb%fr &
             & - p%glb%btn_sf*curv*delta*phix / (p%glb%we*rho) 
+
+            p%of(id)%loc%velsrc%x%now(i,j,k) = p%of(id)%loc%velsrc%x%now(i,j,k) + p%of(id)%loc%velsrc%x%tmp(i,j,k)
             
             ! =================================================
             
-            rho = 0.5d0*(p%of(id)%loc%rho%old(i,j,k)+p%of(id)%loc%rho%old(i+1,j,k))
-            mu = 0.5d0*(p%of(id)%loc%mu%old(i,j,k)+p%of(id)%loc%mu%old(i+1,j,k))
-            delta = 0.5d0*(p%of(id)%loc%delta%now(i,j,k)+p%of(id)%loc%delta%now(i+1,j,k))
-            curv = (p%of(id)%loc%normals%curv%now(i,j,k)+p%of(id)%loc%normals%curv%now(i+1,j,k))/2.0d0
+            ! rho = 0.5d0*(p%of(id)%loc%rho%old(i,j,k)+p%of(id)%loc%rho%old(i+1,j,k))
+            ! mu = 0.5d0*(p%of(id)%loc%mu%old(i,j,k)+p%of(id)%loc%mu%old(i+1,j,k))
+            ! delta = 0.5d0*(p%of(id)%loc%delta%now(i,j,k)+p%of(id)%loc%delta%now(i+1,j,k))
+            ! curv = (p%of(id)%loc%normals%curv%now(i,j,k)+p%of(id)%loc%normals%curv%now(i+1,j,k))/2.0d0
             
-            xx = (p%of(id)%loc%vel%x%tmp(I+1,J,K)-2.0d0*p%of(id)%loc%vel%x%tmp(I,J,K)+p%of(id)%loc%vel%x%tmp(I-1,J,K))/p%glb%dx**2.0d0
-            yy = (p%of(id)%loc%vel%x%tmp(I,J+1,K)-2.0d0*p%of(id)%loc%vel%x%tmp(I,J,K)+p%of(id)%loc%vel%x%tmp(I,J-1,K))/p%glb%dy**2.0d0
-            zz = (p%of(id)%loc%vel%x%tmp(I,J,K+1)-2.0d0*p%of(id)%loc%vel%x%tmp(I,J,K)+p%of(id)%loc%vel%x%tmp(I,J,K-1))/p%glb%dz**2.0d0
+            ! xx = (p%of(id)%loc%vel%x%tmp(I+1,J,K)-2.0d0*p%of(id)%loc%vel%x%tmp(I,J,K)+p%of(id)%loc%vel%x%tmp(I-1,J,K))/p%glb%dx**2.0d0
+            ! yy = (p%of(id)%loc%vel%x%tmp(I,J+1,K)-2.0d0*p%of(id)%loc%vel%x%tmp(I,J,K)+p%of(id)%loc%vel%x%tmp(I,J-1,K))/p%glb%dy**2.0d0
+            ! zz = (p%of(id)%loc%vel%x%tmp(I,J,K+1)-2.0d0*p%of(id)%loc%vel%x%tmp(I,J,K)+p%of(id)%loc%vel%x%tmp(I,J,K-1))/p%glb%dz**2.0d0
             
-            ux = 0.5d0*( p%of(id)%loc%vel%x%tmp(i+1,j,k)-p%of(id)%loc%vel%x%tmp(i-1,j,k) )/p%glb%dx
-            uy = 0.5d0*( p%of(id)%loc%vel%x%tmp(i,j+1,k)-p%of(id)%loc%vel%x%tmp(i,j-1,k) )/p%glb%dy
-            uz = 0.5d0*( p%of(id)%loc%vel%x%tmp(i,j,k+1)-p%of(id)%loc%vel%x%tmp(i,j,k-1) )/p%glb%dz
+            ! ux = 0.5d0*( p%of(id)%loc%vel%x%tmp(i+1,j,k)-p%of(id)%loc%vel%x%tmp(i-1,j,k) )/p%glb%dx
+            ! uy = 0.5d0*( p%of(id)%loc%vel%x%tmp(i,j+1,k)-p%of(id)%loc%vel%x%tmp(i,j-1,k) )/p%glb%dy
+            ! uz = 0.5d0*( p%of(id)%loc%vel%x%tmp(i,j,k+1)-p%of(id)%loc%vel%x%tmp(i,j,k-1) )/p%glb%dz
     
-            vx = 0.5d0*( p%of(id)%loc%vel%y%tmp(i+1,j,k)-p%of(id)%loc%vel%y%tmp(i,j,k)+p%of(id)%loc%vel%y%tmp(i+1,j-1,k)-p%of(id)%loc%vel%y%tmp(i,j-1,k) )/p%glb%dx
-            wx = 0.5d0*( p%of(id)%loc%vel%z%tmp(i+1,j,k)-p%of(id)%loc%vel%z%tmp(i,j,k)+p%of(id)%loc%vel%z%tmp(i+1,j,k-1)-p%of(id)%loc%vel%z%tmp(i,j,k-1) )/p%glb%dx
+            ! vx = 0.5d0*( p%of(id)%loc%vel%y%tmp(i+1,j,k)-p%of(id)%loc%vel%y%tmp(i,j,k)+p%of(id)%loc%vel%y%tmp(i+1,j-1,k)-p%of(id)%loc%vel%y%tmp(i,j-1,k) )/p%glb%dx
+            ! wx = 0.5d0*( p%of(id)%loc%vel%z%tmp(i+1,j,k)-p%of(id)%loc%vel%z%tmp(i,j,k)+p%of(id)%loc%vel%z%tmp(i+1,j,k-1)-p%of(id)%loc%vel%z%tmp(i,j,k-1) )/p%glb%dx
     
-            phix = (p%of(id)%loc%phi%now(i+1,j,k)-p%of(id)%loc%phi%now(i,j,k))/p%glb%dx
-            phiy = 0.25d0*(p%of(id)%loc%phi%now(i+1,j+1,k)-p%of(id)%loc%phi%now(i+1,j-1,k)+p%of(id)%loc%phi%now(i,j+1,k)-p%of(id)%loc%phi%now(i,j-1,k))/p%glb%dy
-            phiz = 0.25d0*(p%of(id)%loc%phi%now(i+1,j,k+1)-p%of(id)%loc%phi%now(i+1,j,k-1)+p%of(id)%loc%phi%now(i,j,k+1)-p%of(id)%loc%phi%now(i,j,k-1))/p%glb%dz
+            ! phix = (p%of(id)%loc%phi%now(i+1,j,k)-p%of(id)%loc%phi%now(i,j,k))/p%glb%dx
+            ! phiy = 0.25d0*(p%of(id)%loc%phi%now(i+1,j+1,k)-p%of(id)%loc%phi%now(i+1,j-1,k)+p%of(id)%loc%phi%now(i,j+1,k)-p%of(id)%loc%phi%now(i,j-1,k))/p%glb%dy
+            ! phiz = 0.25d0*(p%of(id)%loc%phi%now(i+1,j,k+1)-p%of(id)%loc%phi%now(i+1,j,k-1)+p%of(id)%loc%phi%now(i,j,k+1)-p%of(id)%loc%phi%now(i,j,k-1))/p%glb%dz
             
-            dif_x = mu/rho*xx/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phix*2.0d0*ux/(rho*p%glb%re)
-            dif_y = mu/rho*yy/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiy*(uy+vx)/(rho*p%glb%re)
-            dif_z = mu/rho*zz/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiz*(uz+wx)/(rho*p%glb%re)
+            ! dif_x = mu/rho*xx/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phix*2.0d0*ux/(rho*p%glb%re)
+            ! dif_y = mu/rho*yy/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiy*(uy+vx)/(rho*p%glb%re)
+            ! dif_z = mu/rho*zz/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiz*(uz+wx)/(rho*p%glb%re)
             
-            p%of(id)%loc%velsrc%x%tmp(i,j,k) = ( p%of(id)%loc%velsrc%x%tmp(i,j,k) + &
-            & dif_x + dif_y + dif_z &
-            & + p%glb%gx*p%glb%btn_g / p%glb%fr &
-            & - p%glb%btn_sf*curv*delta*phix / (p%glb%we*rho) )/2.0d0
+            ! p%of(id)%loc%velsrc%x%tmp(i,j,k) = ( p%of(id)%loc%velsrc%x%tmp(i,j,k) + &
+            ! & dif_x + dif_y + dif_z &
+            ! & + p%glb%gx*p%glb%btn_g / p%glb%fr &
+            ! & - p%glb%btn_sf*curv*delta*phix / (p%glb%we*rho) )/2.0d0
             
         end do
         end do
@@ -134,44 +136,46 @@ real(8) :: vx,vy,vz,wy,uy,phix,phiy,phiz,dif_x,dif_y,dif_z,curv
             phiy = ( p%of(id)%loc%phi%old(i,j+1,k)-p%of(id)%loc%phi%old(i,j,k) )/p%glb%dy
             phiz = 0.25d0*(p%of(id)%loc%phi%old(i,j+1,k+1)-p%of(id)%loc%phi%old(i,j+1,k-1)+p%of(id)%loc%phi%old(i,j,k+1)-p%of(id)%loc%phi%old(i,j,k-1))/p%glb%dz
             
-            dif_x = mu/rho*xx/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phix*(uy+vx)/(rho*p%glb%re)
-            dif_y = mu/rho*yy/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiy*2.0d0*vy/(rho*p%glb%re)
-            dif_z = mu/rho*zz/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiz*(wy+vz)/(rho*p%glb%re)
+            dif_x = mu/rho*xx/p%glb%re + (1.0d0-p%glb%mu_12)*delta*phix*(uy+vx)/(rho*p%glb%re)
+            dif_y = mu/rho*yy/p%glb%re + (1.0d0-p%glb%mu_12)*delta*phiy*2.0d0*vy/(rho*p%glb%re)
+            dif_z = mu/rho*zz/p%glb%re + (1.0d0-p%glb%mu_12)*delta*phiz*(wy+vz)/(rho*p%glb%re)
             
             p%of(id)%loc%velsrc%y%tmp(i,j,k) = dif_x + dif_y + dif_z &
             & + p%glb%gy*p%glb%btn_g / p%glb%fr &
             & - p%glb%btn_sf*curv*delta*phiy / (p%glb%we*rho)
+
+            p%of(id)%loc%velsrc%y%now(i,j,k) = p%of(id)%loc%velsrc%y%now(i,j,k) + p%of(id)%loc%velsrc%y%tmp(i,j,k)
             
             ! =========================================================================
             
-            rho = 0.5d0*(p%of(id)%loc%rho%old(i,j,k)+p%of(id)%loc%rho%old(i,j+1,k))
-            mu = 0.5d0*(p%of(id)%loc%mu%old(i,j,k)+p%of(id)%loc%mu%old(i,j+1,k))
-            delta = 0.5d0*(p%of(id)%loc%delta%now(i,j,k)+p%of(id)%loc%delta%now(i,j+1,k))
-            curv = (p%of(id)%loc%normals%curv%now(i,j,k)+p%of(id)%loc%normals%curv%now(i,j+1,k))/2.0d0
+            ! rho = 0.5d0*(p%of(id)%loc%rho%old(i,j,k)+p%of(id)%loc%rho%old(i,j+1,k))
+            ! mu = 0.5d0*(p%of(id)%loc%mu%old(i,j,k)+p%of(id)%loc%mu%old(i,j+1,k))
+            ! delta = 0.5d0*(p%of(id)%loc%delta%now(i,j,k)+p%of(id)%loc%delta%now(i,j+1,k))
+            ! curv = (p%of(id)%loc%normals%curv%now(i,j,k)+p%of(id)%loc%normals%curv%now(i,j+1,k))/2.0d0
             
-            xx = (p%of(id)%loc%vel%y%tmp(I+1,J,K)-2.0d0*p%of(id)%loc%vel%y%tmp(I,J,K)+p%of(id)%loc%vel%y%tmp(I-1,J,K))/p%glb%dx**2.0d0
-            yy = (p%of(id)%loc%vel%y%tmp(I,J+1,K)-2.0d0*p%of(id)%loc%vel%y%tmp(I,J,K)+p%of(id)%loc%vel%y%tmp(I,J-1,K))/p%glb%dy**2.0d0
-            zz = (p%of(id)%loc%vel%y%tmp(I,J,K+1)-2.0d0*p%of(id)%loc%vel%y%tmp(I,J,K)+p%of(id)%loc%vel%y%tmp(I,J,K-1))/p%glb%dz**2.0d0
+            ! xx = (p%of(id)%loc%vel%y%tmp(I+1,J,K)-2.0d0*p%of(id)%loc%vel%y%tmp(I,J,K)+p%of(id)%loc%vel%y%tmp(I-1,J,K))/p%glb%dx**2.0d0
+            ! yy = (p%of(id)%loc%vel%y%tmp(I,J+1,K)-2.0d0*p%of(id)%loc%vel%y%tmp(I,J,K)+p%of(id)%loc%vel%y%tmp(I,J-1,K))/p%glb%dy**2.0d0
+            ! zz = (p%of(id)%loc%vel%y%tmp(I,J,K+1)-2.0d0*p%of(id)%loc%vel%y%tmp(I,J,K)+p%of(id)%loc%vel%y%tmp(I,J,K-1))/p%glb%dz**2.0d0
             
-            vx = 0.5d0*( p%of(id)%loc%vel%y%tmp(i+1,j,k)-p%of(id)%loc%vel%y%tmp(i-1,j,k) )/p%glb%dx
-            vy = 0.5d0*( p%of(id)%loc%vel%y%tmp(i,j+1,k)-p%of(id)%loc%vel%y%tmp(i,j-1,k) )/p%glb%dy
-            vz = 0.5d0*( p%of(id)%loc%vel%y%tmp(i,j,k+1)-p%of(id)%loc%vel%y%tmp(i,j,k-1) )/p%glb%dz
+            ! vx = 0.5d0*( p%of(id)%loc%vel%y%tmp(i+1,j,k)-p%of(id)%loc%vel%y%tmp(i-1,j,k) )/p%glb%dx
+            ! vy = 0.5d0*( p%of(id)%loc%vel%y%tmp(i,j+1,k)-p%of(id)%loc%vel%y%tmp(i,j-1,k) )/p%glb%dy
+            ! vz = 0.5d0*( p%of(id)%loc%vel%y%tmp(i,j,k+1)-p%of(id)%loc%vel%y%tmp(i,j,k-1) )/p%glb%dz
     
-            uy = 0.5d0*( p%of(id)%loc%vel%x%tmp(i,j+1,k)-p%of(id)%loc%vel%x%tmp(i,j,k)+p%of(id)%loc%vel%x%tmp(i-1,j+1,k)-p%of(id)%loc%vel%x%tmp(i-1,j,k) )/p%glb%dy
-            wy = 0.5d0*( p%of(id)%loc%vel%z%tmp(i,j+1,k)-p%of(id)%loc%vel%z%tmp(i,j,k)+p%of(id)%loc%vel%z%tmp(i,j+1,k-1)-p%of(id)%loc%vel%z%tmp(i,j,k-1) )/p%glb%dy
+            ! uy = 0.5d0*( p%of(id)%loc%vel%x%tmp(i,j+1,k)-p%of(id)%loc%vel%x%tmp(i,j,k)+p%of(id)%loc%vel%x%tmp(i-1,j+1,k)-p%of(id)%loc%vel%x%tmp(i-1,j,k) )/p%glb%dy
+            ! wy = 0.5d0*( p%of(id)%loc%vel%z%tmp(i,j+1,k)-p%of(id)%loc%vel%z%tmp(i,j,k)+p%of(id)%loc%vel%z%tmp(i,j+1,k-1)-p%of(id)%loc%vel%z%tmp(i,j,k-1) )/p%glb%dy
     
-            phix = 0.25d0*(p%of(id)%loc%phi%now(i+1,j,k)-p%of(id)%loc%phi%now(i-1,j,k)+p%of(id)%loc%phi%now(i+1,j+1,k)-p%of(id)%loc%phi%now(i-1,j+1,k))/p%glb%dx
-            phiy = ( p%of(id)%loc%phi%now(i,j+1,k)-p%of(id)%loc%phi%now(i,j,k) )/p%glb%dy
-            phiz = 0.25d0*(p%of(id)%loc%phi%now(i,j+1,k+1)-p%of(id)%loc%phi%now(i,j+1,k-1)+p%of(id)%loc%phi%now(i,j,k+1)-p%of(id)%loc%phi%now(i,j,k-1))/p%glb%dz
+            ! phix = 0.25d0*(p%of(id)%loc%phi%now(i+1,j,k)-p%of(id)%loc%phi%now(i-1,j,k)+p%of(id)%loc%phi%now(i+1,j+1,k)-p%of(id)%loc%phi%now(i-1,j+1,k))/p%glb%dx
+            ! phiy = ( p%of(id)%loc%phi%now(i,j+1,k)-p%of(id)%loc%phi%now(i,j,k) )/p%glb%dy
+            ! phiz = 0.25d0*(p%of(id)%loc%phi%now(i,j+1,k+1)-p%of(id)%loc%phi%now(i,j+1,k-1)+p%of(id)%loc%phi%now(i,j,k+1)-p%of(id)%loc%phi%now(i,j,k-1))/p%glb%dz
             
-            dif_x = mu/rho*xx/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phix*(uy+vx)/(rho*p%glb%re)
-            dif_y = mu/rho*yy/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiy*2.0d0*vy/(rho*p%glb%re)
-            dif_z = mu/rho*zz/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiz*(wy+vz)/(rho*p%glb%re)
+            ! dif_x = mu/rho*xx/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phix*(uy+vx)/(rho*p%glb%re)
+            ! dif_y = mu/rho*yy/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiy*2.0d0*vy/(rho*p%glb%re)
+            ! dif_z = mu/rho*zz/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiz*(wy+vz)/(rho*p%glb%re)
             
-            p%of(id)%loc%velsrc%y%tmp(i,j,k) = ( p%of(id)%loc%velsrc%y%tmp(i,j,k) + &
-            & dif_x + dif_y + dif_z + &
-            & p%glb%gy*p%glb%btn_g / p%glb%fr &
-            & - p%glb%btn_sf*curv*delta*phiy / (p%glb%we*rho) )/2.0d0
+            ! p%of(id)%loc%velsrc%y%tmp(i,j,k) = ( p%of(id)%loc%velsrc%y%tmp(i,j,k) + &
+            ! & dif_x + dif_y + dif_z + &
+            ! & p%glb%gy*p%glb%btn_g / p%glb%fr &
+            ! & - p%glb%btn_sf*curv*delta*phiy / (p%glb%we*rho) )/2.0d0
             
         end do
         end do
@@ -218,44 +222,46 @@ real(8) :: wx,wy,wz,uz,vz,phix,phiy,phiz,dif_x,dif_y,dif_z,curv
             phiy = 0.25d0*( p%of(id)%loc%phi%old(i,j+1,k+1)-p%of(id)%loc%phi%old(i,j-1,k+1) + p%of(id)%loc%phi%old(i,j+1,k)-p%of(id)%loc%phi%old(i,j-1,k) )/p%glb%dy
             phiz = ( p%of(id)%loc%phi%old(i,j,k+1)-p%of(id)%loc%phi%old(i,j,k) )/p%glb%dz
             
-            dif_x = mu/rho*xx/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phix*(uz+wx)/(rho*p%glb%re)
-            dif_y = mu/rho*yy/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiy*(vz+wy)/(rho*p%glb%re)
-            dif_z = mu/rho*zz/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiz*2.0d0*wz/(rho*p%glb%re)
+            dif_x = mu/rho*xx/p%glb%re + (1.0d0-p%glb%mu_12)*delta*phix*(uz+wx)/(rho*p%glb%re)
+            dif_y = mu/rho*yy/p%glb%re + (1.0d0-p%glb%mu_12)*delta*phiy*(vz+wy)/(rho*p%glb%re)
+            dif_z = mu/rho*zz/p%glb%re + (1.0d0-p%glb%mu_12)*delta*phiz*2.0d0*wz/(rho*p%glb%re)
             
             p%of(id)%loc%velsrc%z%tmp(i,j,k) = dif_x + dif_y + dif_z &
             & + p%glb%gz*p%glb%btn_g / p%glb%fr &
             & - p%glb%btn_sf*curv*delta*phiz / (p%glb%we*rho) 
+
+            p%of(id)%loc%velsrc%z%now(i,j,k) = p%of(id)%loc%velsrc%z%now(i,j,k) + p%of(id)%loc%velsrc%z%tmp(i,j,k)
             
             ! ==========================================================================
             
-            rho = 0.5d0*(p%of(id)%loc%rho%old(i,j,k)+p%of(id)%loc%rho%old(i,j,k+1))
-            mu = 0.5d0*(p%of(id)%loc%mu%old(i,j,k)+p%of(id)%loc%mu%old(i,j,k+1))
-            delta = 0.5d0*(p%of(id)%loc%delta%now(i,j,k)+p%of(id)%loc%delta%now(i,j,k+1))
-            curv = (p%of(id)%loc%normals%curv%now(i,j,k)+p%of(id)%loc%normals%curv%now(i,j+1,k))/2.0d0
+            ! rho = 0.5d0*(p%of(id)%loc%rho%old(i,j,k)+p%of(id)%loc%rho%old(i,j,k+1))
+            ! mu = 0.5d0*(p%of(id)%loc%mu%old(i,j,k)+p%of(id)%loc%mu%old(i,j,k+1))
+            ! delta = 0.5d0*(p%of(id)%loc%delta%now(i,j,k)+p%of(id)%loc%delta%now(i,j,k+1))
+            ! curv = (p%of(id)%loc%normals%curv%now(i,j,k)+p%of(id)%loc%normals%curv%now(i,j+1,k))/2.0d0
             
-            xx = (p%of(id)%loc%vel%z%tmp(I+1,J,K)-2.0d0*p%of(id)%loc%vel%z%tmp(I,J,K)+p%of(id)%loc%vel%z%tmp(I-1,J,K))/p%glb%dx**2.0d0
-            yy = (p%of(id)%loc%vel%z%tmp(I,J+1,K)-2.0d0*p%of(id)%loc%vel%z%tmp(I,J,K)+p%of(id)%loc%vel%z%tmp(I,J-1,K))/p%glb%dy**2.0d0
-            zz = (p%of(id)%loc%vel%z%tmp(I,J,K+1)-2.0d0*p%of(id)%loc%vel%z%tmp(I,J,K)+p%of(id)%loc%vel%z%tmp(I,J,K-1))/p%glb%dz**2.0d0
+            ! xx = (p%of(id)%loc%vel%z%tmp(I+1,J,K)-2.0d0*p%of(id)%loc%vel%z%tmp(I,J,K)+p%of(id)%loc%vel%z%tmp(I-1,J,K))/p%glb%dx**2.0d0
+            ! yy = (p%of(id)%loc%vel%z%tmp(I,J+1,K)-2.0d0*p%of(id)%loc%vel%z%tmp(I,J,K)+p%of(id)%loc%vel%z%tmp(I,J-1,K))/p%glb%dy**2.0d0
+            ! zz = (p%of(id)%loc%vel%z%tmp(I,J,K+1)-2.0d0*p%of(id)%loc%vel%z%tmp(I,J,K)+p%of(id)%loc%vel%z%tmp(I,J,K-1))/p%glb%dz**2.0d0
             
-            wx = 0.5d0*( p%of(id)%loc%vel%z%tmp(i+1,j,k)-p%of(id)%loc%vel%z%tmp(i-1,j,k) )/p%glb%dx
-            wy = 0.5d0*( p%of(id)%loc%vel%z%tmp(i,j+1,k)-p%of(id)%loc%vel%z%tmp(i,j-1,k) )/p%glb%dy
-            wz = 0.5d0*( p%of(id)%loc%vel%z%tmp(i,j,k+1)-p%of(id)%loc%vel%z%tmp(i,j,k-1) )/p%glb%dz
+            ! wx = 0.5d0*( p%of(id)%loc%vel%z%tmp(i+1,j,k)-p%of(id)%loc%vel%z%tmp(i-1,j,k) )/p%glb%dx
+            ! wy = 0.5d0*( p%of(id)%loc%vel%z%tmp(i,j+1,k)-p%of(id)%loc%vel%z%tmp(i,j-1,k) )/p%glb%dy
+            ! wz = 0.5d0*( p%of(id)%loc%vel%z%tmp(i,j,k+1)-p%of(id)%loc%vel%z%tmp(i,j,k-1) )/p%glb%dz
     
-            uz = 0.5d0*( p%of(id)%loc%vel%x%tmp(i,j,k+1)-p%of(id)%loc%vel%x%tmp(i,j,k)+p%of(id)%loc%vel%x%tmp(i-1,j,k+1)-p%of(id)%loc%vel%x%tmp(i-1,j,k) )/p%glb%dz
-            vz = 0.5d0*( p%of(id)%loc%vel%y%tmp(i,j,k+1)-p%of(id)%loc%vel%y%tmp(i,j,k)+p%of(id)%loc%vel%y%tmp(i,j-1,k+1)-p%of(id)%loc%vel%y%tmp(i,j-1,k) )/p%glb%dz
+            ! uz = 0.5d0*( p%of(id)%loc%vel%x%tmp(i,j,k+1)-p%of(id)%loc%vel%x%tmp(i,j,k)+p%of(id)%loc%vel%x%tmp(i-1,j,k+1)-p%of(id)%loc%vel%x%tmp(i-1,j,k) )/p%glb%dz
+            ! vz = 0.5d0*( p%of(id)%loc%vel%y%tmp(i,j,k+1)-p%of(id)%loc%vel%y%tmp(i,j,k)+p%of(id)%loc%vel%y%tmp(i,j-1,k+1)-p%of(id)%loc%vel%y%tmp(i,j-1,k) )/p%glb%dz
     
-            phix = 0.25d0*( p%of(id)%loc%phi%now(i+1,j,k+1)-p%of(id)%loc%phi%now(i-1,j,k+1) + p%of(id)%loc%phi%now(i+1,j,k)-p%of(id)%loc%phi%now(i-1,j,k) )/p%glb%dx
-            phiy = 0.25d0*( p%of(id)%loc%phi%now(i,j+1,k+1)-p%of(id)%loc%phi%now(i,j-1,k+1) + p%of(id)%loc%phi%now(i,j+1,k)-p%of(id)%loc%phi%now(i,j-1,k) )/p%glb%dy
-            phiz = ( p%of(id)%loc%phi%now(i,j,k+1)-p%of(id)%loc%phi%now(i,j,k) )/p%glb%dz
+            ! phix = 0.25d0*( p%of(id)%loc%phi%now(i+1,j,k+1)-p%of(id)%loc%phi%now(i-1,j,k+1) + p%of(id)%loc%phi%now(i+1,j,k)-p%of(id)%loc%phi%now(i-1,j,k) )/p%glb%dx
+            ! phiy = 0.25d0*( p%of(id)%loc%phi%now(i,j+1,k+1)-p%of(id)%loc%phi%now(i,j-1,k+1) + p%of(id)%loc%phi%now(i,j+1,k)-p%of(id)%loc%phi%now(i,j-1,k) )/p%glb%dy
+            ! phiz = ( p%of(id)%loc%phi%now(i,j,k+1)-p%of(id)%loc%phi%now(i,j,k) )/p%glb%dz
             
-            dif_x = mu/rho*xx/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phix*(uz+wx)/(rho*p%glb%re)
-            dif_y = mu/rho*yy/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiy*(vz+wy)/(rho*p%glb%re)
-            dif_z = mu/rho*zz/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiz*2.0d0*wz/(rho*p%glb%re)
+            ! dif_x = mu/rho*xx/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phix*(uz+wx)/(rho*p%glb%re)
+            ! dif_y = mu/rho*yy/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiy*(vz+wy)/(rho*p%glb%re)
+            ! dif_z = mu/rho*zz/p%glb%re !+ (1.0d0-p%glb%mu_12)*delta*phiz*2.0d0*wz/(rho*p%glb%re)
             
-            p%of(id)%loc%velsrc%z%tmp(i,j,k) = ( p%of(id)%loc%velsrc%z%tmp(i,j,k) + &
-            & dif_x + dif_y + dif_z + &
-            & p%glb%gz*p%glb%btn_g / p%glb%fr &
-            & - p%glb%btn_sf*curv*delta*phiz / (p%glb%we*rho) ) /2.0d0
+            ! p%of(id)%loc%velsrc%z%tmp(i,j,k) = ( p%of(id)%loc%velsrc%z%tmp(i,j,k) + &
+            ! & dif_x + dif_y + dif_z + &
+            ! & p%glb%gz*p%glb%btn_g / p%glb%fr &
+            ! & - p%glb%btn_sf*curv*delta*phiz / (p%glb%we*rho) ) /2.0d0
             
         end do
         end do
