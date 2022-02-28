@@ -37,6 +37,7 @@ logical :: switch, finish
 
     allocate(mass(cnt))
 
+    call p%rho_mu
     dv = p%glb%dx * p%glb%dy * p%glb%dz
     eps = 1.0d-12
     pi = dacos(-1.0_8)
@@ -70,19 +71,7 @@ logical :: switch, finish
                     do j = p%of(id)%loc%js, p%of(id)%loc%je
                     do i = p%of(id)%loc%is, p%of(id)%Loc%ie
 
-                        x = -p%of(id)%loc%phi%now(i,j,k) / p%glb%ls_wid
-        
-                        if( x > 1.0_8-eps )then
-                            heavy = 1.0_8
-                        else if ( x < -1.0_8+eps )then
-                            heavy = 0.0_8
-                        else
-                            heavy = 0.5_8 * (1.0_8 + x + dsin(pi*x) / pi )
-                        endif
-
-                        rho = p%glb%rho_12*heavy + (1.0_8 - heavy )
-
-                        mass(num)=mass(num)+rho*heavy*dv
+                        mass(num)=mass(num)+p%of(id)%loc%rho%now(i,j,k)*p%of(id)%loc%heavy%now(i,j,k)*dv
 
                     enddo
                     enddo
