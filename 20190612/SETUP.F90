@@ -35,7 +35,7 @@ DX = 1.0_DP / REAL(UNIT_GRID,KIND=DP)
 DY = DX
 DZ = DX
 
-DT = 0.01_DP*DX
+DT = 0.005_DP*DX
 RDT = 0.5_DP*DX
 INTERFACE_WIDTH = 1.5*DX
 
@@ -46,7 +46,7 @@ REC_MASS = 0
 
 ! Tolerance of convervence
 
-TOL_P = 1.0E-6_DP
+TOL_P = 1.0E-7_DP
 TOL_M = 1.0E-5_DP
 
 ! Enviornment Parameters
@@ -66,7 +66,7 @@ SURFACE_TENSION = 0.072_DP
  CHAR_VELOCITY = DSQRT(GRAVITY*CHAR_LENGTH)
  CHAR_TIME = CHAR_LENGTH / CHAR_VELOCITY
 
- TIME_TO_STOP = 5.5
+ TIME_TO_STOP = 3.0
  TIME_TO_PLOT = 0.1
 
 ! Dimensionless Parameters
@@ -101,7 +101,7 @@ VEL_BC = 0
 ST_FORCE = 1
 G_FORCE = 1
 
-LS_SOLVER = 4
+LS_SOLVER = 10
 VOF_SOLVER = 1
 
 SOLID_MOTION = 0
@@ -194,7 +194,9 @@ DO I = 1, NODE_X
       PHI(I,J,K) = sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-2.5)**2)-0.5
    else
       PHI(I,J,K) = MIN( sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-1.0)**2)-0.5, sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-2.5)**2)-0.5 )
-   end if 
+   end if
+
+   PHI(I,J,K) = -PHI(I,J,K)
   
 END DO
 END DO

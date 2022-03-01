@@ -16,7 +16,7 @@ logical :: switch, finish
  VOL_LS = 0.0_DP
  VOL_VOF = 0.0_DP
  
- CALL HEAVY_F(PHI)
+call AMURHO(PHI)
  
  !$OMP PARALLEL DO REDUCTION(+:MASS_LS,MASS_VOF,VOL_LS,VOL_VOF)
  DO K = 1, NODE_Z
@@ -25,10 +25,10 @@ logical :: switch, finish
  DO I = 1, NODE_X
  
  	 VOL_LS = VOL_LS + HEAVY(I,J,K)
- 	 VOL_VOF = VOL_VOF + VOF(I,J,K)
+ 	 ! VOL_VOF = VOL_VOF + VOF(I,J,K)
 	 
-	 MASS_LS = MASS_LS + HEAVY(I,J,K)*(HEAVY(I,J,K) + RATIO_RHO*(1.0-HEAVY(I,J,K)))
-	 MASS_VOF = MASS_VOF + VOF(I,J,K)*(VOF(I,J,K) + RATIO_RHO*(1.0-VOF(I,J,K)))
+	 MASS_LS = MASS_LS + HEAVY(I,J,K)*RHO(I,J,K)
+	 ! MASS_VOF = MASS_VOF + VOF(I,J,K)*(VOF(I,J,K) + RATIO_RHO*(1.0-VOF(I,J,K)))
 
 	 IF( PHI(I,J,K) < 0.0 ) F(K) = 1
 	 
@@ -44,8 +44,6 @@ logical :: switch, finish
  CNT=CNT/2
 
  ALLOCATE(MASS(CNT))
-
-CALL HEAVY_F(-PHI)
 
 dv = DX*DY*DZ
 kk=1
@@ -72,7 +70,6 @@ do num = 1, cnt
     do k = ks, ke
     do j = 1, NODE_Y
     do i = 1, NODE_X
-        rho = RATIO_RHO*heavy(I,J,K) + (1.0_8 - heavy(I,J,K) )
         mass(num)=mass(num)+rho*heavy(I,J,K)*dv
     enddo
     enddo
@@ -94,6 +91,9 @@ enddo
 	
 	IVOL_LS = VOL_LS
 	IVOL_VOF = VOL_VOF
+
+    B1 = MASS(1)
+    B2 = MASS(2)
 	
 	CLOSE(11)
 	CLOSE(12)
@@ -106,7 +106,7 @@ enddo
  	!OPEN(UNIT=12,FILE='VOL LOSS_'//Met//'_'//GRI//'_.PLT')
  	!OPEN(UNIT=12,FILE='VOL LOSS_'//MET//'.PLT')
  	OPEN(UNIT=12,FILE='VOL LOSS.PLT')
- 	WRITE(12,*)'VARIABLES = "T" "LOSS OF LS(%)" "LOSS OF VOF(%)" '
+ 	! WRITE(12,*)'VARIABLES = "T" "LOSS OF LS(%)" "LOSS OF VOF(%)" '
 
     OPEN(UNIT=13,FILE='BUBBLE MASS.PLT')
     WRITE(13,*)'VARIABLES ="T" "B1" "B2" '
@@ -118,9 +118,8 @@ enddo
 	
  END IF
  
-  WRITE(11,*)TIME,(1.0-MASS_LS/IMASS_LS)*100,(1.0-MASS_VOF/IMASS_VOF)*100
-  WRITE(12,*)TIME,(1.0-VOL_LS/IVOL_LS)*100,(1.0-VOL_VOF/IVOL_VOF)*100 
-  WRITE(*,*)"NUM OF BUBBLES",CNT,MASS(:)
-  write(13,*)time,mass(:)
+  WRITE(11,*)TIME,(1.0-MASS_LS/IMASS_LS)*100!,(1.0-MASS_VOF/IMASS_VOF)*100
+  WRITE(12,*)TIME,(1.0-VOL_LS/IVOL_LS)*100!,(1.0-VOL_VOF/IVOL_VOF)*100 
+  WRITE(13,*)TIME,(MASS(1)-B1)/B1*100,(MASS(2)-B2)/B2*100
   
 END SUBROUTINE

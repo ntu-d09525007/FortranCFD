@@ -16,7 +16,7 @@ logical :: switch, finish
             if( p%of(id)%loc%ks<=k .and. p%of(id)%loc%ke>=k)then
                 do j = p%of(id)%loc%js, p%of(id)%loc%je
                 do i = p%of(id)%loc%is, p%of(id)%Loc%ie
-                    if( p%of(id)%loc%phi%now(i,j,k) < 0.0d0 )then
+                    if( p%of(id)%loc%phi%now(i,j,k) > 0.0d0 )then
                         f(k) = 1
                     endif
                 enddo

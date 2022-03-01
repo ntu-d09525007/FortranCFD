@@ -58,10 +58,10 @@ CHARACTER(100) :: NAME_OF_FILE
 
             ! merging bubbles
             !=========================================
-            p%of(id)%loc%phi%now(i,j,k) = min( dsqrt( x**2+y**2+(z-1.0)**2 )-0.5, dsqrt( x**2+y**2+(z-2.5)**2 )-0.5 )
+            p%of(id)%loc%phi%now(i,j,k) = max( -dsqrt( x**2+y**2+(z-1.0)**2 )+0.5, -dsqrt( x**2+y**2+(z-2.5)**2 )+0.5 )
 
-            if( x**2+y**2+(z-1.0)**2 < 0.25d0 ) p%of(id)%loc%phi%now(i,j,k) = dsqrt( x**2+y**2+(z-1.0)**2 ) - 0.5
-            if( x**2+y**2+(z-2.5)**2 < 0.25d0 ) p%of(id)%loc%phi%now(i,j,k) = dsqrt( x**2+y**2+(z-2.5)**2 ) - 0.5
+            if( x**2+y**2+(z-1.0)**2 < 0.25d0 ) p%of(id)%loc%phi%now(i,j,k) = -dsqrt( x**2+y**2+(z-1.0)**2 ) + 0.5
+            if( x**2+y**2+(z-2.5)**2 < 0.25d0 ) p%of(id)%loc%phi%now(i,j,k) = -dsqrt( x**2+y**2+(z-2.5)**2 ) + 0.5
 
             ! vortex
             !=========================================
