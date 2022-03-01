@@ -1,11 +1,12 @@
 SUBROUTINE FIND_MASS()
 USE PRECISION
 USE PROBLEM_DEF
+USE FLUID_PROPERTIES
 USE LS_DATA
 USE VOF_DATA
 IMPLICIT NONE
 INTEGER :: I,J,K,F(1:NODE_Z),CNT,NUM,KK,ks,ke
-real(8) :: rho,dv
+real(8) :: dv
 CHARACTER(3) :: MET,GRI
 real(8),dimension(:),allocatable :: mass
 logical :: switch, finish
@@ -25,12 +26,12 @@ call AMURHO(PHI)
  DO I = 1, NODE_X
  
  	 VOL_LS = VOL_LS + HEAVY(I,J,K)
- 	 ! VOL_VOF = VOL_VOF + VOF(I,J,K)
+ 	 VOL_VOF = VOL_VOF + VOF(I,J,K)
 	 
 	 MASS_LS = MASS_LS + HEAVY(I,J,K)*RHO(I,J,K)
-	 ! MASS_VOF = MASS_VOF + VOF(I,J,K)*(VOF(I,J,K) + RATIO_RHO*(1.0-VOF(I,J,K)))
+	 MASS_VOF = MASS_VOF + VOF(I,J,K)*RHO(I,J,K)
 
-	 IF( PHI(I,J,K) < 0.0 ) F(K) = 1
+	 IF( PHI(I,J,K) > 0.0 ) F(K) = 1
 	 
  END DO
  END DO
@@ -70,7 +71,7 @@ do num = 1, cnt
     do k = ks, ke
     do j = 1, NODE_Y
     do i = 1, NODE_X
-        mass(num)=mass(num)+rho*heavy(I,J,K)*dv
+        mass(num)=mass(num)+rho(I,J,K)*heavy(I,J,K)*dv
     enddo
     enddo
     enddo
