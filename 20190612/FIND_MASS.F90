@@ -31,7 +31,7 @@ logical :: switch, finish
 	 MASS_LS = MASS_LS + HEAVY(I,J,K)*RHO(I,J,K)
 	 MASS_VOF = MASS_VOF + VOF(I,J,K)*RHO(I,J,K)
 
-	 IF( HEAVY(I,J,K) < 0.99 ) F(K) = 1
+	 IF( Delta(I,J,K) > EPS ) F(K) = 1
 	 
  END DO
  END DO
@@ -71,7 +71,7 @@ do num = 1, cnt
     do k = ks, ke
     do j = 1, NODE_Y
     do i = 1, NODE_X
-        mass(num)=mass(num)+rho(I,J,K)*heavy(I,J,K)*dv
+        IF( HEAVY(I,J,K)<1.0 )mass(num)=mass(num)+rho(I,J,K)*heavy(I,J,K)*dv
     enddo
     enddo
     enddo
