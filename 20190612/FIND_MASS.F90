@@ -17,7 +17,7 @@ logical :: switch, finish
  VOL_LS = 0.0_DP
  VOL_VOF = 0.0_DP
  
-call AMURHO(PHI)
+call AMURHO()
  
  !$OMP PARALLEL DO REDUCTION(+:MASS_LS,MASS_VOF,VOL_LS,VOL_VOF)
  DO K = 1, NODE_Z
