@@ -17,7 +17,7 @@ logical :: switch, finish
  VOL_LS = 0.0_DP
  VOL_VOF = 0.0_DP
  
-call AMURHO()
+ CALL AMURHO()
  
  !$OMP PARALLEL DO REDUCTION(+:MASS_LS,MASS_VOF,VOL_LS,VOL_VOF)
  DO K = 1, NODE_Z
@@ -31,7 +31,7 @@ call AMURHO()
 	 MASS_LS = MASS_LS + HEAVY(I,J,K)*RHO(I,J,K)
 	 MASS_VOF = MASS_VOF + VOF(I,J,K)*RHO(I,J,K)
 
-	 IF( PHI(I,J,K) > 0.0 ) F(K) = 1
+	 IF( HEAVY(I,J,K) < 0.99 ) F(K) = 1
 	 
  END DO
  END DO
@@ -57,10 +57,10 @@ do num = 1, cnt
         if(finish)exit
         if( f(k)*f(k+1) < 0 )then
             if(.not.switch)then
-                ks=k+1
+                ks=k
                 switch=.true.
             else
-                ke=k
+                ke=k+1
                 finish=.true.
                 kk=k+1
             endif
@@ -122,5 +122,7 @@ enddo
   WRITE(11,*)TIME,(1.0-MASS_LS/IMASS_LS)*100!,(1.0-MASS_VOF/IMASS_VOF)*100
   WRITE(12,*)TIME,(1.0-VOL_LS/IVOL_LS)*100!,(1.0-VOL_VOF/IVOL_VOF)*100 
   WRITE(13,*)TIME,(MASS(1)-B1_M)/B1_M*100,(MASS(2)-B2_M)/B2_M*100
+
+  WRITE(*,*)CNT,(MASS(1)-B1_M)/B1_M*100,(MASS(2)-B2_M)/B2_M*100
   
 END SUBROUTINE

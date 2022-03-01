@@ -15,11 +15,8 @@ INTEGER :: I,J,K
   DO K = 1, NODE_Z
   DO J = 1, NODE_Y
   DO I = 1, NODE_X
-    ! RHO(I,J,K) = HEAVY(I,J,K) + RATIO_RHO*(1.0-HEAVY(I,J,K))
-    ! AMU(I,J,K) = HEAVY(I,J,K) + RATIO_AMU*(1.0-HEAVY(I,J,K))
-
-    RHO(I,J,K) = RATIO_RHO*HEAVY(I,J,K) + (1.0-HEAVY(I,J,K))
-    AMU(I,J,K) = RATIO_AMU*HEAVY(I,J,K) + (1.0-HEAVY(I,J,K))
+    RHO(I,J,K) = HEAVY(I,J,K) + RATIO_RHO*(1.0-HEAVY(I,J,K))
+    AMU(I,J,K) = HEAVY(I,J,K) + RATIO_AMU*(1.0-HEAVY(I,J,K))
   END DO
   END DO
   END DO

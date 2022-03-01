@@ -196,7 +196,7 @@ DO I = 1, NODE_X
       PHI(I,J,K) = MIN( sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-1.0)**2)-0.5, sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-2.5)**2)-0.5 )
    end if
 
-   PHI(I,J,K) = -PHI(I,J,K)
+   ! PHI(I,J,K) = -PHI(I,J,K)
   
 END DO
 END DO
