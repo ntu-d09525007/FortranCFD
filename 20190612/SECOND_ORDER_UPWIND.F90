@@ -79,7 +79,7 @@ REAL(DP) :: UP,UM,VV,VP,VM,WW,WP,WM,CM,CR,CC,DETF,CURVK,FINX,A1,A2,A3,A4,A5,A6,A
         A7=2.0_DP/(CR*WE)*curvk*detf*finx*2.0_DP*TMP
     ENDIF
     
-    US(I,J,K)=A1+A2+A3-A4-A5-A6-A7
+    US(I,J,K)=A1+A2+A3-A4-A5-A6+A7
 
   ENDDO
   ENDDO
@@ -161,7 +161,7 @@ REAL(DP) :: UP,UM,VV,VP,VM,WW,WP,WM,CM,CR,CC,DETF,CURVK,FINX,A1,A2,A3,A4,A5,A6,A
         B7=2.0/(CR*WE)*curvk*detf*finy*2.0_DP*TMP
     ENDIF
 
-    VS(I,J,K)=B1+B2+B3-B4-B5-B6-B7
+    VS(I,J,K)=B1+B2+B3-B4-B5-B6+B7
 
   ENDDO
   ENDDO
@@ -244,7 +244,7 @@ SUBROUTINE VELC()
         C7=2.0_DP/(CR*WE)*curvk*detf*finz*2.0_DP*TMP
     ENDIF
     
-    WS(I,J,K)=C1+C2+C3-C4-C5-C6-C7
+    WS(I,J,K)=C1+C2+C3-C4-C5-C6+C7
     
     IF( G_FORCE==1 )WS(I,J,K)=WS(I,J,K)+1.0_DP/FR2
     
