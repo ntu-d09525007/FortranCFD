@@ -11,7 +11,6 @@ CHARACTER(3) :: MET,GRI
 real(8),dimension(:),allocatable :: mass
 logical :: switch, finish
 
-  IF(MOD(ITER,5)==0) return
 
  MASS_LS = 0.0_DP
  MASS_VOF = 0.0_DP

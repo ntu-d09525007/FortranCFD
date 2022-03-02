@@ -6,6 +6,7 @@ USE LS_DATA
  IF(INTERFACE_METHOD==1 .OR. INTERFACE_METHOD==3)RETURN
  
  CALL LS_RK3_SOLVER
+! CALL MPLS
  CALL LS_MAINTAIN
  CALL MPLS
 
@@ -76,9 +77,9 @@ INTEGER :: I,J,K
 DO K = 1, NODE_Z
 DO J = 1, NODE_Y
 DO I = 1, NODE_X
-	UH(I,J,K) = 0.5_DP*(U(I,J,K)+U(I-1,J,K))
-	VH(I,J,K) = 0.5_DP*(V(I,J,K)+V(I,J-1,K))
-	WH(I,J,K) = 0.5_DP*(W(I,J,K)+W(I,J,K-1))
+    UH(I,J,K) = 0.5_DP*(U(I,J,K)+U(I-1,J,K))
+    VH(I,J,K) = 0.5_DP*(V(I,J,K)+V(I,J-1,K))
+    WH(I,J,K) = 0.5_DP*(W(I,J,K)+W(I,J,K-1))
 END DO
 END DO
 END DO
@@ -120,7 +121,7 @@ END DO
  !$OMP PARALLEL DO
  DO K = 1, NODE_Z 
  DO J = 1, NODE_Y 
- 	call split_sorce(um(:,j,k),up(:,j,k),fp(:,j,k),fm(:,j,k),NODE_X,LS_SOLVER) 	
+    call split_sorce(um(:,j,k),up(:,j,k),fp(:,j,k),fm(:,j,k),NODE_X,LS_SOLVER)  
  end do
  end do
  !$OMP END PARALLEL DO
@@ -128,7 +129,7 @@ END DO
  !$OMP PARALLEL DO
  DO K = 1, NODE_Z
  DO I = 1, NODE_X
- 	call split_sorce(vm(i,:,k),vp(i,:,k),gp(i,:,k),gm(i,:,k),NODE_Y,LS_SOLVER) 
+    call split_sorce(vm(i,:,k),vp(i,:,k),gp(i,:,k),gm(i,:,k),NODE_Y,LS_SOLVER) 
  END DO
  END DO
  !$OMP END PARALLEL DO
@@ -136,7 +137,7 @@ END DO
  !$OMP PARALLEL DO
  DO J = 1, NODE_Y
  DO I = 1, NODE_X
- 	call split_sorce(wm(i,j,:),wp(i,j,:),hp(i,j,:),hm(i,j,:),NODE_Z,LS_SOLVER) 
+    call split_sorce(wm(i,j,:),wp(i,j,:),hp(i,j,:),hm(i,j,:),NODE_Z,LS_SOLVER) 
  END DO
  END DO
  !$OMP END PARALLEL DO
@@ -158,26 +159,26 @@ END DO
  DO K = 1, NODE_Z
  DO J = 1, NODE_Y
  DO I = 1, NODE_X
- 	 s(i,j,k) = -(F(i,j,k)-F(i-1,j,k))/dx -(G(i,j,k)-G(i,j-1,k))/dy -(H(i,j,k)-H(i,j,k-1))/dz 	 
+     s(i,j,k) = -(F(i,j,k)-F(i-1,j,k))/dx -(G(i,j,k)-G(i,j-1,k))/dy -(H(i,j,k)-H(i,j,k-1))/dz    
  end do
  end do
  end do
  !$omp end parallel do
 
 else if( LS_SOLVER==10 )then
-	
+    
  !$OMP PARALLEL DO
  DO K = 1, NODE_Z
  DO J = 1, NODE_Y
- 	call UCCD(NODE_X,dx,UH(1:NODE_X,j,k),PHI(1:NODE_X,j,k),F(1:NODE_X,j,k))
+    call UCCD(NODE_X,dx,UH(1:NODE_X,j,k),PHI(1:NODE_X,j,k),F(1:NODE_X,j,k))
  end do
  end do
  !$OMP END PARALLEL DO
- 	
+    
  !$OMP PARALLEL DO
  DO K = 1, NODE_Z
  DO I = 1, NODE_X
- 	call UCCD(NODE_Y,dy,VH(i,1:NODE_Y,k),PHI(i,1:NODE_Y,k),G(i,1:NODE_Y,k))
+    call UCCD(NODE_Y,dy,VH(i,1:NODE_Y,k),PHI(i,1:NODE_Y,k),G(i,1:NODE_Y,k))
  end do
  end do
  !$OMP END PARALLEL DO
@@ -185,7 +186,7 @@ else if( LS_SOLVER==10 )then
  !$OMP PARALLEL DO
  DO J = 1, NODE_Y
  DO I = 1, NODE_X
- 	call UCCD(NODE_Z,dz,WH(i,j,1:NODE_Z),PHI(i,j,1:NODE_Z),H(i,j,1:NODE_Z))
+    call UCCD(NODE_Z,dz,WH(i,j,1:NODE_Z),PHI(i,j,1:NODE_Z),H(i,j,1:NODE_Z))
  end do
  end do
  !$OMP END PARALLEL DO
@@ -194,12 +195,12 @@ else if( LS_SOLVER==10 )then
  DO K = 1, NODE_Z
  DO J = 1, NODE_Y
  DO I = 1, NODE_X
- 	 s(i,j,k) = -( F(i,j,k)*UH(i,j,k) + G(i,j,k)*VH(i,j,k) + H(i,j,k)*WH(i,j,k) )	 
+     s(i,j,k) = -( F(i,j,k)*UH(i,j,k) + G(i,j,k)*VH(i,j,k) + H(i,j,k)*WH(i,j,k) )    
  end do
  end do
  end do
  !$omp end parallel do
- 	
+    
 end if
   
 end subroutine
@@ -215,7 +216,7 @@ if( btn==0 )then
  call weno_js(g,gp,gm,N)
 else if( btn==1 )then
  call weno_z(f,fp,fm,N)
- call weno_z(g,gp,gm,N)	
+ call weno_z(g,gp,gm,N) 
 else if( btn==2 )then
  call weno_m(f,fp,fm,N)
  call weno_m(g,gp,gm,N)
@@ -238,7 +239,7 @@ IMPLICIT NONE
 INTEGER :: I,J,K,IT
 REAL(DP) :: FS,  TMP
 
-DO IT = 1, 5
+DO IT = 1, 3
 
  CALL AMURHO()
  CALL LS_CCD(PHI)
@@ -261,7 +262,7 @@ DO IT = 1, 5
  DO K = 1, NODE_Z
  DO J = 1, NODE_Y
  DO I = 1, NODE_X  
- 	 VOL_LS = VOL_LS + HEAVY(I,J,K)
+   VOL_LS = VOL_LS + HEAVY(I,J,K)
    MASS_LS = MASS_LS + HEAVY(I,J,K)*RHO(I,J,K)
    !FS = FS + (2.0*(1.0-RATIO_RHO)*HEAVY(i,j,k)+RATIO_RHO)*DELTA(I,J,K)**2*GRAD(I,J,K)
    FS = FS + (2.0*(RATIO_RHO-1.0)*HEAVY(i,j,k)+1.0)*DELTA(I,J,K)**2*GRAD(I,J,K)
@@ -270,7 +271,7 @@ DO IT = 1, 5
  END DO
  !$OMP END PARALLEL DO
 
-  FS=(IMASS_LS-MASS_LS)/(DT*FS)
+ FS=(IMASS_LS-MASS_LS)/(DT*FS)
 
  !$OMP PARALLEL DO
  DO K = 1, NODE_Z

@@ -9,17 +9,17 @@ REAL(DP),DIMENSION(-2:NODE_X+3,-2:NODE_Y+3,-2:NODE_Z+3) :: TARGET
 REAL(DP) :: AMX, RED_TIME, ERR
 
 IF( BTN/=1 .and. btn/=4 )THEN
-	
+    
   !$OMP PARALLEL DO
   DO K = 1, NODE_Z
   DO J = 1, NODE_Y
   DO I = 1, NODE_X
-	  SGN(I,J,K) = TARGET(I,J,K)
+      SGN(I,J,K) = TARGET(I,J,K)
   END DO
   END DO
   END DO
   !$OMP END PARALLEL DO
-  	
+    
   CALL GRADFI(TARGET)
   
   AMX = MAXVAL(GRAD(1:NODE_X,1:NODE_Y,1:NODE_Z))
@@ -28,7 +28,7 @@ IF( BTN/=1 .and. btn/=4 )THEN
   DO K = 1, NODE_Z
   DO J = 1, NODE_Y
   DO I = 1, NODE_X
-	  TARGET(I,J,K) = TARGET(I,J,K) / AMX
+      TARGET(I,J,K) = TARGET(I,J,K) / AMX
   END DO
   END DO
   END DO
@@ -41,26 +41,26 @@ END IF
   RED_TIME = 0.0_DP
   
   DO
-  	
-  	RED_TIME = RED_TIME + RDT
-  	
+    
+    RED_TIME = RED_TIME + RDT
+    
     !$OMP PARALLEL DO
     DO K = 1, NODE_Z
     DO J = 1, NODE_Y
     DO I = 1, NODE_X
-	    PHI_TMP(I,J,K) = TARGET(I,J,K)
+        PHI_TMP(I,J,K) = TARGET(I,J,K)
     END DO
     END DO
     END DO
     !$OMP END PARALLEL DO
-  	
+    
     CALL LS_REDIS(TARGET,BTN)
-  	
+    
     CALL FIND_ERROR(ERR,PHI_TMP,TARGET,2)
     
     IF( BTN==0 .AND. (RED_TIME > 1.5*MAX(XL,YL,ZL)) )EXIT
-    IF( BTN/=0 .AND. (RED_TIME > 5.0*INTERFACE_WIDTH) )EXIT
-  	
+    IF( BTN/=0 .AND. (RED_TIME > 2.0*INTERFACE_WIDTH) )EXIT
+    
   END DO
 
 END SUBROUTINE
@@ -156,55 +156,55 @@ REAL(DP),DIMENSION(-2:NODE_X+3,-2:NODE_Y+3,-2:NODE_Z+3) :: TARGET
 REAL(DP) :: SUMA, SUMB
 
  IF( BTN/=1 .AND. BTN/=4 )THEN
- 	
+    
     !$omp parallel do
- 	  do k=1,NODE_Z
- 	  do j=1,NODE_Y
-	  do i=1,NODE_X
+      do k=1,NODE_Z
+      do j=1,NODE_Y
+      do i=1,NODE_X
        C(I,J,K) = 0.0_DP
     enddo
     enddo
     enddo
     !$omp end parallel do
- 	
+    
  ELSE
- 	
+    
     CALL HEAVY_F(TARGET)
     
     !$omp parallel do
- 	  do k=1,NODE_Z
- 	  do j=1,NODE_Y
-	  do i=1,NODE_X
+      do k=1,NODE_Z
+      do j=1,NODE_Y
+      do i=1,NODE_X
        A(i,j,k)= (SGN(i,j,k)*DELTA(i,j,k))*(GRAD(i,j,k)-1.0_dp)
-    	 B(i,j,k)= GRAD(i,j,k)*DELTA(i,j,k)**2
+         B(i,j,k)= GRAD(i,j,k)*DELTA(i,j,k)**2
     enddo
     enddo
     enddo
     !$omp end parallel do
       
     call bc3d(a)
-    call bc3d(b) 	
+    call bc3d(b)    
     
-	  !$omp parallel do private(suma,sumb)
+      !$omp parallel do private(suma,sumb)
      do k=1,NODE_Z
      do j=1,NODE_Y
-	   do i=1,NODE_X
+       do i=1,NODE_X
 
-	    suma=51.0_dp*a(i,j,k)+sum(a(i-1:i+1,j-1:j+1,k-1:k+1))
-	  	sumb=51.0_dp*b(i,j,k)+sum(b(i-1:i+1,j-1:j+1,k-1:k+1))
+        suma=51.0_dp*a(i,j,k)+sum(a(i-1:i+1,j-1:j+1,k-1:k+1))
+        sumb=51.0_dp*b(i,j,k)+sum(b(i-1:i+1,j-1:j+1,k-1:k+1))
 
       if(sumb /=0.0_dp ) then
-		    c(i,j,k)=suma/sumb
+            c(i,j,k)=suma/sumb
       else
-		    c(i,j,k)=0.0_dp
-		  end if
+            c(i,j,k)=0.0_dp
+          end if
       
       c(i,j,k) = c(i,j,k)*DELTA(i,j,k)
       
     enddo
-	  enddo
-	  enddo
-	  !$omp end parallel do  
+      enddo
+      enddo
+      !$omp end parallel do  
   
  END IF
 
@@ -225,7 +225,7 @@ REAL(DP),DIMENSION(-2:NODE_X+3,-2:NODE_Y+3,-2:NODE_Z+3) :: TARGET
   DO K = 1, NODE_Z
   DO J = 1, NODE_Y
   DO I = 1, NODE_X
-  	GRAD(I,J,K) = gradf(up(I,J,K),um(I,J,K),vp(I,J,K),vm(I,J,K),wp(I,J,K),wm(I,J,K),SGN(I,J,K))  	
+    GRAD(I,J,K) = gradf(up(I,J,K),um(I,J,K),vp(I,J,K),vm(I,J,K),wp(I,J,K),wm(I,J,K),SGN(I,J,K))     
   END DO  
   END DO
   END DO
