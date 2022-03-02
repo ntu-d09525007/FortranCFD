@@ -51,8 +51,8 @@ REAL(DP) :: UP,UM,VV,VP,VM,WW,WP,WM,CM,CR,CC,DETF,CURVK,FINX,A1,A2,A3,A4,A5,A6,A
     finx = 0.5_DP*(NORMAL_X(i,j,k)+NORMAL_X(i+1,j,k))
     
     IF(INTERFACE_METHOD.eq.1)THEN
-    	DETF=1.0
-    	FINX=(VOF(I+1,J,K)-VOF(I,J,K))/DX
+        DETF=1.0
+        FINX=(VOF(I+1,J,K)-VOF(I,J,K))/DX
     ENDIF
  
 
@@ -70,16 +70,16 @@ REAL(DP) :: UP,UM,VV,VP,VM,WW,WP,WM,CM,CR,CC,DETF,CURVK,FINX,A1,A2,A3,A4,A5,A6,A
     A5=1.0_DP/RE2Y*CC*(U_OLD(I,J+1,K)-2.0_DP*U_OLD(I,J,K)+U_OLD(I,J-1,K))
    
     A6=1.0_DP/RE2Z*CC*(U_OLD(I,J,K+1)-2.0_DP*U_OLD(I,J,K)+U_OLD(I,J,K-1))
-	
+    
     if(ST_FORCE==0)THEN
-    	A7=0.0_dp
+        A7=0.0_dp
     ELSE IF(ST_FORCE==1)THEN
-    	A7=2.0_DP/(CR*WE)*curvk*detf*finx
+        A7=2.0_DP/(CR*WE)*curvk*detf*finx
     ELSE IF(ST_FORCE==2)THEN
-    	A7=2.0_DP/(CR*WE)*curvk*detf*finx*2.0_DP*TMP
+        A7=2.0_DP/(CR*WE)*curvk*detf*finx*2.0_DP*TMP
     ENDIF
     
-    US(I,J,K)=A1+A2+A3-A4-A5-A6+A7
+    US(I,J,K)=A1+A2+A3-A4-A5-A6-A7
 
   ENDDO
   ENDDO
@@ -134,8 +134,8 @@ REAL(DP) :: UP,UM,VV,VP,VM,WW,WP,WM,CM,CR,CC,DETF,CURVK,FINX,A1,A2,A3,A4,A5,A6,A
     finy = 0.5_DP*(NORMAL_Y(i,j,k)+NORMAL_Y(i,j+1,k))   
 
     IF(INTERFACE_METHOD.eq.1)THEN
-    	DETF=1.0
-    	FINY=(VOF(I,J+1,K)-VOF(I,J,K))/DX
+        DETF=1.0
+        FINY=(VOF(I,J+1,K)-VOF(I,J,K))/DX
     ENDIF
     
     B1=0.5_DP/DX*(UP*(3.0_DP*V_OLD(I,J,K)-4.0_DP*V_OLD(I-1,J,K)+V_OLD(I-2,J,K)) &
@@ -154,14 +154,14 @@ REAL(DP) :: UP,UM,VV,VP,VM,WW,WP,WM,CM,CR,CC,DETF,CURVK,FINX,A1,A2,A3,A4,A5,A6,A
     B6=1.0_DP/RE2Z*CC*(V_OLD(I,J,K+1)-2.0_DP*V_OLD(I,J,K)+V_OLD(I,J,K-1))
     
     if(ST_FORCE==0)THEN
-    	B7=0.0_dp
+        B7=0.0_dp
     ELSE IF(ST_FORCE==1)THEN
-    	B7=2.0/(CR*WE)*curvk*detf*finy
+        B7=2.0/(CR*WE)*curvk*detf*finy
     ELSE IF(ST_FORCE==2)THEN
-    	B7=2.0/(CR*WE)*curvk*detf*finy*2.0_DP*TMP
+        B7=2.0/(CR*WE)*curvk*detf*finy*2.0_DP*TMP
     ENDIF
 
-    VS(I,J,K)=B1+B2+B3-B4-B5-B6+B7
+    VS(I,J,K)=B1+B2+B3-B4-B5-B6-B7
 
   ENDDO
   ENDDO
@@ -216,8 +216,8 @@ SUBROUTINE VELC()
     finz=0.5_DP*(NORMAL_Z(i,j,k)+NORMAL_Z(i,j,k+1))
     
     IF(INTERFACE_METHOD.eq.1)THEN
-    	DETF=1.0
-    	FINZ=(VOF(I,J,K+1)-VOF(I,J,K))/DZ
+        DETF=1.0
+        FINZ=(VOF(I,J,K+1)-VOF(I,J,K))/DZ
     ENDIF
     
 
@@ -237,14 +237,14 @@ SUBROUTINE VELC()
     C6=1.0_DP/RE2Z*CC*(W_OLD(I,J,K+1)-2.0_DP*W_OLD(I,J,K)+W_OLD(I,J,K-1))
 
     if(ST_FORCE==0)THEN
-    	C7=0.0_dp
+        C7=0.0_dp
     ELSE IF(ST_FORCE==1)THEN
-    	C7=2.0_DP/(CR*WE)*curvk*detf*finz
+        C7=2.0_DP/(CR*WE)*curvk*detf*finz
     ELSE IF(ST_FORCE==2)THEN
-    	C7=2.0_DP/(CR*WE)*curvk*detf*finz*2.0_DP*TMP
+        C7=2.0_DP/(CR*WE)*curvk*detf*finz*2.0_DP*TMP
     ENDIF
     
-    WS(I,J,K)=C1+C2+C3-C4-C5-C6+C7
+    WS(I,J,K)=C1+C2+C3-C4-C5-C6-C7
     
     IF( G_FORCE==1 )WS(I,J,K)=WS(I,J,K)+1.0_DP/FR2
     

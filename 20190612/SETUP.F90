@@ -24,7 +24,7 @@ XL = XEND-XSTART
 YL = YEND-YSTART
 ZL = ZEND-ZSTART
 
-UNIT_GRID = 40
+UNIT_GRID = 15
 UNIT_GRID2= 20
 
 NODE_X = UNIT_GRID * (XEND-XSTART)
@@ -80,7 +80,7 @@ SURFACE_TENSION = 0.072_DP
  RATIO_RHO = 0.001
  RATIO_AMU = 0.01
  Re   = 67.27_DP
- Fr   = 1.0_dp	
+ Fr   = 1.0_dp  
  WE   = 16.0_DP
  
 ! Numerical Setup
@@ -169,13 +169,13 @@ DO I = 1, NODE_X
     YS = 0.5_DP*(Y(J-1)+Y(J)) + REAL(JJ,KIND=DP)*DY/REAL(UNIT_GRID2,KIND=DP) 
     ZS = 0.5_DP*(Z(K-1)+Z(K)) + REAL(KK,KIND=DP)*DZ/REAL(UNIT_GRID2,KIND=DP)
 
-	 if( sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-1.0)**2)-0.5 < 0.0 )then
-		  vof(i,j,k)=vof(i,j,k)
-	 else if( sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-2.5)**2)-0.5 < 0.0 )then
-		  vof(i,j,k)=vof(i,j,k)
-	 else
-  		vof(i,j,k)=vof(i,j,k)+1.0			    		
-	 end if 
+     if( sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-1.0)**2)-0.5 < 0.0 )then
+          vof(i,j,k)=vof(i,j,k)
+     else if( sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-2.5)**2)-0.5 < 0.0 )then
+          vof(i,j,k)=vof(i,j,k)
+     else
+        vof(i,j,k)=vof(i,j,k)+1.0                       
+     end if 
 
 
   END DO
@@ -196,7 +196,7 @@ DO I = 1, NODE_X
       PHI(I,J,K) = MIN( sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-1.0)**2)-0.5, sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-2.5)**2)-0.5 )
    end if
 
-   ! PHI(I,J,K) = -PHI(I,J,K)
+   PHI(I,J,K) = -PHI(I,J,K)
   
 END DO
 END DO

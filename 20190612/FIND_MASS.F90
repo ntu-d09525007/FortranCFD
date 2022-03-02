@@ -21,18 +21,18 @@ logical :: switch, finish
  
  !$OMP PARALLEL DO REDUCTION(+:MASS_LS,MASS_VOF,VOL_LS,VOL_VOF)
  DO K = 1, NODE_Z
- 	F(K) = -1
+    F(K) = -1
  DO J = 1, NODE_Y
  DO I = 1, NODE_X
  
- 	 VOL_LS = VOL_LS + HEAVY(I,J,K)
- 	 VOL_VOF = VOL_VOF + VOF(I,J,K)
-	 
-	 MASS_LS = MASS_LS + HEAVY(I,J,K)*RHO(I,J,K)
-	 MASS_VOF = MASS_VOF + VOF(I,J,K)*RHO(I,J,K)
+     VOL_LS = VOL_LS + HEAVY(I,J,K)
+     VOL_VOF = VOL_VOF + VOF(I,J,K)
+     
+     MASS_LS = MASS_LS + HEAVY(I,J,K)*RHO(I,J,K)
+     MASS_VOF = MASS_VOF + VOF(I,J,K)*RHO(I,J,K)
 
-	 IF( Delta(I,J,K) > EPS ) F(K) = 1
-	 
+     IF( Delta(I,J,K) > EPS ) F(K) = 1
+     
  END DO
  END DO
  END DO
@@ -40,7 +40,7 @@ logical :: switch, finish
 
  CNT=0
  DO K = 1, NODE_Z-1
- 	IF( F(K)*F(K+1) < 0 )CNT=CNT+1
+    IF( F(K)*F(K+1) < 0 )CNT=CNT+1
  ENDDO
  CNT=CNT/2
 
@@ -71,7 +71,7 @@ do num = 1, cnt
     do k = ks, ke
     do j = 1, NODE_Y
     do i = 1, NODE_X
-        IF( HEAVY(I,J,K)<1.0 )mass(num)=mass(num)+rho(I,J,K)*heavy(I,J,K)*dv
+        mass(num)=mass(num)+rho(I,J,K)*heavy(I,J,K)*dv
     enddo
     enddo
     enddo
@@ -83,40 +83,40 @@ enddo
 
  
  IF( REC_MASS==0 )THEN
- 	
- 	WRITE(MET,'(I3.3)')METHOD_CNT
- 	WRITE(GRI,'(I3.3)')GRID_CNT
+    
+    WRITE(MET,'(I3.3)')METHOD_CNT
+    WRITE(GRI,'(I3.3)')GRID_CNT
  
- 	IMASS_LS = MASS_LS
- 	IMASS_VOF = MASS_VOF
-	
-	IVOL_LS = VOL_LS
-	IVOL_VOF = VOL_VOF
+    IMASS_LS = MASS_LS
+    IMASS_VOF = MASS_VOF
+    
+    IVOL_LS = VOL_LS
+    IVOL_VOF = VOL_VOF
 
     B1_M = MASS(1)
     B2_M = MASS(2)
-	
-	CLOSE(11)
-	CLOSE(12)
-	
- 	!OPEN(UNIT=11,FILE='MASS LOSS_'//Met//'_'//GRI//'_.PLT')
- 	!OPEN(UNIT=11,FILE='MASS LOSS_'//MET//'.PLT')
- 	OPEN(UNIT=11,FILE='MASS LOSS.PLT')
- 	WRITE(11,*)'VARIABLES = "T" "LOSS OF LS(%)" "LOSS OF VOF(%)" '
-	
- 	!OPEN(UNIT=12,FILE='VOL LOSS_'//Met//'_'//GRI//'_.PLT')
- 	!OPEN(UNIT=12,FILE='VOL LOSS_'//MET//'.PLT')
- 	OPEN(UNIT=12,FILE='VOL LOSS.PLT')
- 	! WRITE(12,*)'VARIABLES = "T" "LOSS OF LS(%)" "LOSS OF VOF(%)" '
+    
+    CLOSE(11)
+    CLOSE(12)
+    
+    !OPEN(UNIT=11,FILE='MASS LOSS_'//Met//'_'//GRI//'_.PLT')
+    !OPEN(UNIT=11,FILE='MASS LOSS_'//MET//'.PLT')
+    OPEN(UNIT=11,FILE='MASS LOSS.PLT')
+    WRITE(11,*)'VARIABLES = "T" "LOSS OF LS(%)" "LOSS OF VOF(%)" '
+    
+    !OPEN(UNIT=12,FILE='VOL LOSS_'//Met//'_'//GRI//'_.PLT')
+    !OPEN(UNIT=12,FILE='VOL LOSS_'//MET//'.PLT')
+    OPEN(UNIT=12,FILE='VOL LOSS.PLT')
+    ! WRITE(12,*)'VARIABLES = "T" "LOSS OF LS(%)" "LOSS OF VOF(%)" '
 
     OPEN(UNIT=13,FILE='BUBBLE MASS.PLT')
     WRITE(13,*)'VARIABLES ="T" "B1" "B2" '
-	
- 	REC_MASS = 1
+    
+    REC_MASS = 1
 
-	EM_LS_A  = 0.0_DP
-	EM_VOF_A = 0.0_DP
-	
+    EM_LS_A  = 0.0_DP
+    EM_VOF_A = 0.0_DP
+    
  END IF
  
   WRITE(11,*)TIME,(1.0-MASS_LS/IMASS_LS)*100!,(1.0-MASS_VOF/IMASS_VOF)*100
