@@ -24,7 +24,7 @@ XL = XEND-XSTART
 YL = YEND-YSTART
 ZL = ZEND-ZSTART
 
-UNIT_GRID = 20
+UNIT_GRID = 35
 UNIT_GRID2= 20
 
 NODE_X = UNIT_GRID * (XEND-XSTART)
@@ -46,7 +46,7 @@ REC_MASS = 0
 
 ! Tolerance of convervence
 
-TOL_P = 1.0E-6_DP
+TOL_P = 1.0E-7_DP
 TOL_M = 1.0E-5_DP
 
 ! Enviornment Parameters
