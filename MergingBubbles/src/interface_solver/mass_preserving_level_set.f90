@@ -25,8 +25,9 @@ do iter = 1, 3
                                                 & p%of(id)%loc%normals%z%now(i,j,k)**2.0_8 )
             
             plam =  p%of(id)%loc%delta%now(i,j,k)**2.0_8 * p%of(id)%loc%grad%now(i,j,k) 
-            plam = plam * ( 2.0_8*(1.0_8-p%glb%rho_12)*p%of(id)%loc%heavy%now(i,j,k) + p%glb%rho_12 )*p%glb%dx*p%glb%dy*p%glb%dz
-            
+            !plam = plam * ( 2.0_8*(1.0_8-p%glb%rho_12)*p%of(id)%loc%heavy%now(i,j,k) + p%glb%rho_12 )*p%glb%dx*p%glb%dy*p%glb%dz
+            plam = plam * ( 2.0_8*(p%glb%rho_12-1.0)*p%of(id)%loc%heavy%now(i,j,k) + 1.0 )*p%glb%dx*p%glb%dy*p%glb%dz
+
             lam = lam + plam
             
         end do

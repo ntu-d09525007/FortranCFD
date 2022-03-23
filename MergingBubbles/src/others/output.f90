@@ -16,7 +16,7 @@ logical :: switch, finish
             if( p%of(id)%loc%ks<=k .and. p%of(id)%loc%ke>=k)then
                 do j = p%of(id)%loc%js, p%of(id)%loc%je
                 do i = p%of(id)%loc%is, p%of(id)%Loc%ie
-                    if( p%of(id)%loc%phi%now(i,j,k) > 0.0d0 )then
+                    if( p%of(id)%loc%phi%now(i,j,k) > 1.0d-12 )then
                         f(k) = 1
                     endif
                 enddo
@@ -30,8 +30,6 @@ logical :: switch, finish
         if( f(k)*f(k+1) < 0 ) cnt = cnt + 1
     enddo
     cnt=cnt/2
-
-    write(*,*)"Num of bubbles:",cnt
     
     if(cnt<2)return
 
@@ -82,7 +80,15 @@ logical :: switch, finish
 
     enddo
 
-    write(p%fil%bubble_mass,*)p%glb%time,mass(:)
+    if(p%glb%time<p%glb%dt)then
+        p%glb%b1 = mass(1)
+        p%glb%b2 = mass(2)
+
+        write(*,*)p%glb%b1, p%glb%b2
+    else
+        write(*,*)cnt,(mass(1)/p%glb%b1-1.0)*100,(mass(2)/p%glb%b2-1.0)*100
+        write(p%fil%bubble_mass,*)p%glb%time,(mass(1)/p%glb%b1-1.0)*100,(mass(2)/p%glb%b2-1.0)*100
+    endif
 
 end subroutine
 

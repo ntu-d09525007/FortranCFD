@@ -60,8 +60,8 @@ do id = 0, p%glb%threads-1
         heavy = p%of(id)%loc%vof%now(i,j,k)
         if( p%glb%method .ne. 3)heavy = p%of(id)%loc%heavy%now(i,j,k)
         
-        p%of(id)%loc%rho%now(i,j,k) = heavy + p%glb%rho_12 * (1.0_8 - heavy )
-        p%of(id)%loc%mu%now(i,j,k)  = heavy + p%glb%mu_12  * (1.0_8 - heavy )
+        ! p%of(id)%loc%rho%now(i,j,k) = heavy + p%glb%rho_12 * (1.0_8 - heavy )
+        ! p%of(id)%loc%mu%now(i,j,k)  = heavy + p%glb%mu_12  * (1.0_8 - heavy )
         
         p%of(id)%loc%rho%now(i,j,k) = p%glb%rho_12 * heavy +  (1.0_8 - heavy )
         p%of(id)%loc%mu%now(i,j,k)  = p%glb%rho_12 * heavy +  (1.0_8 - heavy )

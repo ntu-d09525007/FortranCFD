@@ -17,32 +17,25 @@ integer :: id,i,j,k
 
 relax_iter = 3
 
-call ns_ab_adv_source
-call ns_ab_diff_source
-call ns_ab_predictor 
-
-! iter=0
 p%glb%piter=0
-    
-! do 
-    
-!     iter=iter+1 
-    
-!     call ns_linearize
-!     call ns_ab_diff_source
-!     call ns_ab_predictor   
 
-!     if(iter>5)exit
-        
-! end do
+do iter = 1, 5
+
+    call ns_linearize
+    call ns_ab_adv_source
+    call ns_ab_diff_source
+    call ns_ab_predictor 
+
+    if( p%glb%iter<relax_iter )then
+        call ppe_sor_solver(1.0d-5)
+    else
+        call ppe_mg_solver(0)
+    endif
+
+enddo
 
 call ns_check_convergence_vel
 
-if( p%glb%iter<relax_iter )then
-    call ppe_sor_solver(1.0d-5)
-else
-    call ppe_mg_solver(0)
-endif
     
 end subroutine
 
