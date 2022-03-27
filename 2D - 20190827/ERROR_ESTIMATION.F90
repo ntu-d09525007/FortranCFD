@@ -32,21 +32,21 @@ REAL(DP) :: TMPA, TMPB, TMPC
  DO J = 1, NODE_Y
  DO I = 1, NODE_X
  
-   ! TMPA = MAX(VOF(I,J)-0.5_DP,0.0_DP)
-   ! TMPB = MAX(VOF_I(I,J)-0.5_DP,0.0_DP)
+   TMPA = max(HEAV(phi(I,J),TMPC),0.5)
+   TMPB = max(HEAV(PHI_I(I,J),TMPC),0.5)
    
    !IF(VOF(I,J)>=0.5)TMPA=1.0_DP
    !IF(VOF_I(I,J)>=0.5)TMPB=1.0_DP
    
    ! EI_VOF = EI_VOF + ABS(TMPA-TMPB)
  
+   TMPA = MAX(0.0, HEAV(PHI(I,J),TMPC)-0.5)+0.5
+   TMPB = MAX(0.0, HEAV(PHI_I(I,J),TMPC)-0.5)+0.5
+   
    TMPA = HEAV(PHI(I,J),TMPC)
    TMPB = HEAV(PHI_I(I,J),TMPC)
 
-   ! IF( TMPA < 0.5 )TMPA=0.0
-   ! IF( TMPB < 0.5 )TMPB=0.0
-   
-   EI_LS = EI_LS + ABS(TMPA-TMPB)/(0.15*2*ACOS(-1.0D0))
+   EI_LS = EI_LS + ABS(TMPA-TMPB)!/(0.15*2*ACOS(-1.0D0))
    
  END DO
  END DO
