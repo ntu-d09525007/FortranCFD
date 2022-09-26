@@ -60,7 +60,6 @@ END IF
     
     IF( BTN==0 .AND. (RED_TIME > 1.5*MAX(XL,YL,ZL)) )EXIT
     IF( BTN/=0 .and. BTN/=5 .AND. (RED_TIME > 2.0*INTERFACE_WIDTH) )EXIT
-    IF( BTN==5 .and. RED_TIME > 4.0*INTERFACE_WIDTH) exit
     
   END DO
 

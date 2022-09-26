@@ -24,7 +24,7 @@ real(8) :: heav1, heav2, tmp
  DO K = 1, NODE_Z
  DO J = 1, NODE_Y
  DO I = 1, NODE_X
-   phi(i,j,k) = HEAV(PHI1(i,j,k), tmp) + HEAV(PHI2(i,j,k), tmp) - 1.0
+   phi(i,j,k) = max(phi1(i,j,k), phi2(i,j,k))
  enddo
  ENDDO
  enddo
@@ -32,7 +32,7 @@ real(8) :: heav1, heav2, tmp
 
 CALL BC_LS()
 
-CALL LS_REDISTANCE(PHI,5)
+CALL LS_REDISTANCE(PHI,1)
 
 end subroutine
 

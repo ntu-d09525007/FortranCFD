@@ -190,7 +190,8 @@ DO I = 1, NODE_X
 
    PHI1(i,j,k) = -sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-1.0)**2)+0.5
    phi2(i,j,k) = -sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-2.5)**2)+0.5
-   phi(i,j,k) = HEAV(PHI1(i,j,k), tmp) + HEAV(PHI2(i,j,k), tmp)  -1.0
+
+   phi(i,j,k) = max(phi1(i,j,k), phi2(i,j,k))
   
 END DO
 END DO
@@ -203,7 +204,7 @@ END DO
  CALL BC3D(V)
  CALL BC3D(W)
  
- CALL LS_REDISTANCE(PHI,0)
+ CALL LS_REDISTANCE(PHI,1)
  
  PLOT_INT=0
  TIME=ITER*DT
