@@ -2,13 +2,39 @@ subroutine SOLVE_LS()
 USE PRECISION
 USE PROBLEM_DEF
 USE LS_DATA
+implicit none
+integer :: i,j,k
+real(8) :: heav1, heav2, tmp
 
  IF(INTERFACE_METHOD==1 .OR. INTERFACE_METHOD==3)RETURN
  
+ PHI = PHI1
  CALL LS_RK3_SOLVER
-! CALL MPLS
  CALL LS_MAINTAIN
  CALL MPLS
+ PHI1 = PHI
+
+ PHI = PHI2
+ CALL LS_RK3_SOLVER
+ CALL LS_MAINTAIN
+ CALL MPLS
+ PHI2 = PHI
+
+ !$omp parallel do
+ DO K = 1, NODE_Z
+ DO J = 1, NODE_Y
+ DO I = 1, NODE_X
+    heav1 = HEAV(PHI1(i,j,k), tmp)
+    heav2 = HEAV(PHI2(i,j,k), tmp)
+    phi(i,j,k) = 0.5*(heav1+heav2)
+ enddo
+ ENDDO
+ enddo
+ !$omp end parallel do  
+
+CALL BC_LS()
+
+CALL LS_REDISTANCE(PHI,5)
 
 end subroutine
 

@@ -187,16 +187,9 @@ DO I = 1, NODE_X
   XS = X(I)
   YS = Y(J)
   ZS = Z(K)
-  
-   if( sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-1.0)**2)-0.5 < 0.0 )then
-      PHI(I,J,K) = sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-1.0)**2)-0.5
-   else if( sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-2.5)**2)-0.5 < 0.0 )then
-      PHI(I,J,K) = sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-2.5)**2)-0.5
-   else
-      PHI(I,J,K) = MIN( sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-1.0)**2)-0.5, sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-2.5)**2)-0.5 )
-   end if
 
-   PHI(I,J,K) = -PHI(I,J,K)
+   PHI1(i,j,k) = -sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-1.0)**2)+0.5
+   phi2(i,j,k) = -sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-2.5)**2)+0.5
   
 END DO
 END DO
@@ -209,7 +202,7 @@ END DO
  CALL BC3D(V)
  CALL BC3D(W)
  
- CALL LS_REDISTANCE(PHI,0)
+ ! CALL LS_REDISTANCE(PHI,0)
  
  PLOT_INT=0
  TIME=ITER*DT
