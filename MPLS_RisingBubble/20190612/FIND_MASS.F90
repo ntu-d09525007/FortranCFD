@@ -84,6 +84,39 @@ enddo
 
  
  IF( REC_MASS==0 )THEN
+
+! #############################################################
+
+ PHI_TMP = PHI
+
+ PHI = PHI1
+ CALL AMURHO()
+ B1_iM = 0.0
+ !$OMP PARALLEL DO REDUCTION(+:B1_iM)
+ DO K = 1, NODE_Z
+ DO J = 1, NODE_Y
+ DO I = 1, NODE_X
+     B1_iM = B1_iM + HEAVY(I,J,K)*RHO(I,J,K)
+ END DO
+ END DO
+ END DO
+ !$OMP END PARALLEL DO
+
+ PHI = PHI2
+ CALL AMURHO()
+ B2_iM = 0.0
+ !$OMP PARALLEL DO REDUCTION(+:B2_iM)
+ DO K = 1, NODE_Z
+ DO J = 1, NODE_Y
+ DO I = 1, NODE_X
+     B2_iM = B2_iM + HEAVY(I,J,K)*RHO(I,J,K)
+ END DO
+ END DO
+ END DO
+ !$OMP END PARALLEL DO
+
+ PHI = PHI_TMP
+ ! #############################################################
     
     WRITE(MET,'(I3.3)')METHOD_CNT
     WRITE(GRI,'(I3.3)')GRID_CNT

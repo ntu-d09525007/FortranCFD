@@ -256,7 +256,7 @@ end if
 
 end subroutine
 
-SUBROUTINE MPLS()
+SUBROUTINE MPLS(im)
 USE PRECISION
 USE PROBLEM_DEF
 USE LS_DATA
@@ -265,6 +265,8 @@ USE DUMMY_DATA, ONLY : A
 IMPLICIT NONE
 INTEGER :: I,J,K,IT
 REAL(DP) :: FS,  TMP
+real(dp), optional :: im
+
 
 DO IT = 1, 3
 
@@ -300,7 +302,11 @@ DO IT = 1, 3
  END DO
  !$OMP END PARALLEL DO
 
- FS=(IMASS_LS-MASS_LS)/(DT*FS)
+if(present(im))then
+    FS=(im-MASS_LS)/(DT*FS)
+else
+    FS=(IMASS_LS-MASS_LS)/(DT*FS)
+endif
 
  !$OMP PARALLEL DO
  DO K = 1, NODE_Z
