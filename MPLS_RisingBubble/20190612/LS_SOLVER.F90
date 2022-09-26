@@ -266,7 +266,7 @@ REAL(DP) :: FS,  TMP
 real(dp), optional :: im
 
 
-DO IT = 1, 3
+DO IT = 1, 5
 
  CALL AMURHO()
  CALL LS_CCD(PHI)
@@ -279,7 +279,7 @@ DO IT = 1, 3
  DO K = 1, NODE_Z
  DO J = 1, NODE_Y
  DO I = 1, NODE_X
-   A(I,J,K) = CURV(I,J,K)
+   A(I,J,K) = 1.0
    GRAD(I,J,K) = DSQRT(NORMAL_X(I,J,K)**2+NORMAL_Y(I,J,K)**2+NORMAL_Z(I,J,K)**2)
  ENDDO
  ENDDO
