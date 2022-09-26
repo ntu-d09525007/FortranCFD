@@ -24,9 +24,7 @@ real(8) :: heav1, heav2, tmp
  DO K = 1, NODE_Z
  DO J = 1, NODE_Y
  DO I = 1, NODE_X
-    heav1 = HEAV(PHI1(i,j,k), tmp)
-    heav2 = HEAV(PHI2(i,j,k), tmp)
-    phi(i,j,k) = 0.5*(heav1+heav2)
+   phi(i,j,k) = HEAV(PHI1(i,j,k), tmp) + HEAV(PHI2(i,j,k), tmp) - 1.0
  enddo
  ENDDO
  enddo

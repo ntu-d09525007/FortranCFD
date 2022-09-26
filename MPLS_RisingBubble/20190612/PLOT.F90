@@ -33,7 +33,7 @@ CHARACTER(3) :: MET,GRI,NUM
 SELECT CASE(IBM_SOLVER)
  CASE(0)
     !WRITE(99,*) 'VARIABLES =  "X" "Y" "Z" "u" "v" "w" "p" "phi" "curvature" "Q-cri" "delta-cri" '
-    WRITE(99,*) 'VARIABLES =  "X" "Y" "Z" "phi"'
+    WRITE(99,*) 'VARIABLES =  "X" "Y" "Z" "phi" "phi1" "phi2"'
  CASE(1)
     WRITE(99,*) 'VARIABLES =  "X" "Y" "Z" "u" "v" "w" "phi" "vof" "SOLID"'
 END SELECT
@@ -48,7 +48,7 @@ SELECT CASE(IBM_SOLVER)
   DO J = 0, NODE_Y+1
   DO I = 0, NODE_X+1
     !WRITE(99,'(15E14.4)')X(I),Y(J),Z(K),U(I,J,K),V(I,J,K),W(I,J,K),P(I,J,K),PHI(I,J,K),CURV(I,J,K),F(I,J,K),G(I,J,K)
-    WRITE(99,'(15E14.4)')X(i),Y(J),Z(k),phi(I,J,K)
+    WRITE(99,'(15E14.4)')X(i),Y(J),Z(k),phi(I,J,K), phi1(i,j,k), phi2(i,j,k)
   END DO
   END DO
   END DO

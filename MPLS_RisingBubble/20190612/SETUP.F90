@@ -9,7 +9,7 @@ IMPLICIT NONE
 INTEGER :: I,J,K,II,JJ,KK
 REAL(DP) :: XS,YS,ZS
 REAL(DP) :: IMF, B, DEL, DELX
-REAL(DP) :: OH, height
+REAL(DP) :: OH, height, tmp
 
  Xstart =  0.0_DP
  Xend   =  4.0_DP
@@ -190,6 +190,7 @@ DO I = 1, NODE_X
 
    PHI1(i,j,k) = -sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-1.0)**2)+0.5
    phi2(i,j,k) = -sqrt((xs-2.0)**2+(ys-2.0)**2+(zs-2.5)**2)+0.5
+   phi(i,j,k) = HEAV(PHI1(i,j,k), tmp) + HEAV(PHI2(i,j,k), tmp)  -1.0
   
 END DO
 END DO
@@ -202,7 +203,7 @@ END DO
  CALL BC3D(V)
  CALL BC3D(W)
  
- ! CALL LS_REDISTANCE(PHI,0)
+ CALL LS_REDISTANCE(PHI,0)
  
  PLOT_INT=0
  TIME=ITER*DT
